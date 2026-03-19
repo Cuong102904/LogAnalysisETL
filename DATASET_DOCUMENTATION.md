@@ -461,3 +461,32 @@ Ngoài thống kê cơ bản, bộ dữ liệu 12.7 triệu bản ghi này có t
 | **Learning Flow** | **Batch** | Nghiên cứu sư phạm |
 
 ---
+
+## 🚀 10. So sánh Apache Spark và Apache Flink (Comparison Framework)
+
+Dưới đây là bảng so sánh chi tiết giữa hai khung công tác (framework) xử lý dữ liệu lớn phổ biến nhất hiện nay, giúp đưa ra quyết định lựa chọn dựa trên kiến trúc và yêu cầu cụ thể của dự án.
+
+### 🔄 So sánh Đặc tính Kỹ thuật
+
+| Đặc tính | Apache Spark | Apache Flink |
+| :--- | :--- | :--- |
+| **Mô hình thực thi (Execution Model)** | Sử dụng cơ chế **Micro-batching** để xử lý luồng, tập hợp các tính toán thành các stage rõ ràng trước khi thực thi. Điều này tạo ra độ trễ nhất định nhưng dễ kiểm soát lỗi. | **Xử lý luồng đích thực (Native Streaming)** và thực thi dưới dạng Pipelined. Dữ liệu được đẩy liên tục qua các toán tử mà không cần rào cản stage, giúp tối ưu thời gian chạy nhưng dễ bị nhiễu I/O (I/O interference) giữa các tiến trình đọc/ghi. |
+| **Quản lý bộ nhớ & Serialization** | Phân bổ bộ nhớ chủ yếu qua JVM Heap (dù đang cải thiện với dự án Tungsten), đòi hỏi cấu hình thủ công các tỷ lệ `spark.storage.fraction` và `spark.shuffle.fraction`. Quá trình phân tích tuần tự hóa (serialization) phụ thuộc vào Java hoặc Kryo. Dễ gặp lỗi sập hệ thống hoặc quá tải Garbage Collection (GC) nếu cấu hình sai. | Sử dụng cơ chế **bộ nhớ lai sinh động (On-heap & Off-heap Memory Management)**, cấp phát một vùng nhớ riêng (Task Slots) để sắp xếp và băm dữ liệu nhằm tránh rủi ro của JVM. Chức năng TypeInformation tự động phân tích các kiểu dữ liệu và tối ưu hóa tuần tự hóa trực tiếp trên dữ liệu nhị phân mà không cần giải mã (deserialization). |
+| **Cơ chế vòng lặp (Iteration Handling)** | Xử lý qua Loop Unrolling, mỗi vòng lặp lên lịch cho một nhóm task mới, yêu cầu tính toán lại và phụ thuộc rất nhiều vào cơ chế lưu trữ (caching) của RDD. | Hỗ trợ **vòng lặp khép kín (Native Closed-loop Iterations)**, bao gồm Bulk Iterations và Delta Iterations. Các toán tử duy trì trạng thái xuyên suốt các vòng lặp, đặc biệt Delta Iteration chỉ tính toán lại trên tập dữ liệu bị thay đổi, tiết kiệm tài nguyên rõ rệt. |
+| **Tối ưu hóa và Cấu hình (Optimization & Tuning)** | Yêu cầu người dùng can thiệp thủ công vào việc tinh chỉnh hệ thống (số lượng partition, persistence level, edge partitions) để đạt hiệu năng tối ưu. | Tích hợp sẵn **Cost-based Optimizer** tự động sắp xếp lại chuỗi thực thi (execution plan), ẩn đi sự phức tạp của việc phân mảnh dữ liệu (partitioning) đối với người dùng. |
+
+---
+
+### 💡 Hướng dẫn Lựa chọn Framework
+
+#### A. Nên sử dụng Apache Flink cho:
+*   **Xử lý Streaming độ trễ cực thấp**: Nhờ thiết kế native streaming và pipelined execution.
+*   **Các tác vụ Batch cơ bản (Aggregation, Sorting)**: Flink đánh bại Spark về tốc độ (nhanh hơn tới 1.5 lần) trong các tác vụ như Word Count hoặc Tera Sort. Khả năng quản lý bộ nhớ tùy chỉnh giúp Flink sort dữ liệu trong bộ đệm an toàn hơn.
+*   **Machine Learning với dữ liệu ít chiều (Fewer Features)**: Khi huấn luyện mô hình (như Linear Regression) với số lượng biến (features) nhỏ (ví dụ: 12 features), throughput của Flink cao hơn Spark tới 31%.
+*   **Xử lý đồ thị vừa và nhỏ (Small/Medium Graphs)**: Thuật toán Connected Components hay PageRank trên tập đồ thị nhỏ đạt hiệu năng tuyệt vời nhờ tận dụng sức mạnh của Delta Iterations và Bulk Iterations.
+
+#### B. Nên sử dụng Apache Spark cho:
+*   **Machine Learning với dữ liệu đa chiều (High-dimensional Features)**: Khi dữ liệu trở nên phức tạp với nhiều biến (ví dụ: tăng lên 24 hoặc 36 features), hiệu năng của Flink giảm cực kỳ mạnh. Ngược lại, Spark chịu tải tốt hơn nhiều, duy trì throughput cao và đánh bại Flink. Phù hợp cho việc huấn luyện AI từ bộ logs đa dạng format.
+*   **Luồng dữ liệu phức tạp nhiều lớp (Multi-layer pipelines)**: Đối với các tác vụ lọc (Filter/Grep) qua nhiều bước liên tiếp, Spark cho thời gian xử lý nhanh hơn 20% nhờ quyền kiểm soát hoàn toàn việc lưu trữ trung gian (persistence) của các RDD lên đĩa hoặc bộ nhớ. (Flink hiện đang tối ưu kém ở các lớp filter liên tiếp).
+*   **Phân tích đồ thị khổng lồ (Large Graph Analytics)**: Với đồ thị lên tới hàng tỷ đỉnh/cạnh, toán tử CoGroup của Flink dễ bị sập (crash) hệ thống do cố gắng đưa toàn bộ tập giải pháp vào bộ nhớ. Spark cực kỳ ổn định trong trường hợp này (nhanh hơn 1.7 lần) vì có chiến lược tràn đĩa (spill-to-disk) an toàn cùng việc kiểm soát chặt chẽ các phân vùng (edge partitions).
+*   **Khi hệ thống yêu cầu kiểm soát tài nguyên thủ công**: Khi bạn cần ép hệ thống chạy theo một chiến lược I/O và RAM cụ thể dựa vào bản chất của dữ liệu, Spark cung cấp bộ API cấu hình sâu hơn.
