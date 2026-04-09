@@ -1,3 +1,11 @@
+Metadata-Version: 2.4
+Name: kafka-producer-lab
+Version: 0.1.0
+Summary: Local Kafka lab: Python producer with confluent-kafka
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: confluent-kafka>=2.3.0
+
 # Kafka producer lab (real exam-day logs)
 
 Project này ingest trực tiếp file log JSONL thật từ `BK_activity_logs_unzipped/exam_days/...` vào Kafka local (3 broker), phân loại `exam/learning/noise` và route vào nhiều topic.

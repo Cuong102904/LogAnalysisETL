@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+src/event_classifier.py
+src/producer.py
+src/kafka_producer_lab.egg-info/PKG-INFO
+src/kafka_producer_lab.egg-info/SOURCES.txt
+src/kafka_producer_lab.egg-info/dependency_links.txt
+src/kafka_producer_lab.egg-info/requires.txt
+src/kafka_producer_lab.egg-info/top_level.txt

@@ -1,27 +1,44 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BOOTSTRAP_SERVER="${BOOTSTRAP_SERVER:-broker1:29092}"
+BOOTSTRAP_SERVER="${1:-broker1:29092}"
 
-topics=(
-  "lsp.raw.logs"
-  "lsp.canonical.events"
-  "lsp.dlq"
-)
+create_topic() {
+  local topic="$1"
+  local partitions="$2"
+  local retention_ms="$3"
 
-for topic in "${topics[@]}"; do
-  echo "Creating topic: ${topic}"
-  kafka-topics --bootstrap-server "${BOOTSTRAP_SERVER}" \
-    --create --if-not-exists \
+  docker compose exec broker1 kafka-topics \
+    --create \
+    --if-not-exists \
     --topic "${topic}" \
-    --partitions 6 \
+    --partitions "${partitions}" \
     --replication-factor 3 \
-    --config min.insync.replicas=2 \
-    --config retention.ms=$((24 * 60 * 60 * 1000))
-done
+    --bootstrap-server "${BOOTSTRAP_SERVER}"
 
-for topic in "${topics[@]}"; do
-  echo "Describe topic: ${topic}"
-  kafka-topics --bootstrap-server "${BOOTSTRAP_SERVER}" --describe --topic "${topic}"
-done
+  docker compose exec broker1 kafka-configs \
+    --bootstrap-server "${BOOTSTRAP_SERVER}" \
+    --entity-type topics \
+    --entity-name "${topic}" \
+    --alter \
+    --add-config "cleanup.policy=delete,retention.ms=${retention_ms},min.insync.replicas=2"
+}
 
+create_topic "lms.raw.events" 12 1209600000
+create_topic "lms.exam.events" 12 7776000000
+create_topic "lms.learning.events" 12 2592000000
+create_topic "lms.noise.events" 6 259200000
+create_topic "lms.dlq.events" 6 1209600000
+
+for topic in \
+  "lms.raw.events" \
+  "lms.exam.events" \
+  "lms.learning.events" \
+  "lms.noise.events" \
+  "lms.dlq.events"
+do
+  docker compose exec broker1 kafka-topics \
+    --describe \
+    --topic "${topic}" \
+    --bootstrap-server "${BOOTSTRAP_SERVER}"
+done
