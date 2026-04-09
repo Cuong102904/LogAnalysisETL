@@ -1,0 +1,242 @@
+name: log-streaming-platform
+
+services:
+  broker1:
+    image: confluentinc/cp-kafka:7.6.1
+    hostname: broker1
+    container_name: lsp-broker1
+    ports:
+      - "9092:9092"
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker1:9101,2@broker2:9101,3@broker3:9101
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9101
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker1:29092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - broker1-data:/var/lib/kafka/data
+    mem_limit: 900m
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server broker1:29092 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  broker2:
+    image: confluentinc/cp-kafka:7.6.1
+    hostname: broker2
+    container_name: lsp-broker2
+    ports:
+      - "9093:9093"
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_NODE_ID: 2
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker1:9101,2@broker2:9101,3@broker3:9101
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9093,CONTROLLER://0.0.0.0:9101
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker2:29092,EXTERNAL://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - broker2-data:/var/lib/kafka/data
+    mem_limit: 700m
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server broker2:29092 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  broker3:
+    image: confluentinc/cp-kafka:7.6.1
+    hostname: broker3
+    container_name: lsp-broker3
+    ports:
+      - "9094:9094"
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_NODE_ID: 3
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker1:9101,2@broker2:9101,3@broker3:9101
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9094,CONTROLLER://0.0.0.0:9101
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker3:29092,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - broker3-data:/var/lib/kafka/data
+    mem_limit: 700m
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server broker3:29092 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  kafka-init:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: lsp-kafka-init
+    depends_on:
+      broker1:
+        condition: service_healthy
+      broker2:
+        condition: service_healthy
+      broker3:
+        condition: service_healthy
+    environment:
+      BOOTSTRAP_SERVER: broker1:29092
+    volumes:
+      - ../kafka/scripts:/scripts:ro
+    entrypoint: ["/bin/bash", "-lc"]
+    command: "/scripts/create_topics.sh"
+    mem_limit: 250m
+
+  minio:
+    image: minio/minio:RELEASE.2024-12-18T05-14-37Z
+    container_name: lsp-minio
+    command: server --console-address ":9001" /data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
+      MINIO_REGION_NAME: ${MINIO_REGION:-us-east-1}
+    volumes:
+      - minio-data:/data
+    mem_limit: 700m
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9000/minio/health/ready >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  minio-init:
+    image: minio/mc:RELEASE.2024-11-17T19-35-30Z
+    container_name: lsp-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
+      MINIO_BUCKET_BRONZE: ${MINIO_BUCKET_BRONZE:-bronze}
+      MINIO_BUCKET_SILVER: ${MINIO_BUCKET_SILVER:-silver}
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}" &&
+      mc mb --ignore-existing "local/$${MINIO_BUCKET_BRONZE}" &&
+      mc mb --ignore-existing "local/$${MINIO_BUCKET_SILVER}" &&
+      mc anonymous set download "local/$${MINIO_BUCKET_BRONZE}" || true
+    mem_limit: 200m
+
+  spark-master:
+    image: bitnami/spark:3.5.1
+    container_name: lsp-spark-master
+    environment:
+      SPARK_MODE: master
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    volumes:
+      - ../spark/conf:/opt/bitnami/spark/conf:ro
+    mem_limit: 900m
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  spark-worker:
+    image: bitnami/spark:3.5.1
+    container_name: lsp-spark-worker
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 1g
+      SPARK_WORKER_CORES: 1
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
+    ports:
+      - "8081:8081"
+    volumes:
+      - ../spark/conf:/opt/bitnami/spark/conf:ro
+    mem_limit: 1000m
+
+  trino:
+    image: trinodb/trino:455
+    container_name: lsp-trino
+    ports:
+      - "8088:8080"
+    volumes:
+      - ../trino/etc:/etc/trino:ro
+    depends_on:
+      minio:
+        condition: service_healthy
+    mem_limit: 900m
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/v1/info >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  airflow:
+    image: apache/airflow:2.10.4
+    container_name: lsp-airflow
+    user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR:-LocalExecutor}
+      AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW__CORE__LOAD_EXAMPLES:-False}
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: ${AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:-True}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////opt/airflow/airflow.db
+    volumes:
+      - ../airflow/dags:/opt/airflow/dags
+      - airflow-data:/opt/airflow
+    ports:
+      - "8089:8080"
+    depends_on:
+      broker1:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    command: >
+      bash -lc "
+      airflow db migrate &&
+      airflow users create --username admin --firstname admin --lastname admin --role Admin --email admin@example.com --password admin || true &&
+      airflow scheduler & airflow webserver
+      "
+    mem_limit: 1200m
+
+volumes:
+  broker1-data:
+  broker2-data:
+  broker3-data:
+  minio-data:
+  airflow-data:
+
