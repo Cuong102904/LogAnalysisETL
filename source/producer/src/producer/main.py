@@ -11,7 +11,6 @@ from producer.kafka_client import (
     event_hash,
     ingest_ts,
     make_producer,
-    parse_event_field,
     produce_json,
 )
 from producer.reader import LogEvent, load_and_sort_events
@@ -29,31 +28,13 @@ def parse_args() -> argparse.Namespace:
         required=True,
         help="Root directory containing tracking.log-* files (recursive).",
     )
-    p.add_argument("--raw-topic", default="lsp.raw.logs")
-    p.add_argument("--canonical-topic", default="lsp.canonical.events")
-    p.add_argument("--dlq-topic", default="lsp.dlq")
+    p.add_argument("--raw-topic", default="lms.raw.events")
+    p.add_argument("--dlq-topic", default="lms.dlq.events")
     p.add_argument("--speed", type=float, default=60.0, help="Replay speed factor (60 = 1 min log time per 1 sec).")
     p.add_argument("--max-events", type=int, default=0, help="Stop after N events (0 = all loaded).")
     p.add_argument("--key-mode", choices=("course_user", "session"), default="course_user")
     p.add_argument("--no-sleep", action="store_true", help="Disable replay delay; send as fast as possible.")
     return p.parse_args()
-
-
-def canonicalize(record: dict[str, Any]) -> dict[str, Any]:
-    context = record.get("context") if isinstance(record.get("context"), dict) else {}
-    return {
-        "event_source": record.get("event_source"),
-        "event_type": record.get("event_type"),
-        "name": record.get("name"),
-        "time": record.get("time"),
-        "username": record.get("username"),
-        "session": record.get("session"),
-        "course_id": context.get("course_id"),
-        "org_id": context.get("org_id"),
-        "user_id": context.get("user_id"),
-        "path": context.get("path"),
-        "event": parse_event_field(record),
-    }
 
 
 def replay_delay(prev_ts: datetime, cur_ts: datetime, speed: float) -> float:
@@ -108,16 +89,6 @@ def main() -> int:
         }
         key = build_partition_key(ev.record, args.key_mode)
         produce_json(producer, args.raw_topic, key=key, value=raw)
-
-        canon = canonicalize(ev.record)
-        canon_envelope = {
-            "ingest_ts": ingest_ts(),
-            "event_hash": event_hash(ev.raw_line),
-            "source_path": str(ev.source_path),
-            "line_no": ev.line_no,
-            "event": canon,
-        }
-        produce_json(producer, args.canonical_topic, key=key, value=canon_envelope)
 
         producer.poll(0)
 

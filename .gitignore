@@ -3,3 +3,29 @@ BK_activity_logs/*
 unique_analysis/*
 
 Resource/*
+
+# Python / packaging artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Kafka / Spark / Airflow / MinIO / Trino runtime artifacts
+**/checkpoints/
+**/spark-warehouse/
+**/metastore_db/
+**/derby.log
+**/airflow.db
+**/airflow-webserver.pid
+**/logs/
+**/.ipynb_checkpoints/
+
+# Local env/config files
+*.env
+.env
+.DS_Store

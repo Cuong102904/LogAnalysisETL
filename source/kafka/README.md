@@ -1,7 +1,7 @@
 # Kafka infra (KRaft)
 
 Thư mục này chỉ chứa hạ tầng Kafka local (KRaft 3 brokers) và script tạo topics.
-Logic producer được tách riêng sang `source/producer`.
+Logic producer raw nằm ở `source/producer`, còn clean/routing nằm ở Spark job riêng.
 
 ## Cấu trúc thư mục
 
@@ -55,7 +55,7 @@ Retention mặc định đã set trong script:
 ## 3) Chạy producer ingest từ file log thật
 
 ```bash
-cd source/producer
+cd /home/cuong/Desktop/DATN
 uv sync
 uv run python -m producer.main \
   --data-dir /home/cuong/Desktop/DATN/BK_activity_logs_unzipped \
@@ -70,7 +70,23 @@ uv run python -m producer.main \
   --max-events 500
 ```
 
-## 4) Kiểm tra message ở partition nào
+Producer hiện tại chỉ đẩy:
+- `lms.raw.events` (toàn bộ raw record)
+- `lms.dlq.events` (record parse lỗi)
+
+## 4) Chạy Spark clean/routing sang topic phân loại
+
+Script: `source/spark/src/jobs/route_raw_to_topics.py`
+
+Ý tưởng:
+- đọc `lms.raw.events`
+- clean field cơ bản
+- route sang:
+  - `lms.exam.events`
+  - `lms.learning.events`
+  - `lms.noise.events`
+
+## 5) Kiểm tra message ở partition nào
 
 ### Cách 1: nhìn log callback của producer app
 
@@ -93,7 +109,7 @@ docker compose exec broker1 kafka-console-consumer \
   --property key.separator=" | "
 ```
 
-## 5) Dừng cụm Kafka
+## 6) Dừng cụm Kafka
 
 ```bash
 cd source/kafka

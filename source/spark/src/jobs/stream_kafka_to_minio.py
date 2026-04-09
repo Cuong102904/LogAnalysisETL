@@ -6,11 +6,11 @@ from pyspark.sql import DataFrame, SparkSession, functions as F
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Consume Kafka and write parquet to MinIO (S3A).")
+    p = argparse.ArgumentParser(description="Consume routed Kafka topic and write parquet to MinIO (S3A).")
     p.add_argument("--bootstrap-servers", default="broker1:29092")
-    p.add_argument("--topic", default="lsp.canonical.events")
-    p.add_argument("--s3a-dest", default="s3a://bronze/lsp/bronze/canonical_events")
-    p.add_argument("--checkpoint", default="s3a://bronze/lsp/checkpoints/canonical_events")
+    p.add_argument("--topic", default="lms.learning.events")
+    p.add_argument("--s3a-dest", default="s3a://bronze/lsp/bronze/routed_events")
+    p.add_argument("--checkpoint", default="s3a://bronze/lsp/checkpoints/routed_events")
     p.add_argument("--starting-offsets", default="latest", choices=("earliest", "latest"))
     return p.parse_args()
 
