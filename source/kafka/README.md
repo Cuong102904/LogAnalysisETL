@@ -1,43 +1,53 @@
-# Kafka infra (KRaft)
+# Kafka repository
 
-Thư mục này chỉ chứa hạ tầng Kafka local (KRaft 3 brokers) và script tạo topics.
-Logic producer raw nằm ở `source/producer`, còn clean/routing nằm ở Spark job riêng.
+Repository nay tap trung vao canonical raw ingress va replay du lieu tracking log.
 
-## Cấu trúc thư mục
+## Thu muc chinh
 
 ```text
 source/kafka/
-  docker-compose.yml
-  Dockerfile
-  README.md
+  config/
+    topics.yaml
+  schemas/
+    json/
+      mooc_raw_envelope.schema.json
+      mooc_tracking_event.schema.json
+      mooc_dlq.schema.json
   scripts/
     create_topics.sh
+  src/
+    common.py
+    producers/
+      simulator.py
+      tracking_log_replayer.py
+    legacy/
+      simulator.py
+    consumers/
+      validator_router.py
+  tests/
+    integration/
+  docker-compose.yml
+  Dockerfile
+  Dockerfile.app
+  pyproject.toml
+  uv.lock
 ```
 
-## Yêu cầu
+## Topic contract
 
-- Docker + Docker Compose
-- [uv](https://docs.astral.sh/uv/)
+- `mooc.raw.events`: canonical raw ingest stream.
+- `mooc.dlq.events`: failed events.
 
-## 1) Khởi động Kafka cluster
+## Chay local nhanh
+
+1) Khoi dong Kafka brokers:
 
 ```bash
 cd source/kafka
 docker compose up -d
 ```
 
-Host bootstrap cho Python producer chạy ngoài container: `localhost:9092,localhost:9093,localhost:9094`.
-
-## 2) Tạo topics theo thiết kế ingest
-
-Thiết kế topic:
-- `lms.raw.events`: full raw stream để replay/audit
-- `lms.exam.events`: log thi/proctoring
-- `lms.learning.events`: log học bình thường
-- `lms.noise.events`: bot/scan/noise
-- `lms.dlq.events`: parse lỗi
-
-Chạy script tạo topic + retention:
+2) Tao topics:
 
 ```bash
 cd source/kafka
@@ -45,80 +55,30 @@ chmod +x scripts/create_topics.sh
 ./scripts/create_topics.sh
 ```
 
-Retention mặc định đã set trong script:
-- raw: 14 ngày
-- exam: 90 ngày
-- learning: 30 ngày
-- noise: 3 ngày
-- dlq: 14 ngày
-
-## 3) Chạy producer ingest từ file log thật
+3) Replay tracking logs:
 
 ```bash
-cd /home/cuong/Desktop/DATN
+cd source/kafka
 uv sync
-uv run python -m producer.main \
-  --data-dir /home/cuong/Desktop/DATN/BK_activity_logs_unzipped \
-  --brokers localhost:9092,localhost:9093,localhost:9094
+uv run python -m src.producers.tracking_log_replayer --brokers localhost:9092,localhost:9093,localhost:9094 --input-root ../BK_activity_logs_unzipped --topic mooc.raw.events
 ```
 
-Chạy nhanh với giới hạn số event để test:
+Them tuy chon toc do replay theo event-time:
 
 ```bash
-uv run python -m producer.main \
-  --data-dir /home/cuong/Desktop/DATN/BK_activity_logs_unzipped \
-  --max-events 500
+uv run python -m src.producers.tracking_log_replayer --brokers localhost:9092,localhost:9093,localhost:9094 --input-root ../BK_activity_logs_unzipped --topic mooc.raw.events --speed 2.0
 ```
 
-Producer hiện tại chỉ đẩy:
-- `lms.raw.events` (toàn bộ raw record)
-- `lms.dlq.events` (record parse lỗi)
+- `--speed 1.0`: phat theo khoang cach thoi gian goc cua truong `time`.
+- `--speed 2.0`: nhanh gap doi so voi khoang cach thoi gian goc.
+- Replay su dung moc thoi gian tu event hop le dau tien, sau do map timeline event vao dong ho chay hien tai.
 
-## 4) Chạy Spark clean/routing sang topic phân loại
+4) Validator router duoc giu o che do deprecated de backward compatibility.
 
-Script: `source/spark/src/jobs/route_raw_to_topics.py`
-
-Ý tưởng:
-- đọc `lms.raw.events`
-- clean field cơ bản
-- route sang:
-  - `lms.exam.events`
-  - `lms.learning.events`
-  - `lms.noise.events`
-
-## 5) Kiểm tra message ở partition nào
-
-### Cách 1: nhìn log callback của producer app
-
-Producer in:
-
-```text
-delivered topic=... partition=... offset=... key='...'
-```
-
-### Cách 2: đọc trực tiếp bằng console consumer
+## Integration test
 
 ```bash
 cd source/kafka
-docker compose exec broker1 kafka-console-consumer \
-  --topic lms.exam.events \
-  --from-beginning \
-  --bootstrap-server broker1:29092 \
-  --property print.key=true \
-  --property print.partition=true \
-  --property key.separator=" | "
-```
-
-## 6) Dừng cụm Kafka
-
-```bash
-cd source/kafka
-docker compose down
-```
-
-Xóa luôn data volumes:
-
-```bash
-docker compose down -v
+uv run python -m unittest discover -s tests/integration -p "test_*.py"
 ```
 

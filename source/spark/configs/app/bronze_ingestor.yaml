@@ -1,0 +1,11 @@
+app_name: bronze_ingestor
+kafka:
+  bootstrap_servers: broker1:29092,broker2:29092,broker3:29092
+  input_topic: mooc.raw.events
+  dlq_topic: mooc.dlq.events
+  starting_offsets: latest
+storage:
+  table_path: s3a://bronze/mooc/bronze/mooc_events_raw
+  checkpoint_path: s3a://checkpoints/mooc/bronze_ingestor
+options:
+  fanout_enabled: false

@@ -1,0 +1,1 @@
+"""Gold domain logic."""

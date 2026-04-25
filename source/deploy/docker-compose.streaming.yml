@@ -198,6 +198,35 @@ services:
       - ../spark/conf:/opt/bitnami/spark/conf:ro
     mem_limit: 1000m
 
+  spark-bronze-ingestor:
+    image: local/spark:dev
+    container_name: lsp-spark-bronze-ingestor
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+      minio-init:
+        condition: service_completed_successfully
+    command: ["python", "-m", "apps.bronze_ingestor.main"]
+    mem_limit: 1000m
+
+  spark-silver-transformer:
+    image: local/spark:dev
+    container_name: lsp-spark-silver-transformer
+    depends_on:
+      spark-bronze-ingestor:
+        condition: service_started
+    command: ["python", "-m", "apps.silver_transformer.main"]
+    mem_limit: 1000m
+
+  spark-gold-aggregator:
+    image: local/spark:dev
+    container_name: lsp-spark-gold-aggregator
+    depends_on:
+      spark-silver-transformer:
+        condition: service_started
+    command: ["python", "-m", "apps.gold_aggregator.main"]
+    mem_limit: 1000m
+
   trino:
     build:
       context: ../trino

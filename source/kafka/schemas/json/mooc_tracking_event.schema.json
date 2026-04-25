@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mooc_tracking_event.schema.json",
+  "title": "MoocTrackingEvent",
+  "type": "object",
+  "required": ["time", "event_type", "event_source"],
+  "properties": {
+    "name": { "type": ["string", "null"] },
+    "context": { "type": ["object", "null"], "additionalProperties": true },
+    "username": { "type": ["string", "null"] },
+    "session": { "type": ["string", "null"] },
+    "ip": { "type": ["string", "null"] },
+    "agent": { "type": ["string", "null"] },
+    "host": { "type": ["string", "null"] },
+    "referer": { "type": ["string", "null"] },
+    "accept_language": { "type": ["string", "null"] },
+    "event": {},
+    "time": { "type": "string" },
+    "event_type": { "type": "string" },
+    "event_source": { "type": "string" },
+    "page": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

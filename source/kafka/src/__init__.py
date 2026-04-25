@@ -1,0 +1,1 @@
+"""Kafka domain logic package."""

@@ -1,6 +1,27 @@
-# minio
+# MinIO Repository
 
-MinIO là S3-compatible object storage cho bronze/silver.
+MinIO la object storage cho Delta Lake:
 
-- Buckets được tạo tự động bởi service `minio-init` trong compose.
+- Bronze tables
+- Silver tables
+- Gold tables
+- Streaming checkpoints
+
+## Buckets
+
+- `bronze`
+- `silver`
+- `gold`
+- `checkpoints`
+
+## Bootstrap
+
+Script tao bucket:
+
+```bash
+cd source/minio
+sh scripts/make_buckets.sh
+```
+
+Chi tiet layout nam trong `bootstrap/bucket-layout.md`.
 

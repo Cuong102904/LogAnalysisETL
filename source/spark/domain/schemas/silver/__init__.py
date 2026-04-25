@@ -1,0 +1,1 @@
+"""Silver schema namespace."""

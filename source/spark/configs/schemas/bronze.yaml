@@ -1,0 +1,4 @@
+tables:
+  - name: bronze.mooc_events_raw
+    path: s3a://bronze/mooc/bronze/mooc_events_raw
+    partition_by: [ingest_date, ingest_hour]

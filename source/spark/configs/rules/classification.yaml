@@ -1,0 +1,21 @@
+version: 1
+default: unknown
+classes:
+  - name: learning
+    when:
+      all:
+        - eq: { field: event_source, value: browser }
+        - any:
+            - contains: { field: event_type, substr: video }
+            - contains: { field: event_type, substr: seq }
+  - name: performance
+    when:
+      all:
+        - eq: { field: event_source, value: server }
+        - eq: { field: event_type, value: edx.grades.problem.submitted }
+  - name: system
+    when:
+      any:
+        - contains_any: { field: event_type, substrs: [proctoring, heartbeat] }
+        - contains_any: { field: name, substrs: [auth, login, session] }
+        - contains_any: { field: path, substrs: ["/auth/", "/login", "/session"] }

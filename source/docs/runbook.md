@@ -1,62 +1,46 @@
-# Runbook (local)
+# Runbook (current local)
 
-## Start stack
+## 1) Start stack
 
 ```bash
-cd source/deploy
-cp env/.env.example .env
-docker compose -f docker-compose.streaming.yml --env-file .env up -d
+cd source/infra-central
+docker compose -f docker-compose.phase1.yml up --build
 ```
 
-## Validate services
+## 2) Topic inventory
 
-- Kafka: `broker1:29092` (inside docker network), `localhost:9092` (host).
-- MinIO: `http://localhost:9001`
-- Spark master UI: `http://localhost:8080`
-- Airflow: `http://localhost:8089`
-- Trino: `http://localhost:8088`
+- `mooc.raw.events`
+- `mooc.dlq.events`
 
-## Topics
-
-Topics được tạo tự động bởi service `kafka-init`:
-
-- `lsp.raw.logs`
-- `lsp.canonical.events`
-- `lsp.dlq`
-
-Nếu muốn chạy lại thủ công:
+## 3) Replay dữ liệu tracking logs
 
 ```bash
-cd source
-BOOTSTRAP_SERVER=broker1:29092 ./kafka/scripts/create_topics.sh
+cd source/kafka
+uv run python -m src.producers.tracking_log_replayer \
+  --brokers broker1:29092,broker2:29092,broker3:29092 \
+  --topic mooc.raw.events \
+  --input-root ../BK_activity_logs_unzipped
 ```
 
-## Producer
+## 4) Run Spark apps
 
 ```bash
-cd source/producer
-uv sync
-uv run python -m producer.main \
-  --data-dir /home/cuong/Desktop/DATN/BK_activity_logs_unzipped \
-  --speed 120 \
-  --raw-topic lsp.raw.logs \
-  --canonical-topic lsp.canonical.events \
-  --dlq-topic lsp.dlq
+cd source/spark
+uv run python -m apps.bronze_ingestor.main
+uv run python -m apps.silver_transformer.main
+uv run python -m apps.gold_aggregator.main
 ```
 
-## Spark job (skeleton)
+## 5) Verification checklist
 
-Draft chạy trong Spark container:
+- Raw topic co du lieu.
+- Bronze Delta co metadata + dedup key.
+- Silver co day du `learning/performance/system/unknown/video_interactions`.
+- Gold co `video_anomaly_features`.
 
-```bash
-docker exec -it lsp-spark-master bash
-```
-
-Bạn có thể copy code job vào image hoặc mount thêm volume vào compose rồi chạy `spark-submit`.
-
-## Stop stack
+## 6) Stop stack
 
 ```bash
-cd source/deploy
-docker compose -f docker-compose.streaming.yml down -v
+cd source/infra-central
+docker compose -f docker-compose.phase1.yml down -v
 ```

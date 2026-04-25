@@ -1,0 +1,19 @@
+---
+description: Add dependencies only in the single active pyproject file
+alwaysApply: false
+---
+# Single Pyproject Dependency Rule
+
+When adding or updating Python dependencies, always use only one file:
+
+- `source/pyproject.toml`
+
+Mandatory constraints:
+
+- Do not create any other `pyproject.toml` in subfolders.
+- Do not split dependencies by folder.
+- Treat `source/pyproject.toml` as the latest and only dependency source of truth.
+
+If locking is needed, update the single lock file from `source` root:
+
+- `source/uv.lock`

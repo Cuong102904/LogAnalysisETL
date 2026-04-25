@@ -1,0 +1,10 @@
+app_name: gold_aggregator
+input:
+  silver_video_interactions_path: s3a://silver/mooc/silver/video_interactions
+storage:
+  video_anomaly_features_path: s3a://gold/mooc/gold/video_anomaly_features
+  user_learning_profile_path: s3a://gold/mooc/gold/user_learning_profile
+  problem_performance_path: s3a://gold/mooc/gold/problem_performance
+  system_profile_path: s3a://gold/mooc/gold/system_profile
+checkpoint:
+  base_path: s3a://checkpoints/mooc/gold_aggregator

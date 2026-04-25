@@ -1,0 +1,10 @@
+tables:
+  - name: gold.user_learning_profile
+    status: skeleton
+  - name: gold.problem_performance
+    status: skeleton
+  - name: gold.system_profile
+    status: skeleton
+  - name: gold.video_anomaly_features
+    status: implemented
+    partition_by: [event_date, course_id]

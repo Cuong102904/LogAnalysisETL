@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mooc_dlq.schema.json",
+  "title": "MoocDlqEvent",
+  "type": "object",
+  "required": ["ingest_time", "error_type", "error_message", "raw_event"],
+  "properties": {
+    "ingest_time": { "type": "string", "format": "date-time" },
+    "error_type": { "type": "string" },
+    "error_message": { "type": "string" },
+    "failed_topic": { "type": "string" },
+    "failed_key": { "type": "string" },
+    "raw_event": {}
+  },
+  "additionalProperties": true
+}

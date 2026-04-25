@@ -1,0 +1,8 @@
+topics:
+  raw: mooc.raw.events
+  dlq: mooc.dlq.events
+  optional_fanout:
+    learning: mooc.learning.events
+    performance: mooc.performance.events
+    system: mooc.system.events
+    unknown: mooc.unknown.events

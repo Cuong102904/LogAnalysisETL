@@ -1,0 +1,11 @@
+app_name: silver_transformer
+input:
+  bronze_table_path: s3a://bronze/mooc/bronze/mooc_events_raw
+storage:
+  learning_path: s3a://silver/mooc/silver/learning_events
+  performance_path: s3a://silver/mooc/silver/performance_events
+  system_path: s3a://silver/mooc/silver/system_events
+  unknown_path: s3a://silver/mooc/silver/unknown_events
+  video_interactions_path: s3a://silver/mooc/silver/video_interactions
+checkpoint:
+  base_path: s3a://checkpoints/mooc/silver_transformer

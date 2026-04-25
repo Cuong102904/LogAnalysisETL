@@ -24,18 +24,12 @@ create_topic() {
     --add-config "cleanup.policy=delete,retention.ms=${retention_ms},min.insync.replicas=2"
 }
 
-create_topic "lms.raw.events" 12 1209600000
-create_topic "lms.exam.events" 12 7776000000
-create_topic "lms.learning.events" 12 2592000000
-create_topic "lms.noise.events" 6 259200000
-create_topic "lms.dlq.events" 6 1209600000
+create_topic "mooc.raw.events" 12 1209600000
+create_topic "mooc.dlq.events" 6 1209600000
 
 for topic in \
-  "lms.raw.events" \
-  "lms.exam.events" \
-  "lms.learning.events" \
-  "lms.noise.events" \
-  "lms.dlq.events"
+  "mooc.raw.events" \
+  "mooc.dlq.events"
 do
   docker compose exec broker1 kafka-topics \
     --describe \
