@@ -1,4 +1,3 @@
-from apps.silver_transformer.config import SilverConfig
 from domain.silver.classifier import add_classification
 from domain.silver.normalizers.learning import normalize_learning
 from domain.silver.normalizers.performance import normalize_performance
@@ -6,6 +5,8 @@ from domain.silver.normalizers.system import normalize_system
 from domain.silver.normalizers.unknown import normalize_unknown
 from domain.silver.normalizers.video_interaction import normalize_video_interactions
 from infrastructure.spark.session import build_spark
+
+from apps.silver_transformer.config import SilverConfig
 
 
 def _start_delta_writer(df, path: str, checkpoint: str) -> None:
@@ -30,7 +31,9 @@ def run(config: SilverConfig) -> None:
     video = normalize_video_interactions(learning)
 
     _start_delta_writer(learning, config.learning_path, f"{config.checkpoint_base}/learning")
-    _start_delta_writer(performance, config.performance_path, f"{config.checkpoint_base}/performance")
+    _start_delta_writer(
+        performance, config.performance_path, f"{config.checkpoint_base}/performance"
+    )
     _start_delta_writer(system, config.system_path, f"{config.checkpoint_base}/system")
     _start_delta_writer(unknown, config.unknown_path, f"{config.checkpoint_base}/unknown")
     _start_delta_writer(video, config.video_path, f"{config.checkpoint_base}/video")

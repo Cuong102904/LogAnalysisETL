@@ -4,16 +4,23 @@ import argparse
 from pathlib import Path
 
 from kafka.src.adapters.mooc_tracking_log_adapter import iter_mooc_tracking_log_records
-from kafka.src.common import ANONYMOUS_RAW_TOPIC, DLQ_TOPIC, RAW_TOPIC, delivery_report, make_producer
+from kafka.src.common import (
+    ANONYMOUS_RAW_TOPIC,
+    DLQ_TOPIC,
+    RAW_TOPIC,
+    delivery_report,
+    make_producer,
+)
 from kafka.src.common.core_producer import replay_stream
 from kafka.src.filters.mooc_event_filter import is_event_allowed, load_producer_filter_config
-
 
 DEFAULT_FILTER_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "producer_filter.yaml"
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Replay BK_activity_logs_unzipped into Kafka raw topic.")
+    parser = argparse.ArgumentParser(
+        description="Replay BK_activity_logs_unzipped into Kafka raw topic."
+    )
     parser.add_argument("--brokers", default="broker1:29092,broker2:29092,broker3:29092")
     parser.add_argument("--topic", default=RAW_TOPIC)
     parser.add_argument(

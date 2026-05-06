@@ -1,7 +1,8 @@
-from apps.gold_aggregator.config import GoldConfig
 from domain.gold.video_anomaly.aggregator import aggregate_features
 from domain.gold.video_anomaly.time_bucketing import bucket_video_interactions
 from infrastructure.spark.session import build_spark
+
+from apps.gold_aggregator.config import GoldConfig
 
 
 def run(config: GoldConfig) -> None:

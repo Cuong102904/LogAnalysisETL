@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import time
+from collections.abc import Callable, Iterable
 from datetime import datetime
-from typing import Any, Callable, Iterable, Optional
+from typing import Any
 
 from kafka.src.common.actor_identity import event_has_subject_identity
 from kafka.src.common.encoding import encode_json
@@ -17,8 +18,8 @@ def build_dlq_payload(
     error_type: str,
     error_message: str,
     raw_event: Any,
-    failed_topic: Optional[str] = None,
-    failed_key: Optional[str] = None,
+    failed_topic: str | None = None,
+    failed_key: str | None = None,
 ) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "ingest_time": ingest_time,
@@ -33,7 +34,7 @@ def build_dlq_payload(
     return payload
 
 
-def _decode_key_bytes(key_bytes: Optional[bytes]) -> str:
+def _decode_key_bytes(key_bytes: bytes | None) -> str:
     if not key_bytes:
         return "missing-key"
     try:
@@ -49,12 +50,12 @@ def replay_stream(
     raw_topic: str,
     dlq_topic: str,
     speed: float,
-    dlq_failed_topic: Optional[str],
+    dlq_failed_topic: str | None,
     dlq_publish_cb: Callable[[Any], None] | None = None,
     filter_fn: Callable[[dict[str, Any], dict[str, Any]], tuple[bool, str]] | None = None,
     filter_cfg: dict[str, Any] | None = None,
     delivery_report_cb: Callable[[Any, Any], None] | None = None,
-    anonymous_topic: Optional[str] = None,
+    anonymous_topic: str | None = None,
 ) -> dict[str, int]:
     """
     Core replay engine:

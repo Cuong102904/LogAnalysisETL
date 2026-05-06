@@ -5,10 +5,10 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 
-from kafka.src.common.core_producer import build_dlq_payload, replay_stream
-from kafka.src.models.replay_record import ReplayRecord
 from kafka.src.common.actor_identity import event_has_subject_identity
+from kafka.src.common.core_producer import build_dlq_payload, replay_stream
 from kafka.src.filters.mooc_event_filter import is_event_allowed, load_producer_filter_config
+from kafka.src.models.replay_record import ReplayRecord
 
 
 class MoocEventFilterTest(unittest.TestCase):
@@ -33,7 +33,10 @@ class MoocEventFilterTest(unittest.TestCase):
         self.assertTrue(allowed, reason)
 
     def test_proctoring_api_allowed(self) -> None:
-        event = {"event_type": "/api/edx_proctoring/v1/proctored_exam/attempt", "event_source": "server"}
+        event = {
+            "event_type": "/api/edx_proctoring/v1/proctored_exam/attempt",
+            "event_source": "server",
+        }
         allowed, reason = is_event_allowed(event, self.cfg)
         self.assertTrue(allowed, reason)
 
@@ -64,7 +67,10 @@ class MoocEventFilterTest(unittest.TestCase):
         self.assertIn("filtered_out", reason)
 
     def test_bi_marketing_event_allowed(self) -> None:
-        event = {"event_type": "edx.bi.course.upgrade.sidebarupsell.displayed", "event_source": "browser"}
+        event = {
+            "event_type": "edx.bi.course.upgrade.sidebarupsell.displayed",
+            "event_source": "browser",
+        }
         allowed, reason = is_event_allowed(event, self.cfg)
         self.assertTrue(allowed, reason)
         self.assertTrue(reason.startswith("product_and_marketing"))
@@ -198,7 +204,9 @@ class CoreReplayRoutingTest(unittest.TestCase):
 
     def test_allowed_event_routes_to_raw_topic(self) -> None:
         producer = _FakeProducer()
-        record = self._record({"event_type": "play_video", "event_source": "browser", "name": "play_video"})
+        record = self._record(
+            {"event_type": "play_video", "event_source": "browser", "name": "play_video"}
+        )
 
         stats = replay_stream(
             records=[record],
@@ -300,7 +308,9 @@ class CoreReplayRoutingTest(unittest.TestCase):
 class ActorIdentityTest(unittest.TestCase):
     def test_username_present_is_identity(self) -> None:
         self.assertTrue(
-            event_has_subject_identity({"username": "u1", "context": {}, "event_type": "x", "event_source": "b"})
+            event_has_subject_identity(
+                {"username": "u1", "context": {}, "event_type": "x", "event_source": "b"}
+            )
         )
 
     def test_context_user_id_present(self) -> None:
@@ -320,4 +330,3 @@ class ActorIdentityTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

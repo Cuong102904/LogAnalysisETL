@@ -1,4 +1,5 @@
-from pyspark.sql import DataFrame, functions as F
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
 
 
 def enrich_bronze(raw: DataFrame) -> DataFrame:
@@ -18,7 +19,10 @@ def enrich_bronze(raw: DataFrame) -> DataFrame:
             "dedup_key",
             F.sha2(
                 F.concat_ws(
-                    "|", F.col("kafka_topic"), F.col("kafka_partition").cast("string"), F.col("kafka_offset")
+                    "|",
+                    F.col("kafka_topic"),
+                    F.col("kafka_partition").cast("string"),
+                    F.col("kafka_offset"),
                 ),
                 256,
             ),

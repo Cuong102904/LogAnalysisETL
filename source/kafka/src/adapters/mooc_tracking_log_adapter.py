@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable, Optional
+from typing import Any
 
 from kafka.src.common import decode_json, validate_tracking_event
 from kafka.src.models.replay_record import ReplayRecord
@@ -17,10 +18,10 @@ def _extract_key(event: dict[str, Any]) -> bytes:
     session = str(event.get("session") or "").strip()
     ip = str(event.get("ip") or "").strip()
     if username:
-        return f"user:{username}".encode("utf-8")
+        return f"user:{username}".encode()
     if session:
-        return f"session:{session}".encode("utf-8")
-    return f"ip:{ip or 'unknown'}".encode("utf-8")
+        return f"session:{session}".encode()
+    return f"ip:{ip or 'unknown'}".encode()
 
 
 def iter_mooc_tracking_log_records(
@@ -52,10 +53,10 @@ def iter_mooc_tracking_log_records(
                 if not raw:
                     continue
 
-                decode_error: Optional[str] = None
-                event: Optional[dict[str, Any]] = None
+                decode_error: str | None = None
+                event: dict[str, Any] | None = None
                 event_time = None
-                key_bytes: Optional[bytes] = None
+                key_bytes: bytes | None = None
                 validation_ok = False
                 validation_reason = ""
 
@@ -87,4 +88,3 @@ def iter_mooc_tracking_log_records(
                     validation_ok=validation_ok,
                     validation_reason=validation_reason,
                 )
-

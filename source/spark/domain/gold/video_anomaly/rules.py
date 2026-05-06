@@ -1,6 +1,7 @@
 """Skeleton: threshold-based anomaly rules."""
 
-from pyspark.sql import DataFrame, functions as F
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
 
 
 def apply_rule_thresholds(df: DataFrame, min_users: int, surge_z: float) -> DataFrame:

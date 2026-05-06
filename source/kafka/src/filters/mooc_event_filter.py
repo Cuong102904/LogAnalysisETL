@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import yaml
 
@@ -54,7 +54,7 @@ def _group_match_reason(
     event_source: str,
     event_name: str,
     context_path: str,
-) -> Optional[str]:
+) -> str | None:
     lower_type = event_type.lower()
     lower_source = event_source.lower()
     lower_name = event_name.lower()
@@ -133,4 +133,3 @@ def is_event_allowed(event: dict[str, Any], cfg: dict[str, Any]) -> tuple[bool, 
         return True, "special_exam_proctoring: name/context.path contains 'proctor' (guarded)"
 
     return False, f"filtered_out: event_type='{event_type}' not in allowlist"
-

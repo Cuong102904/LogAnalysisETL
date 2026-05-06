@@ -1,9 +1,10 @@
-from apps.bronze_ingestor.config import BronzeConfig
 from domain.bronze.enricher import enrich_bronze
 from domain.bronze.parser import parse_status_columns
 from infrastructure.kafka.reader import read_kafka_stream
 from infrastructure.spark.session import build_spark
 from infrastructure.storage.delta import write_delta_stream
+
+from apps.bronze_ingestor.config import BronzeConfig
 
 
 def run(config: BronzeConfig) -> None:

@@ -1,4 +1,5 @@
-from pyspark.sql import DataFrame, functions as F
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
 
 
 def normalize_video_interactions(learning_df: DataFrame) -> DataFrame:

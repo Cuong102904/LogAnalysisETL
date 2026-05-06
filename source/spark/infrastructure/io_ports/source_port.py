@@ -4,5 +4,4 @@ from pyspark.sql import DataFrame
 
 
 class SourcePort(Protocol):
-    def read(self) -> DataFrame:
-        ...
+    def read(self) -> DataFrame: ...

@@ -8,7 +8,8 @@ def build_spark(app_name: str) -> SparkSession:
     minio_password = os.getenv("MINIO_ROOT_PASSWORD", "minio123456")
 
     return (
-        SparkSession.builder.master("local[*]").appName(app_name)
+        SparkSession.builder.master("local[*]")
+        .appName(app_name)
         .config(
             "spark.jars.packages",
             ",".join(
@@ -22,7 +23,9 @@ def build_spark(app_name: str) -> SparkSession:
         )
         .config("spark.sql.streaming.forceDeleteTempCheckpointLocation", "true")
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
-        .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+        .config(
+            "spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+        )
         .config("spark.databricks.delta.schema.autoMerge.enabled", "true")
         .config("spark.hadoop.fs.s3a.endpoint", "http://minio:9000")
         .config("spark.hadoop.fs.s3a.path.style.access", "true")
