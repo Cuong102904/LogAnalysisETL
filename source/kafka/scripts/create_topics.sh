@@ -25,10 +25,12 @@ create_topic() {
 }
 
 create_topic "mooc.raw.events" 12 1209600000
+create_topic "mooc.raw.anonymous.events" 12 1209600000
 create_topic "mooc.dlq.events" 6 1209600000
 
 for topic in \
   "mooc.raw.events" \
+  "mooc.raw.anonymous.events" \
   "mooc.dlq.events"
 do
   docker compose exec broker1 kafka-topics \

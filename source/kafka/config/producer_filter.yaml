@@ -1,0 +1,130 @@
+# Thứ tự nhóm được giữ cố định: matcher đầu tiên thắng (xem kafka/src/filters/mooc_event_filter.py).
+
+special_exam_proctoring:
+  event_type_prefixes:
+    - "edx.special_exam."
+  event_type_contains_any:
+    - "/api/edx_proctoring/"
+
+# Product / BI / segmentation (marketing funnels, upsells, catalogs).
+product_and_marketing_analytics:
+  event_type_prefixes:
+    - "edx.bi."
+    - "edx.segment."
+
+assessment_performance:
+  event_type_in:
+    - "problem_check"
+    - "edx.grades.problem.submitted"
+    - "problem_graded"
+    - "problem_show"
+    - "problem_reset"
+    - "show_answer"
+    - "reset_problem"
+    - "edx.problem.completed"
+    - "edx.problem.hint.feedback_displayed"
+  event_type_contains_any:
+    - "handler/xmodule_handler/problem_check"
+    - "handler/xmodule_handler/input_ajax"
+    - "handler/xmodule_handler/problem_show"
+    - "handler/xmodule_handler/problem_reset"
+    - "/handler/student_submit"
+    - "essay_question"
+    - "create_submission"
+    - "quiz"
+    - "problem_save"
+    - "showanswer"
+
+completion_tracking:
+  event_type_in:
+    - "edx.video.completed"
+  event_type_contains_any:
+    - "publish_completion"
+    - "handler/publish_completion"
+    - "mark_completed"
+
+sequence_navigation:
+  event_type_prefixes:
+    - "edx.ui.lms.sequence."
+  event_type_prefixes_seq:
+    - "seq_"
+  event_type_contains_any:
+    - "handler/xmodule_handler/goto_position"
+    - "handler/xmodule_handler/get_completion"
+
+video_engagement:
+  event_type_contains_any:
+    - "load_video"
+    - "play_video"
+    - "pause_video"
+    - "seek_video"
+    - "speed_change_video"
+    - "stop_video"
+    # Phụ đề / dịch (thường là request server vào khối video).
+    - "/handler/transcript/"
+    - "handler/transcript/"
+    - "/handler/translation/"
+  event_type_contains_all:
+    - "+type@video+block@"
+    - "handler/xmodule_handler/save_user_state"
+
+embedded_content_learning:
+  event_type_contains_any:
+    - "edx.googlecomponent"
+    # Google Document và XBlock có publish_event; giới hạn chuỗi để không nuốt mọi publish_event.
+  event_type_contains_all:
+    - "google-document"
+    - "publish_event"
+
+learning_content:
+  event_type_contains_any:
+    - "textbook.pdf."
+    - "textbook.book."
+    - "pdfbook"
+    - "book_reader"
+    - "edx.pdfbook."
+  event_type_in:
+    - "book"
+
+content_assignment:
+  event_type_contains_any:
+    - "edx.librarycontentblock"
+
+course_engagement_ux:
+  event_type_contains_any:
+    - "edx.course.home.resume_course.clicked"
+
+navigation_page:
+  event_type_in:
+    - "edx.ui.lms.link_clicked"
+    - "page_close"
+  event_type_contains_any:
+    - "/jump_to/"
+    - "/courseware/"
+    # Outline / trang chủ khóa (đường dẫn .../<run>/course/) — không khớp /courseware/.
+    - "/course/"
+
+grade_progress:
+  event_type_contains_any:
+    - "grade"
+    - "score"
+    - "progress"
+
+access_session:
+  event_type_contains_any:
+    - "/dashboard"
+    - "/login"
+    - "/logout"
+    - "/auth/"
+    - "/signup"
+    - "/signin"
+
+# Catch-all edx namespaced taxonomy not matched above (cohorts, dashboards, catalogs, experiments, etc.).
+edx_taxonomy_residual:
+  event_type_prefixes:
+    - "edx."
+
+# Any LMS-style path emitted as event_type (/courses, /api, /library, /xblock, static assets paths, …).
+leading_slash_path_residual:
+  event_type_prefixes:
+    - "/"

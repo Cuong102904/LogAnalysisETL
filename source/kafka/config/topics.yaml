@@ -7,6 +7,10 @@ topics:
     partitions: 12
     retention_ms: 1209600000
     description: Canonical raw tracking events for medallion pipeline.
+  - name: mooc.raw.anonymous.events
+    partitions: 12
+    retention_ms: 1209600000
+    description: Allowlisted LMS rows without username and without context.user_id (still JSON line value).
   - name: mooc.dlq.events
     partitions: 6
     retention_ms: 1209600000

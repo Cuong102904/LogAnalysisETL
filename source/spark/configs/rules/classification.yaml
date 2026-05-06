@@ -1,21 +1,14 @@
+# Silver label policy (silver_class column). Runtime logic: spark/domain/silver/classifier.py
+# Allowed values: learning, performance, system, product, navigation, unknown
+#
+# Unknown normalizer intentionally includes silver_class unknown|product|navigation so wide-capture rows
+# are not dropped from the silver transformer (see spark/domain/silver/normalizers/unknown.py).
+#
 version: 1
-default: unknown
-classes:
-  - name: learning
-    when:
-      all:
-        - eq: { field: event_source, value: browser }
-        - any:
-            - contains: { field: event_type, substr: video }
-            - contains: { field: event_type, substr: seq }
-  - name: performance
-    when:
-      all:
-        - eq: { field: event_source, value: server }
-        - eq: { field: event_type, value: edx.grades.problem.submitted }
-  - name: system
-    when:
-      any:
-        - contains_any: { field: event_type, substrs: [proctoring, heartbeat] }
-        - contains_any: { field: name, substrs: [auth, login, session] }
-        - contains_any: { field: path, substrs: ["/auth/", "/login", "/session"] }
+silver_classes:
+  - learning
+  - performance
+  - system
+  - product
+  - navigation
+  - unknown

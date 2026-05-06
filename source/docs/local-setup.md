@@ -10,13 +10,17 @@ docker compose -f docker-compose.phase1.yml up --build
 ## 2. Replay dữ liệu thật vào Kafka raw topic
 
 ```bash
-cd source/kafka
-uv run python -m src.producers.tracking_log_replayer \
+cd source
+uv run python -m kafka.src.producers.tracking_log_replayer \
   --brokers broker1:29092,broker2:29092,broker3:29092 \
   --topic mooc.raw.events \
   --input-root ../BK_activity_logs_unzipped \
   --max-files 50
 ```
+
+Luu y:
+- `mooc.raw.events` chi chua su kien thuoc allowlist producer.
+- Su kien bi loai (filtered_out) hoac loi decode/validation duoc day vao `mooc.dlq.events`.
 
 ## 3. Run Spark apps
 

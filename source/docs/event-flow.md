@@ -10,6 +10,16 @@
 6. Gold app tổng hợp feature tables, ưu tiên `gold.video_anomaly_features`.
 7. Event lỗi parse hoặc vi phạm required tối thiểu sẽ đi `mooc.dlq.events` hoặc `silver.unknown_events`.
 
+## Ingest Coverage Notes
+
+- Producer allowlist tại `kafka/config/producer_filter.yaml` đã mở rộng để thu thêm:
+  - `pdf/book` interactions
+  - navigation/page movement
+  - problem/quiz, grade/progress
+  - access/login/dashboard/session
+  - completion-related events
+- Mục tiêu là tăng độ phủ raw events cho phân tích hành vi, đồng thời vẫn giữ DLQ cho dữ liệu nhiễu/không khớp rule.
+
 ## Unknown/Dead-letter Strategy
 
 - Invalid JSON tại ingress: gửi Kafka DLQ.

@@ -18,17 +18,6 @@ def parse_event_time(raw_value: object) -> datetime | None:
         return None
 
 
-def sleep_for_event_gap(previous_time: datetime | None, current_time: datetime | None, speed: float) -> None:
-    if previous_time is None or current_time is None:
-        return
-    if speed <= 0:
-        return
-    delta_seconds = (current_time - previous_time).total_seconds()
-    if delta_seconds <= 0:
-        return
-    time.sleep(delta_seconds / speed)
-
-
 def sleep_by_anchor_clock(
     first_event_time: datetime | None,
     current_event_time: datetime | None,
@@ -40,6 +29,7 @@ def sleep_by_anchor_clock(
     if speed <= 0:
         return
     event_elapsed_seconds = (current_event_time - first_event_time).total_seconds()
+    # Out-of-order or equal-times: do not enforce causality — skip pacing for this row.
     if event_elapsed_seconds <= 0:
         return
     target_elapsed_seconds = event_elapsed_seconds / speed

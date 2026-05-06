@@ -22,8 +22,10 @@ services:
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
     volumes:
       - broker1-data:/var/lib/kafka/data
+    mem_limit: 900m
 
   broker2:
     image: confluentinc/cp-kafka:7.6.1
@@ -46,8 +48,10 @@ services:
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
     volumes:
       - broker2-data:/var/lib/kafka/data
+    mem_limit: 700m
 
   broker3:
     image: confluentinc/cp-kafka:7.6.1
@@ -70,8 +74,25 @@ services:
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
     volumes:
       - broker3-data:/var/lib/kafka/data
+    mem_limit: 700m
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    hostname: kafka-ui
+    depends_on:
+      - broker1
+      - broker2
+      - broker3
+    ports:
+      - "8085:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local-kraft
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker1:29092,broker2:29092,broker3:29092
+      DYNAMIC_CONFIG_ENABLED: "true"
+    mem_limit: 300m
 
   kafka-init:
     image: confluentinc/cp-kafka:7.6.1
@@ -84,6 +105,7 @@ services:
     working_dir: /scripts
     entrypoint: ["/bin/bash", "-lc"]
     command: "sleep 12 && ./create_topics.sh broker1:29092"
+    mem_limit: 256m
 
   tracking-log-replayer:
     build:
@@ -91,17 +113,27 @@ services:
       dockerfile: Dockerfile.app
     depends_on:
       - kafka-init
+    volumes:
+      # Host path resolves to sibling of source/: ../../BK_activity_logs_unzipped
+      - ../../BK_activity_logs_unzipped:/data/activity_logs:ro
     command:
       - python
       - -m
-      - src.producers.tracking_log_replayer
+      - kafka.src.producers.tracking_log_replayer
       - --brokers
       - broker1:29092,broker2:29092,broker3:29092
       - --input-root
-      - ../BK_activity_logs_unzipped
+      - /data/activity_logs
       - --topic
       - mooc.raw.events
+      - --anonymous-topic
+      - mooc.raw.anonymous.events
+      - --max-files
+      - "2"
+      - --speed
+      - "4"
     restart: "no"
+    mem_limit: 512m
 
   minio:
     image: minio/minio:RELEASE.2025-02-18T16-25-55Z
@@ -114,6 +146,7 @@ services:
       - "9001:9001"
     volumes:
       - minio-data:/data
+    mem_limit: 512m
 
   minio-init:
     image: minio/mc:RELEASE.2025-02-21T16-00-46Z
@@ -126,6 +159,7 @@ services:
       mc mb --ignore-existing local/silver &&
       mc mb --ignore-existing local/gold &&
       mc mb --ignore-existing local/checkpoints
+    mem_limit: 128m
 
   spark-bronze-ingestor:
     build:
@@ -135,22 +169,34 @@ services:
       - kafka-init
       - minio-init
     command: ["python", "-m", "apps.bronze_ingestor.main"]
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123456
+    mem_limit: 1800m
 
-  spark-silver-transformer:
-    build:
-      context: ../spark
-      dockerfile: Dockerfile
-    depends_on:
-      - spark-bronze-ingestor
-    command: ["python", "-m", "apps.silver_transformer.main"]
+  # spark-silver-transformer:
+  #   build:
+  #     context: ../spark
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - spark-bronze-ingestor
+  #   command: ["python", "-m", "apps.silver_transformer.main"]
+  #   environment:
+  #     MINIO_ROOT_USER: minio
+  #     MINIO_ROOT_PASSWORD: minio123456
+  #   mem_limit: 1800m
 
-  spark-gold-aggregator:
-    build:
-      context: ../spark
-      dockerfile: Dockerfile
-    depends_on:
-      - spark-silver-transformer
-    command: ["python", "-m", "apps.gold_aggregator.main"]
+  # spark-gold-aggregator:
+  #   build:
+  #     context: ../spark
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - spark-silver-transformer
+  #   command: ["python", "-m", "apps.gold_aggregator.main"]
+  #   environment:
+  #     MINIO_ROOT_USER: minio
+  #     MINIO_ROOT_PASSWORD: minio123456
+  #   mem_limit: 1200m
 
 volumes:
   broker1-data:

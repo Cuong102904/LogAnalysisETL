@@ -8,7 +8,14 @@ from infrastructure.storage.delta import write_delta_stream
 
 def run(config: BronzeConfig) -> None:
     spark = build_spark(config.app_name)
-    raw = read_kafka_stream(spark, config.bootstrap_servers, config.topic, config.starting_offsets)
+    raw = read_kafka_stream(
+        spark,
+        config.bootstrap_servers,
+        config.topic,
+        config.starting_offsets,
+        config.consumer_group_id,
+        config.consumer_client_id,
+    )
     bronze = enrich_bronze(raw)
     bronze = parse_status_columns(bronze)
     write_delta_stream(

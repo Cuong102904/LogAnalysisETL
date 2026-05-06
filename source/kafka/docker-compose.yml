@@ -20,8 +20,10 @@ services:
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
     volumes:
       - broker1-data:/var/lib/kafka/data
+    mem_limit: 900m
 
   broker2:
     image: confluentinc/cp-kafka:7.6.1
@@ -44,8 +46,10 @@ services:
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
     volumes:
       - broker2-data:/var/lib/kafka/data
+    mem_limit: 700m
 
   broker3:
     image: confluentinc/cp-kafka:7.6.1
@@ -68,8 +72,25 @@ services:
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
     volumes:
       - broker3-data:/var/lib/kafka/data
+    mem_limit: 700m
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    hostname: kafka-ui
+    depends_on:
+      - broker1
+      - broker2
+      - broker3
+    ports:
+      - "8085:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local-kraft
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker1:29092,broker2:29092,broker3:29092
+      DYNAMIC_CONFIG_ENABLED: "true"
+    mem_limit: 300m
 
 volumes:
   broker1-data:

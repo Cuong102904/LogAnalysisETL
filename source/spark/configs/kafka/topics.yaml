@@ -1,5 +1,6 @@
 topics:
   raw: mooc.raw.events
+  raw_anonymous: mooc.raw.anonymous.events
   dlq: mooc.dlq.events
   optional_fanout:
     learning: mooc.learning.events

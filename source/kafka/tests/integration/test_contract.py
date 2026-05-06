@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from src.common import validate_tracking_event
+from kafka.src.common import validate_tracking_event
 
 
 class ContractTest(unittest.TestCase):

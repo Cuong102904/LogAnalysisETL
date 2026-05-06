@@ -15,12 +15,16 @@ docker compose -f docker-compose.phase1.yml up --build
 ## 3) Replay dữ liệu tracking logs
 
 ```bash
-cd source/kafka
-uv run python -m src.producers.tracking_log_replayer \
+cd source
+uv run python -m kafka.src.producers.tracking_log_replayer \
   --brokers broker1:29092,broker2:29092,broker3:29092 \
   --topic mooc.raw.events \
   --input-root ../BK_activity_logs_unzipped
 ```
+
+Ghi chu:
+- Producer route theo allowlist, nen `mooc.raw.events` la tap con su kien phuc vu use-case.
+- Su kien ngoai allowlist va cac ban ghi loi duoc publish vao `mooc.dlq.events`.
 
 ## 4) Run Spark apps
 

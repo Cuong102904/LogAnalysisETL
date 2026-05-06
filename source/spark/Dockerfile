@@ -1,4 +1,4 @@
-FROM bitnami/spark:3.5.1
+FROM bitnamilegacy/spark:3.5 
 
 USER root
 
@@ -10,5 +10,14 @@ COPY infrastructure /opt/project/spark/infrastructure
 COPY configs /opt/project/spark/configs
 COPY utils /opt/project/spark/utils
 COPY src /opt/project/spark/src
+
+# Ensure Python runtime has Spark and YAML deps for app modules.
+RUN /opt/bitnami/python/bin/pip install --no-cache-dir \
+    pyspark==3.5.1 \
+    delta-spark==3.2.0 \
+    pyyaml>=6.0.0
+
+WORKDIR /opt/project/spark
+ENV PYTHONPATH=/opt/project/spark
 
 USER 1001

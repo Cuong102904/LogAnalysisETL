@@ -1,22 +1,63 @@
 # Airflow Repository
 
-Airflow la orchestration layer cho phase tiep theo.
+Airflow is the orchestration layer for local Bronze operations.
 
-## Scope hien tai
+## What is implemented
 
-- Giu skeleton folder:
-  - `dags/`
-  - `tasks/`
-  - `plugins/`
-  - `utils/`
-- Chua implement runtime operators cho Bronze/Silver/Gold.
+- Runtime compose stack in `docker-compose.yaml` (CeleryExecutor).
+- Real Bronze DAGs in `dags/bronze/`:
+  - `bronze_stream_health`: Kafka offset progress + checkpoint progress + file health.
+  - `bronze_table_maintenance`: Delta OPTIMIZE compaction + VACUUM + post-health-check.
+- Runtime task module in `tasks/bronze/runtime_checks.py`.
+- Reusable Spark wrapper task in `tasks/spark_task.py` for Bronze/Silver/Gold reuse.
+- Airflow variable adapter in `config/variables.py` for shared secrets/endpoints.
 
-## Future DAG roadmap
+## Project structure
 
-- Trigger `apps.bronze_ingestor`.
-- Trigger `apps.silver_transformer`.
-- Trigger `apps.gold_aggregator`.
-- Data quality checks va SLA alerts.
+- `dags/bronze/`, `dags/silver/`, `dags/gold/`: one DAG per file by domain.
+- `tasks/`: reusable execution task factories (`spark_task`) and domain checks.
+- `utils/`: shared helper utilities.
+- `config/`: shared runtime variables loaded from Airflow Variables.
 
-Trang thai: DEFERRED runtime, docs-first.
+## Setup
+
+1. Create Airflow env file from template:
+
+```bash
+cd source/airflow
+cp .env.example .env
+```
+
+2. Fill required secrets in `.env`:
+   - `FERNET_KEY`
+   - `AIRFLOW__API_AUTH__JWT_SECRET`
+   - `_AIRFLOW_WWW_USER_PASSWORD`
+
+3. Ensure phase1 infra stack is up and external network exists:
+   - expected network name: `mooc-streaming-phase1_default`
+   - override with `PHASE1_NETWORK` in `.env` if needed.
+
+4. Start Airflow:
+
+```bash
+cd source/airflow
+docker compose up -d --build
+```
+
+5. Open UI at [http://localhost:8080](http://localhost:8080).
+
+## DAG behavior
+
+- `bronze_stream_health` (default every 10 minutes):
+  - verifies Kafka topic offsets continue increasing,
+  - verifies Bronze checkpoint offsets continue increasing,
+  - checks Bronze file count/small-file ratio/checkpoint staleness.
+- `bronze_table_maintenance` (default every 6 hours):
+  - runs Delta compaction (`OPTIMIZE`) and `VACUUM`,
+  - reruns file health checks after maintenance.
+
+## Notes
+
+- All runtime knobs are in one file: `source/airflow/.env`.
+- The DAGs target Bronze only. Silver and Gold orchestration remain out of scope in this phase.
 
