@@ -31,7 +31,6 @@ source/kafka/
   tests/
     integration/
     test_mooc_event_filter.py
-  docker-compose.yml
   Dockerfile
   Dockerfile.app
   pyproject.toml
@@ -46,19 +45,18 @@ source/kafka/
 
 ## Chay local nhanh
 
-1) Khoi dong Kafka brokers:
+1) Khoi dong Kafka brokers trong compose goc:
 
 ```bash
-cd source/kafka
-docker compose up -d
+cd source
+docker compose up -d broker1 broker2 broker3 kafka-ui kafka-init
 ```
 
 2) Tao topics:
 
 ```bash
-cd source/kafka
-chmod +x scripts/create_topics.sh
-./scripts/create_topics.sh
+cd source
+docker compose logs -f kafka-init
 ```
 
 3) Replay tracking logs:
@@ -86,4 +84,3 @@ uv run python -m kafka.src.producers.tracking_log_replayer --brokers localhost:9
 cd source
 uv run python -m unittest discover -s kafka/tests/integration -p "test_*.py"
 ```
-

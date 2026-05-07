@@ -3,7 +3,7 @@ from apps.bronze_ingestor.job import run
 
 
 def main() -> None:
-    run(BronzeConfig())
+    run(BronzeConfig.from_env())
 
 
 if __name__ == "__main__":

@@ -1,14 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BOOTSTRAP_SERVER="${1:-broker1:29092}"
+BOOTSTRAP_SERVER="${BOOTSTRAP_SERVER:-${1:-broker1:29092}}"
+
+run_kafka_topics() {
+  if command -v kafka-topics >/dev/null 2>&1; then
+    kafka-topics "$@"
+  elif command -v docker >/dev/null 2>&1; then
+    docker compose exec broker1 kafka-topics "$@"
+  else
+    echo "kafka-topics is not available" >&2
+    exit 1
+  fi
+}
+
+run_kafka_configs() {
+  if command -v kafka-configs >/dev/null 2>&1; then
+    kafka-configs "$@"
+  elif command -v docker >/dev/null 2>&1; then
+    docker compose exec broker1 kafka-configs "$@"
+  else
+    echo "kafka-configs is not available" >&2
+    exit 1
+  fi
+}
 
 create_topic() {
   local topic="$1"
   local partitions="$2"
   local retention_ms="$3"
 
-  docker compose exec broker1 kafka-topics \
+  run_kafka_topics \
     --create \
     --if-not-exists \
     --topic "${topic}" \
@@ -16,7 +38,7 @@ create_topic() {
     --replication-factor 3 \
     --bootstrap-server "${BOOTSTRAP_SERVER}"
 
-  docker compose exec broker1 kafka-configs \
+  run_kafka_configs \
     --bootstrap-server "${BOOTSTRAP_SERVER}" \
     --entity-type topics \
     --entity-name "${topic}" \
@@ -33,7 +55,7 @@ for topic in \
   "mooc.raw.anonymous.events" \
   "mooc.dlq.events"
 do
-  docker compose exec broker1 kafka-topics \
+  run_kafka_topics \
     --describe \
     --topic "${topic}" \
     --bootstrap-server "${BOOTSTRAP_SERVER}"

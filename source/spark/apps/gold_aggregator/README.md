@@ -8,5 +8,5 @@ Trang thai:
 Entry:
 
 ```bash
-python -m apps.gold_aggregator.main
+spark-submit --master spark://spark-master:7077 /opt/project/spark/apps/gold_aggregator/main.py
 ```

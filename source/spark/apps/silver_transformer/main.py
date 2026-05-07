@@ -3,7 +3,7 @@ from apps.silver_transformer.job import run
 
 
 def main() -> None:
-    run(SilverConfig())
+    run(SilverConfig.from_env())
 
 
 if __name__ == "__main__":

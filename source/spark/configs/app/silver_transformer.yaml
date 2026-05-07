@@ -9,3 +9,9 @@ storage:
   video_interactions_path: s3a://silver/mooc/silver/video_interactions
 checkpoint:
   base_path: s3a://checkpoints/mooc/silver_transformer
+streaming:
+  learning_query_name: silver_learning_events
+  performance_query_name: silver_performance_events
+  system_query_name: silver_system_events
+  unknown_query_name: silver_unknown_events
+  video_query_name: silver_video_interactions

@@ -9,12 +9,13 @@ from infrastructure.spark.session import build_spark
 from apps.silver_transformer.config import SilverConfig
 
 
-def _start_delta_writer(df, path: str, checkpoint: str) -> None:
+def _start_delta_writer(df, path: str, checkpoint: str, query_name: str) -> None:
     (
         df.writeStream.format("delta")
         .option("path", path)
         .option("checkpointLocation", checkpoint)
         .outputMode("append")
+        .queryName(query_name)
         .start()
     )
 
@@ -30,11 +31,34 @@ def run(config: SilverConfig) -> None:
     unknown = normalize_unknown(classified)
     video = normalize_video_interactions(learning)
 
-    _start_delta_writer(learning, config.learning_path, f"{config.checkpoint_base}/learning")
     _start_delta_writer(
-        performance, config.performance_path, f"{config.checkpoint_base}/performance"
+        learning,
+        config.learning_path,
+        f"{config.checkpoint_base}/learning",
+        config.learning_query_name,
     )
-    _start_delta_writer(system, config.system_path, f"{config.checkpoint_base}/system")
-    _start_delta_writer(unknown, config.unknown_path, f"{config.checkpoint_base}/unknown")
-    _start_delta_writer(video, config.video_path, f"{config.checkpoint_base}/video")
+    _start_delta_writer(
+        performance,
+        config.performance_path,
+        f"{config.checkpoint_base}/performance",
+        config.performance_query_name,
+    )
+    _start_delta_writer(
+        system,
+        config.system_path,
+        f"{config.checkpoint_base}/system",
+        config.system_query_name,
+    )
+    _start_delta_writer(
+        unknown,
+        config.unknown_path,
+        f"{config.checkpoint_base}/unknown",
+        config.unknown_query_name,
+    )
+    _start_delta_writer(
+        video,
+        config.video_path,
+        f"{config.checkpoint_base}/video",
+        config.video_query_name,
+    )
     spark.streams.awaitAnyTermination()

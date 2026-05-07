@@ -3,7 +3,7 @@ from apps.gold_aggregator.job import run
 
 
 def main() -> None:
-    run(GoldConfig())
+    run(GoldConfig.from_env())
 
 
 if __name__ == "__main__":

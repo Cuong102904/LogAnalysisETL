@@ -2,7 +2,7 @@
 
 Consumes `mooc.raw.events`, enriches ingest metadata, and writes Delta Bronze.
 
-- Entry: `python -m apps.bronze_ingestor.main`
+- Entry: `spark-submit --master spark://spark-master:7077 /opt/project/spark/apps/bronze_ingestor/main.py`
 - Output path: `s3a://bronze/mooc/bronze/mooc_events_raw`
 - Checkpoint path: `s3a://checkpoints/mooc/bronze_ingestor`
 

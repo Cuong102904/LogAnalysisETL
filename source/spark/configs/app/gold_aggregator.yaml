@@ -8,3 +8,8 @@ storage:
   system_profile_path: s3a://gold/mooc/gold/system_profile
 checkpoint:
   base_path: s3a://checkpoints/mooc/gold_aggregator
+  video_anomaly_path: s3a://checkpoints/mooc/gold_aggregator/video_anomaly
+streaming:
+  video_anomaly_query_name: gold_video_anomaly_features
+options:
+  bucket_seconds: 5

@@ -5,6 +5,7 @@ def write_delta_stream(
     df: DataFrame,
     output_path: str,
     checkpoint_path: str,
+    query_name: str | None = None,
     partition_by: list[str] | None = None,
 ) -> None:
     writer = (
@@ -15,4 +16,6 @@ def write_delta_stream(
     )
     if partition_by:
         writer = writer.partitionBy(*partition_by)
+    if query_name:
+        writer = writer.queryName(query_name)
     writer.start().awaitTermination()

@@ -1,0 +1,469 @@
+name: log-streaming-platform
+
+x-kafka-build: &kafka-build
+  context: ./kafka
+  dockerfile: Dockerfile
+
+x-spark-build: &spark-build
+  context: ./spark
+  dockerfile: Dockerfile
+
+x-airflow-build: &airflow-build
+  context: ./airflow
+  dockerfile: Dockerfile
+
+x-spark-env: &spark-env
+  SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+  SPARK_APP_PATH: /opt/project/spark
+  SPARK_CONF_DIR: /opt/bitnami/spark/conf
+  SPARK_JARS_PACKAGES: ${SPARK_JARS_PACKAGES:-io.delta:delta-spark_2.12:3.2.0,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262}
+  PYTHONPATH: /opt/project/spark
+  MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+  MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+  MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
+  MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
+  MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio123456}
+  MINIO_REGION: ${MINIO_REGION:-us-east-1}
+  S3A_PATH_STYLE_ACCESS: "true"
+  S3A_SSL_ENABLED: "false"
+  SPARK_DRIVER_MEMORY: ${SPARK_DRIVER_MEMORY:-512m}
+  SPARK_EXECUTOR_MEMORY: ${SPARK_EXECUTOR_MEMORY:-768m}
+  PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+  PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
+
+x-airflow-env: &airflow-env
+  AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR:-LocalExecutor}
+  AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW__CORE__LOAD_EXAMPLES:-False}
+  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: ${AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:-True}
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD:-airflow}@airflow-db:5432/${AIRFLOW_DB_NAME:-airflow}
+  AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+  AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW__API_AUTH__JWT_SECRET:-airflow_jwt_secret}
+  AIRFLOW__API_AUTH__JWT_ISSUER: ${AIRFLOW__API_AUTH__JWT_ISSUER:-airflow}
+  AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+  AIRFLOW__SCHEDULER__STANDALONE_DAG_PROCESSOR: "true"
+  AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-webserver:8080/execution/
+  SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+  SPARK_APP_PATH: /opt/project/spark
+  SPARK_CONF_DIR: /opt/project/spark/conf
+  SPARK_JARS_PACKAGES: ${SPARK_JARS_PACKAGES:-io.delta:delta-spark_2.12:3.2.0,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262}
+  KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
+  KAFKA_TOPIC_RAW: ${KAFKA_TOPIC_RAW:-mooc.raw.events}
+  MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+  MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+  MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
+  MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
+  MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio123456}
+  MINIO_REGION: ${MINIO_REGION:-us-east-1}
+  BRONZE_TABLE_PATH: ${BRONZE_TABLE_PATH:-s3a://bronze/mooc/bronze/mooc_events_raw}
+  BRONZE_TABLE_BUCKET: ${MINIO_BUCKET_BRONZE:-bronze}
+  BRONZE_TABLE_PREFIX: ${BRONZE_TABLE_PREFIX:-mooc/bronze/mooc_events_raw/}
+  CHECKPOINT_BUCKET: ${MINIO_BUCKET_CHECKPOINTS:-checkpoints}
+  CHECKPOINT_PREFIX: ${BRONZE_CHECKPOINT_PREFIX:-mooc/bronze_ingestor/offsets/}
+  BRONZE_VACUUM_RETENTION_HOURS: ${BRONZE_VACUUM_RETENTION_HOURS:-168}
+  BRONZE_OPTIMIZE_ENABLED: ${BRONZE_OPTIMIZE_ENABLED:-true}
+  BRONZE_VACUUM_ENABLED: ${BRONZE_VACUUM_ENABLED:-false}
+  PYTHONPATH: /opt/airflow:/opt/project/spark
+  _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
+  _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-admin}
+  AIRFLOW_CONN_SPARK_DEFAULT: spark://spark-master:7077
+
+services:
+  broker1:
+    build: *kafka-build
+    image: local/kafka:dev
+    hostname: broker1
+    container_name: lsp-broker1
+    ports:
+      - "9092:9092"
+    environment:
+      CLUSTER_ID: ${KAFKA_CLUSTER_ID:-MkU3OEVBNTcwNTJENDM2Qk}
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker1:9101,2@broker2:9101,3@broker3:9101
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9101
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker1:29092,EXTERNAL://${KAFKA_EXTERNAL_HOST:-localhost}:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: ${KAFKA_HEAP_OPTS:-"-Xms256m -Xmx384m"}
+    volumes:
+      - broker1-data:/var/lib/kafka/data
+    mem_limit: ${KAFKA_BROKER1_MEM_LIMIT:-650m}
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server broker1:29092 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  broker2:
+    build: *kafka-build
+    image: local/kafka:dev
+    hostname: broker2
+    container_name: lsp-broker2
+    ports:
+      - "9093:9093"
+    environment:
+      CLUSTER_ID: ${KAFKA_CLUSTER_ID:-MkU3OEVBNTcwNTJENDM2Qk}
+      KAFKA_NODE_ID: 2
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker1:9101,2@broker2:9101,3@broker3:9101
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9093,CONTROLLER://0.0.0.0:9101
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker2:29092,EXTERNAL://${KAFKA_EXTERNAL_HOST:-localhost}:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: ${KAFKA_HEAP_OPTS:-"-Xms256m -Xmx384m"}
+    volumes:
+      - broker2-data:/var/lib/kafka/data
+    mem_limit: ${KAFKA_BROKER_MEM_LIMIT:-650m}
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server broker2:29092 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  broker3:
+    build: *kafka-build
+    image: local/kafka:dev
+    hostname: broker3
+    container_name: lsp-broker3
+    ports:
+      - "9094:9094"
+    environment:
+      CLUSTER_ID: ${KAFKA_CLUSTER_ID:-MkU3OEVBNTcwNTJENDM2Qk}
+      KAFKA_NODE_ID: 3
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker1:9101,2@broker2:9101,3@broker3:9101
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9094,CONTROLLER://0.0.0.0:9101
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker3:29092,EXTERNAL://${KAFKA_EXTERNAL_HOST:-localhost}:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: ${KAFKA_HEAP_OPTS:-"-Xms256m -Xmx384m"}
+    volumes:
+      - broker3-data:/var/lib/kafka/data
+    mem_limit: ${KAFKA_BROKER_MEM_LIMIT:-650m}
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server broker3:29092 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: lsp-kafka-ui
+    depends_on:
+      broker1:
+        condition: service_healthy
+      broker2:
+        condition: service_healthy
+      broker3:
+        condition: service_healthy
+    ports:
+      - "8085:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local-kraft
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker1:29092,broker2:29092,broker3:29092
+      DYNAMIC_CONFIG_ENABLED: "true"
+    mem_limit: ${KAFKA_UI_MEM_LIMIT:-300m}
+
+  kafka-init:
+    build: *kafka-build
+    image: local/kafka:dev
+    container_name: lsp-kafka-init
+    depends_on:
+      broker1:
+        condition: service_healthy
+      broker2:
+        condition: service_healthy
+      broker3:
+        condition: service_healthy
+    environment:
+      BOOTSTRAP_SERVER: broker1:29092
+    volumes:
+      - ./kafka/scripts:/scripts:ro
+    entrypoint: ["/bin/bash", "-lc"]
+    command: "/scripts/create_topics.sh"
+    mem_limit: ${KAFKA_INIT_MEM_LIMIT:-256m}
+
+  minio:
+    build:
+      context: ./minio
+      dockerfile: Dockerfile
+    image: local/minio:dev
+    container_name: lsp-minio
+    command: server --console-address ":9001" /data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
+      MINIO_REGION_NAME: ${MINIO_REGION:-us-east-1}
+    volumes:
+      - minio-data:/data
+    mem_limit: ${MINIO_MEM_LIMIT:-512m}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://minio:9000/minio/health/ready >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: lsp-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
+      MINIO_BUCKET_BRONZE: ${MINIO_BUCKET_BRONZE:-bronze}
+      MINIO_BUCKET_CHECKPOINTS: ${MINIO_BUCKET_CHECKPOINTS:-checkpoints}
+      MINIO_BUCKET_SPARK_EVENTS: ${MINIO_BUCKET_SPARK_EVENTS:-spark-events}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
+        mc mb --ignore-existing "local/$${MINIO_BUCKET_BRONZE}"
+        mc mb --ignore-existing "local/$${MINIO_BUCKET_CHECKPOINTS}"
+        mc mb --ignore-existing "local/$${MINIO_BUCKET_SPARK_EVENTS}"
+        touch /tmp/spark-events-log-keep
+        mc cp /tmp/spark-events-log-keep "local/$${MINIO_BUCKET_SPARK_EVENTS}/logs/.keep"
+        mc anonymous set download "local/$${MINIO_BUCKET_BRONZE}" || true
+    mem_limit: ${MINIO_INIT_MEM_LIMIT:-192m}
+
+  spark-master:
+    build: *spark-build
+    image: local/spark:dev
+    container_name: lsp-spark-master
+    environment:
+      <<: *spark-env
+      SPARK_MODE: master
+    ports:
+      - "7077:7077"
+      - "8081:8080"
+    mem_limit: ${SPARK_MASTER_MEM_LIMIT:-512m}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://spark-master:8080 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  spark-worker-1:
+    build: *spark-build
+    image: local/spark:dev
+    container_name: lsp-spark-worker-1
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    environment:
+      <<: *spark-env
+      SPARK_MODE: worker
+      SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-1g}
+      SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-1}
+    ports:
+      - "8082:8081"
+    mem_limit: ${SPARK_WORKER_MEM_LIMIT:-1400m}
+
+  spark-history-server:
+    build: *spark-build
+    image: local/spark:dev
+    container_name: lsp-spark-history-server
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+    environment:
+      <<: *spark-env
+    command: >
+      bash -lc "/opt/bitnami/spark/bin/spark-class org.apache.spark.deploy.history.HistoryServer"
+    ports:
+      - "18080:18080"
+    mem_limit: ${SPARK_HISTORY_MEM_LIMIT:-512m}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://spark-history-server:18080 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  bronze-stream:
+    build: *spark-build
+    image: local/spark:dev
+    container_name: lsp-bronze-stream
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+      minio-init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_healthy
+      spark-worker-1:
+        condition: service_started
+    environment:
+      <<: *spark-env
+      BRONZE_APP_NAME: ${BRONZE_APP_NAME:-bronze_ingestor}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
+      KAFKA_TOPIC_RAW: ${KAFKA_TOPIC_RAW:-mooc.raw.events}
+      BRONZE_TABLE_PATH: ${BRONZE_TABLE_PATH:-s3a://bronze/mooc/bronze/mooc_events_raw}
+      BRONZE_CHECKPOINT_PATH: ${BRONZE_CHECKPOINT_PATH:-s3a://checkpoints/mooc/bronze_ingestor}
+      BRONZE_QUERY_NAME: ${BRONZE_QUERY_NAME:-bronze_ingestor_raw}
+    command: >
+      bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
+      --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
+      --name \"$${BRONZE_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      /opt/project/spark/apps/bronze_ingestor/main.py"
+    restart: unless-stopped
+    mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
+
+  tracking-log-replayer:
+    build:
+      context: ./kafka
+      dockerfile: Dockerfile.app
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+    profiles: ["replay"]
+    volumes:
+      - ../BK_activity_logs_unzipped:/data/activity_logs:ro
+    command:
+      - python
+      - -m
+      - kafka.src.producers.tracking_log_replayer
+      - --brokers
+      - broker1:29092,broker2:29092,broker3:29092
+      - --input-root
+      - /data/activity_logs
+      - --topic
+      - mooc.raw.events
+      - --anonymous-topic
+      - mooc.raw.anonymous.events
+      - --max-files
+      - "2"
+      - --speed
+      - "4"
+    restart: "no"
+    mem_limit: 512m
+
+  airflow-db:
+    image: postgres:16-alpine
+    container_name: lsp-airflow-db
+    environment:
+      POSTGRES_USER: ${AIRFLOW_DB_USER:-airflow}
+      POSTGRES_PASSWORD: ${AIRFLOW_DB_PASSWORD:-airflow}
+      POSTGRES_DB: ${AIRFLOW_DB_NAME:-airflow}
+    volumes:
+      - airflow-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AIRFLOW_DB_USER:-airflow} -d ${AIRFLOW_DB_NAME:-airflow}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    mem_limit: ${AIRFLOW_DB_MEM_LIMIT:-256m}
+
+  airflow-webserver:
+    build: *airflow-build
+    image: local/airflow:dev
+    container_name: lsp-airflow-webserver
+    user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
+    environment:
+      <<: *airflow-env
+    volumes:
+      - airflow-logs:/opt/airflow/logs
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/tasks:/opt/airflow/tasks
+      - ./airflow/config:/opt/airflow/config
+      - ./airflow/utils:/opt/airflow/utils
+      - ./spark:/opt/project/spark:ro
+    ports:
+      - "8089:8080"
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    command: "airflow api-server"
+    restart: unless-stopped
+    mem_limit: ${AIRFLOW_WEBSERVER_MEM_LIMIT:-512m}
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/monitor/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  airflow-scheduler:
+    build: *airflow-build
+    image: local/airflow:dev
+    container_name: lsp-airflow-scheduler
+    user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
+    environment:
+      <<: *airflow-env
+    volumes:
+      - airflow-logs:/opt/airflow/logs
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/tasks:/opt/airflow/tasks
+      - ./airflow/config:/opt/airflow/config
+      - ./airflow/utils:/opt/airflow/utils
+      - ./spark:/opt/project/spark:ro
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+      kafka-init:
+        condition: service_completed_successfully
+      minio-init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_healthy
+    command: "airflow scheduler"
+    restart: unless-stopped
+    mem_limit: ${AIRFLOW_SCHEDULER_MEM_LIMIT:-2g}
+
+  airflow-init:
+    build: *airflow-build
+    image: local/airflow:dev
+    container_name: lsp-airflow-init
+    user: "${AIRFLOW_UID:-50000}:0"
+    environment:
+      <<: *airflow-env
+    volumes:
+      - airflow-logs:/opt/airflow/logs
+    command: >
+      bash -lc "set -e;
+      mkdir -p /opt/airflow/logs;
+      chmod -R g+rwX /opt/airflow/logs;
+      airflow db migrate;
+      airflow users create --username \"${_AIRFLOW_WWW_USER_USERNAME:-admin}\" --password \"${_AIRFLOW_WWW_USER_PASSWORD:-admin}\" --firstname Admin --lastname User --role Admin --email admin@example.com || true"
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_healthy
+    mem_limit: ${AIRFLOW_INIT_MEM_LIMIT:-256m}
+
+volumes:
+  broker1-data:
+  broker2-data:
+  broker3-data:
+  minio-data:
+  airflow-db-data:
+  airflow-logs:

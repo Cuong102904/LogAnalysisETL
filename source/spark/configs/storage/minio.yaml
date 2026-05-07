@@ -9,3 +9,4 @@ buckets:
   silver: silver
   gold: gold
   checkpoints: checkpoints
+  spark_events: spark-events

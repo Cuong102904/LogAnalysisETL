@@ -23,5 +23,6 @@ def run(config: BronzeConfig) -> None:
         bronze,
         output_path=config.output_path,
         checkpoint_path=config.checkpoint_path,
+        query_name=config.query_name,
         partition_by=["ingest_date", "ingest_hour"],
     )

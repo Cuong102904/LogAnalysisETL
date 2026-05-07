@@ -15,6 +15,7 @@ def run(config: GoldConfig) -> None:
         .option("path", config.output_video_features_path)
         .option("checkpointLocation", config.checkpoint_path)
         .outputMode("append")
+        .queryName(config.query_name)
         .start()
         .awaitTermination()
     )
