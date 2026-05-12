@@ -5,7 +5,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
-from kafka.src.common import decode_json, validate_tracking_event
+from kafka.src.common import validate_tracking_event
 from kafka.src.models.replay_record import ReplayRecord
 from kafka.src.producers.replayer.pacing import parse_event_time
 
