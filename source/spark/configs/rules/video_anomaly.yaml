@@ -1,0 +1,11 @@
+version: 1
+bucket_seconds: 5
+wallclock_window_minutes: 60
+min_distinct_users: 5
+surge_z_threshold: 3.0
+actions:
+  - play
+  - pause
+  - seek
+  - stop
+  - speed_change

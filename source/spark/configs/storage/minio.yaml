@@ -1,0 +1,9 @@
+s3a:
+  endpoint: http://minio:9000
+  access_key_env: MINIO_ROOT_USER
+  secret_key_env: MINIO_ROOT_PASSWORD
+  path_style_access: true
+  ssl_enabled: false
+buckets:
+  data: lakehouse
+  platform: platform

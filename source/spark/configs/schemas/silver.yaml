@@ -1,0 +1,11 @@
+tables:
+  - name: silver.learning_events
+    partition_by: [event_date, course_bucket]
+  - name: silver.performance_events
+    partition_by: [event_date, course_bucket]
+  - name: silver.system_events
+    partition_by: [event_date, event_category]
+  - name: silver.unknown_events
+    partition_by: [event_date]
+  - name: silver.video_interactions
+    partition_by: [event_date, course_bucket]

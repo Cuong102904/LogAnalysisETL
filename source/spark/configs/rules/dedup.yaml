@@ -1,0 +1,15 @@
+version: 1
+technical:
+  watermark: 1 hour
+  key: dedup_key
+silver:
+  watermark: 10 minutes
+  learning:
+    keys: [user_id_int, event_type, video_id, ts_rounded_500ms]
+  performance:
+    keys: [event_transaction_id]
+  system:
+    keys: [session, ip, event_category, event_type, ts_rounded_1s]
+gold:
+  video_interactions:
+    replay_collapse_ms: 500

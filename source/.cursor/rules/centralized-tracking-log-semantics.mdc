@@ -1,0 +1,10 @@
+---
+description: Centralized LMS/Open edX tracking — log order and event time are unreliable for strict causality
+alwaysApply: true
+---
+
+Centralized ingest (files, Kafka) can reorder or delay lines; payloads can mix client/server clocks and skew.
+
+Do **not** treat **record order** or a single **`time` field alone** as proof that event A strictly preceded B or necessarily caused B.
+
+Prefer bucketing/TTLs/reordering-safe joins, tolerate small deltas, document assumptions—and only impose hard ordering when backed by correlated ids plus explicit slack.

@@ -1,0 +1,25 @@
+cluster:
+  default_replication_factor: 3
+  min_insync_replicas: 2
+
+topics:
+  - name: mooc.raw.events
+    partitions: 12
+    retention_ms: 1209600000
+    description: Canonical raw tracking events for medallion pipeline.
+  - name: mooc.raw.anonymous.events
+    partitions: 12
+    retention_ms: 1209600000
+    description: Allowlisted LMS rows without username and without context.user_id (still JSON line value).
+  - name: mooc.dlq.events
+    partitions: 6
+    retention_ms: 1209600000
+    description: Events that fail decode/validation.
+
+topics_legacy:
+  - name: mooc.ingest.raw
+  - name: mooc.clickstream.raw
+  - name: mooc.quiz.raw
+  - name: mooc.video.raw
+  - name: mooc.exam.raw
+  - name: mooc.system.raw
