@@ -36,7 +36,7 @@ docker compose up -d --build
 Default mode starts Kafka, Kafka UI, MinIO, Spark Master/Worker, History Server, Airflow, and Bronze stream. Optional replay is behind the `replay` profile:
 
 ```bash
-docker compose --profile replay up -d tracking-log-replayer
+docker compose up -d tracking-log-replayer
 ```
 
 Do not run production streams with `python -m apps.*`; the stack submits Bronze with `spark-submit --master spark://spark-master:7077`.
@@ -112,14 +112,14 @@ Manual checklist:
 
 ```bash
 cd source
-docker compose --profile replay up -d tracking-log-replayer
+docker compose up -d tracking-log-replayer
 docker compose logs -f tracking-log-replayer
 ```
 
-Mặc định replay 2 file đầu ở tốc độ 4x. Để thay đổi tham số:
+Mặc định replay 10 file đầu ở tốc độ 4x. Để thay đổi tham số:
 
 ```bash
-docker compose run --rm --profile replay tracking-log-replayer \
+docker compose run --rm tracking-log-replayer \
   python -m kafka.src.producers.tracking_log_replayer \
   --brokers broker1:29092,broker2:29092,broker3:29092 \
   --input-root /data/activity_logs \

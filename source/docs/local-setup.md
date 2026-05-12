@@ -61,17 +61,17 @@ Chạy replayer qua Docker (không cần cài thêm gì):
 
 ```bash
 cd source
-docker compose --profile replay up -d tracking-log-replayer
+docker compose up -d tracking-log-replayer
 docker compose logs -f tracking-log-replayer
 ```
 
-Tham số mặc định trong `docker-compose.yaml`: `--max-files 2 --speed 4` (2 file đầu, replay nhanh 4x).
+Tham số mặc định trong `docker-compose.yaml`: `--max-files 10 --speed 4` (10 file đầu, replay nhanh 4x).
 
 Để chạy nhiều file hơn hoặc điều chỉnh tốc độ, override trực tiếp:
 
 ```bash
 cd source
-docker compose run --rm --profile replay tracking-log-replayer \
+docker compose run --rm tracking-log-replayer \
   python -m kafka.src.producers.tracking_log_replayer \
   --brokers broker1:29092,broker2:29092,broker3:29092 \
   --input-root /data/activity_logs \
