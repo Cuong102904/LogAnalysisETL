@@ -19,12 +19,12 @@ def _enabled(env_name: str, default: str = "true") -> bool:
 def _maintenance_arguments() -> list[str]:
     base_path = os.getenv("SILVER_TABLE_BASE_PATH", "s3a://lakehouse/mooc/silver")
     table_path = f"{base_path}/exam_attempts"
-    
+
     arguments = [
         "--table-path",
         table_path,
         "--app-name",
-        f"silver_exam_attempts_maintenance",
+        "silver_exam_attempts_maintenance",
     ]
     if _enabled("SILVER_OPTIMIZE_ENABLED"):
         arguments.append("--optimize")
@@ -39,19 +39,19 @@ def _maintenance_arguments() -> list[str]:
     return arguments
 
 with DAG(
-    dag_id=f"silver_maintenance_exam_attempts",
-    description=f"Scheduled OPTIMIZE and VACUUM for Silver Delta table: exam_attempts",
+    dag_id="silver_maintenance_exam_attempts",
+    description="Scheduled OPTIMIZE and VACUUM for Silver Delta table: exam_attempts",
     start_date=datetime(2026, 1, 1),
     schedule=os.getenv("SILVER_MAINTENANCE_SCHEDULE", "0 1 * * *"),
     catchup=False,
     tags=["silver", "maintenance", "delta", "exam_attempts"],
     default_args=DEFAULT_ARGS,
 ) as dag:
-    
+
     start = EmptyOperator(task_id="start")
-    
+
     run_maintenance = spark_task(
-        name=f"run_maintenance",
+        name="run_maintenance",
         command="apps/maintenance",
         subcommand="delta_maintenance",
         pool="silver_pool",
@@ -61,7 +61,7 @@ with DAG(
         spark_executor_memory=os.getenv("SILVER_MAINTENANCE_EXECUTOR_MEMORY", "1g"),
         spark_executor_cores=int(os.getenv("SILVER_MAINTENANCE_EXECUTOR_CORES", "1")),
     )
-    
+
     end = EmptyOperator(task_id="end")
-    
+
     start >> run_maintenance >> end
