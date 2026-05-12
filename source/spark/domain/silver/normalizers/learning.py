@@ -27,26 +27,18 @@ def normalize_learning(df: DataFrame) -> DataFrame:
     event_type_col = F.get_json_object("value_raw", "$.event_type")
     completion_value = F.when(
         event_type_col.contains("publish_completion"),
-        F.get_json_object(
-            F.get_json_object("value_raw", "$.event"), "$.completion"
-        ).cast("int"),
+        F.get_json_object(F.get_json_object("value_raw", "$.event"), "$.completion").cast("int"),
     ).otherwise(F.lit(None).cast("int"))
 
     return base.select(
         F.col("dedup_key").alias("event_id"),
         F.to_timestamp(F.get_json_object("value_raw", "$.time")).alias("ts"),
-        F.to_date(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias(
-            "event_date"
-        ),
-        F.hour(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias(
-            "event_hour"
-        ),
+        F.to_date(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias("event_date"),
+        F.hour(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias("event_hour"),
         F.get_json_object("value_raw", "$.event_type").alias("event_type"),
         F.get_json_object("value_raw", "$.event_source").alias("event_source"),
         F.get_json_object("value_raw", "$.username").alias("username"),
-        F.get_json_object("value_raw", "$.context.user_id")
-        .cast("long")
-        .alias("user_id"),
+        F.get_json_object("value_raw", "$.context.user_id").cast("long").alias("user_id"),
         F.get_json_object("value_raw", "$.session").alias("session_id"),
         F.get_json_object("value_raw", "$.context.course_id").alias("course_id"),
         F.get_json_object("value_raw", "$.context.org_id").alias("org_id"),

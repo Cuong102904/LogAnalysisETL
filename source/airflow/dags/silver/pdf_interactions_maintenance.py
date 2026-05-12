@@ -13,8 +13,10 @@ DEFAULT_ARGS = {
     "retries": 1,
 }
 
+
 def _enabled(env_name: str, default: str = "true") -> bool:
     return os.getenv(env_name, default).lower() == "true"
+
 
 def _maintenance_arguments() -> list[str]:
     base_path = os.getenv("SILVER_TABLE_BASE_PATH", "s3a://lakehouse/mooc/silver")
@@ -38,6 +40,7 @@ def _maintenance_arguments() -> list[str]:
         )
     return arguments
 
+
 with DAG(
     dag_id="silver_maintenance_pdf_interactions",
     description="Scheduled OPTIMIZE and VACUUM for Silver Delta table: pdf_interactions",
@@ -47,7 +50,6 @@ with DAG(
     tags=["silver", "maintenance", "delta", "pdf_interactions"],
     default_args=DEFAULT_ARGS,
 ) as dag:
-
     start = EmptyOperator(task_id="start")
 
     run_maintenance = spark_task(

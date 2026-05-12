@@ -36,26 +36,22 @@ def add_classification(df: DataFrame) -> DataFrame:
         | event_type.contains("create_submission")
         | event_type.contains("student_submit")
         | event_type.contains("/handler/student_submit")
-        | event_type.contains("/handler/get_test_case")   # coderunner
-        | event_type.contains("/handler/get_id")          # coderunner
+        | event_type.contains("/handler/get_test_case")  # coderunner
+        | event_type.contains("/handler/get_id")  # coderunner
     )
 
     # ── exam ─────────────────────────────────────────────────────────────────
-    exam = (
-        event_type.startswith("edx.special_exam.timed.attempt.")
-    )
+    exam = event_type.startswith("edx.special_exam.timed.attempt.")
 
     # ── video ─────────────────────────────────────────────────────────────────
-    video = (
-        event_type.isin(
-            "play_video", "pause_video", "seek_video",
-            "stop_video", "speed_change_video", "load_video",
-        )
-        | (
-            event_type.contains("save_user_state")
-            & event_type.contains("+type@video+block@")
-        )
-    )
+    video = event_type.isin(
+        "play_video",
+        "pause_video",
+        "seek_video",
+        "stop_video",
+        "speed_change_video",
+        "load_video",
+    ) | (event_type.contains("save_user_state") & event_type.contains("+type@video+block@"))
 
     # ── pdf ───────────────────────────────────────────────────────────────────
     pdf = (

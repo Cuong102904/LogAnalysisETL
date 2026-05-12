@@ -18,9 +18,7 @@ def normalize_exam_attempts(df: DataFrame) -> DataFrame:
     return base.select(
         F.col("dedup_key").alias("event_id"),
         F.to_timestamp(F.get_json_object("value_raw", "$.time")).alias("ts"),
-        F.to_date(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias(
-            "event_date"
-        ),
+        F.to_date(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias("event_date"),
         # State transition type: created | started | ready_to_submit | submitted
         F.regexp_extract(
             F.get_json_object("value_raw", "$.event_type"),
@@ -28,9 +26,7 @@ def normalize_exam_attempts(df: DataFrame) -> DataFrame:
             1,
         ).alias("attempt_event"),
         F.get_json_object("value_raw", "$.username").alias("username"),
-        F.get_json_object("value_raw", "$.context.user_id")
-        .cast("long")
-        .alias("user_id"),
+        F.get_json_object("value_raw", "$.context.user_id").cast("long").alias("user_id"),
         F.get_json_object("value_raw", "$.session").alias("session_id"),
         F.get_json_object("value_raw", "$.context.course_id").alias("course_id"),
         # Attempt fields — direct from raw payload
@@ -40,24 +36,14 @@ def normalize_exam_attempts(df: DataFrame) -> DataFrame:
         ev.getItem("exam_content_id").alias("exam_content_id"),
         ev.getItem("exam_name").alias("exam_name"),
         ev.getItem("exam_is_proctored").cast("boolean").alias("exam_is_proctored"),
-        ev.getItem("exam_is_practice_exam")
-        .cast("boolean")
-        .alias("exam_is_practice_exam"),
+        ev.getItem("exam_is_practice_exam").cast("boolean").alias("exam_is_practice_exam"),
         ev.getItem("exam_is_active").cast("boolean").alias("exam_is_active"),
-        ev.getItem("exam_default_time_limit_mins")
-        .cast("int")
-        .alias("time_limit_mins"),
-        ev.getItem("attempt_allowed_time_limit_mins")
-        .cast("int")
-        .alias("allowed_time_limit_mins"),
+        ev.getItem("exam_default_time_limit_mins").cast("int").alias("time_limit_mins"),
+        ev.getItem("attempt_allowed_time_limit_mins").cast("int").alias("allowed_time_limit_mins"),
         F.to_timestamp(ev.getItem("attempt_started_at")).alias("attempt_started_at"),
-        F.to_timestamp(ev.getItem("attempt_completed_at")).alias(
-            "attempt_completed_at"
-        ),
+        F.to_timestamp(ev.getItem("attempt_completed_at")).alias("attempt_completed_at"),
         ev.getItem("attempt_status").alias("attempt_status"),
-        ev.getItem("attempt_event_elapsed_time_secs")
-        .cast("int")
-        .alias("elapsed_time_secs"),
+        ev.getItem("attempt_event_elapsed_time_secs").cast("int").alias("elapsed_time_secs"),
         ev.getItem("attempt_code").alias("attempt_code"),
         F.col("ingest_ts").alias("ingested_at"),
     )

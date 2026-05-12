@@ -12,9 +12,7 @@ def normalize_unknown(df: DataFrame) -> DataFrame:
         F.col("dedup_key").alias("event_id"),
         F.col("silver_class"),
         F.to_timestamp(F.get_json_object("value_raw", "$.time")).alias("ts"),
-        F.to_date(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias(
-            "event_date"
-        ),
+        F.to_date(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias("event_date"),
         F.get_json_object("value_raw", "$.event_source").alias("event_source"),
         F.get_json_object("value_raw", "$.event_type").alias("event_type"),
         F.get_json_object("value_raw", "$.username").alias("username"),

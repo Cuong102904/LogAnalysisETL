@@ -34,19 +34,40 @@ def run(config: SilverConfig) -> None:
     # Domain-specific tables (read from classified, not from learning)
     performance = normalize_performance(classified)
     exam = normalize_exam_attempts(classified)
-    video = normalize_video_interactions(learning)   # filter from learning (has event_json)
+    video = normalize_video_interactions(learning)  # filter from learning (has event_json)
     navigation = normalize_navigation(classified)
     pdf = normalize_pdf_interactions(classified)
     system = normalize_system(classified)
     unknown = normalize_unknown(classified)
 
-    _write_stream(learning, config.learning_path, f"{config.checkpoint_base}/learning", config.learning_query_name)
-    _write_stream(performance, config.performance_path, f"{config.checkpoint_base}/performance", config.performance_query_name)
+    _write_stream(
+        learning,
+        config.learning_path,
+        f"{config.checkpoint_base}/learning",
+        config.learning_query_name,
+    )
+    _write_stream(
+        performance,
+        config.performance_path,
+        f"{config.checkpoint_base}/performance",
+        config.performance_query_name,
+    )
     _write_stream(exam, config.exam_path, f"{config.checkpoint_base}/exam", config.exam_query_name)
-    _write_stream(video, config.video_path, f"{config.checkpoint_base}/video", config.video_query_name)
-    _write_stream(navigation, config.navigation_path, f"{config.checkpoint_base}/navigation", config.navigation_query_name)
+    _write_stream(
+        video, config.video_path, f"{config.checkpoint_base}/video", config.video_query_name
+    )
+    _write_stream(
+        navigation,
+        config.navigation_path,
+        f"{config.checkpoint_base}/navigation",
+        config.navigation_query_name,
+    )
     _write_stream(pdf, config.pdf_path, f"{config.checkpoint_base}/pdf", config.pdf_query_name)
-    _write_stream(system, config.system_path, f"{config.checkpoint_base}/system", config.system_query_name)
-    _write_stream(unknown, config.unknown_path, f"{config.checkpoint_base}/unknown", config.unknown_query_name)
+    _write_stream(
+        system, config.system_path, f"{config.checkpoint_base}/system", config.system_query_name
+    )
+    _write_stream(
+        unknown, config.unknown_path, f"{config.checkpoint_base}/unknown", config.unknown_query_name
+    )
 
     spark.streams.awaitAnyTermination()

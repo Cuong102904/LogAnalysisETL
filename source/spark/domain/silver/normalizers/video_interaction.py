@@ -11,15 +11,16 @@ def normalize_video_interactions(learning_df: DataFrame) -> DataFrame:
     Note: seek_direction (forward/backward) is a derived field -> computed at Gold.
     """
     ev = F.from_json(F.col("event_json"), "map<string,string>")
-    video_events = (
-        F.col("event_type").isin(
-            "play_video", "pause_video", "seek_video", "stop_video",
-            "speed_change_video", "load_video",
-        )
-        | (
-            F.col("event_type").contains("save_user_state")
-            & F.col("event_type").contains("+type@video+block@")
-        )
+    video_events = F.col("event_type").isin(
+        "play_video",
+        "pause_video",
+        "seek_video",
+        "stop_video",
+        "speed_change_video",
+        "load_video",
+    ) | (
+        F.col("event_type").contains("save_user_state")
+        & F.col("event_type").contains("+type@video+block@")
     )
 
     return learning_df.filter(video_events).select(
@@ -41,13 +42,13 @@ def normalize_video_interactions(learning_df: DataFrame) -> DataFrame:
         # seek fields (only seek_video)
         ev.getItem("old_time").cast("double").alias("old_time"),
         ev.getItem("new_time").cast("double").alias("new_time"),
-        ev.getItem("type").alias("seek_type"),           # 'html5' | 'youtube'
+        ev.getItem("type").alias("seek_type"),  # 'html5' | 'youtube'
         # speed change fields (only speed_change_video)
         ev.getItem("old_speed").cast("double").alias("old_speed"),
         ev.getItem("new_speed").cast("double").alias("new_speed"),
         # save_user_state POST body field (nested under POST array)
         F.coalesce(
             ev.getItem("saved_video_position"),
-            F.get_json_object(F.col("event_json"), "$.POST.saved_video_position[0]")
+            F.get_json_object(F.col("event_json"), "$.POST.saved_video_position[0]"),
         ).alias("saved_position"),
     )
