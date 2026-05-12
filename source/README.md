@@ -18,7 +18,7 @@ Service folders:
 - `kafka/`: raw event ingress, replay producer, topic bootstrap, and Kafka image build.
 - `spark/`: Bronze streaming job, maintenance job, shared domain logic, and Spark runtime config.
 - `minio/`: bucket bootstrap and storage bootstrap helpers.
-- `airflow/`: DAGs, task wrappers, and shared runtime helpers for Bronze maintenance.
+- `airflow/`: DAGs, task wrappers, and shared runtime helpers for Bronze and Silver maintenance.
 
 ## Best-Practice Structure By Service
 
@@ -30,7 +30,7 @@ Service folders:
 - `tests/`: unit and integration tests.
 
 `spark/`
-- `apps/`: executable Spark entrypoints such as `bronze_ingestor` and maintenance jobs.
+- `apps/`: executable Spark entrypoints such as `bronze_ingestor`, `silver_transformer`, and maintenance jobs.
 - `domain/`: pure business logic and schemas.
 - `infrastructure/`: Spark, Kafka, and storage adapters.
 - `configs/`: app, schema, rule, and storage YAML files.
@@ -68,6 +68,7 @@ Keep service-specific variables grouped by prefix:
 - `SPARK_*`
 - `AIRFLOW_*`
 - `BRONZE_*`
+- `SILVER_*`
 
 ## Run
 
@@ -94,5 +95,5 @@ docker compose up -d --build
 
 ## Notes
 
-- The current runtime scope is intentionally small: Kafka ingest, Spark Bronze stream, Airflow maintenance.
-- Silver and Gold remain in the codebase, but they are not part of the active local stack.
+- The current runtime scope includes Kafka ingest, Spark Bronze stream, Spark Silver stream, and Airflow maintenance.
+- Gold remains in the codebase and can be explored, but it is not part of the continuously running local stack.
