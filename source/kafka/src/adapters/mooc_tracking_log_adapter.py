@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
@@ -24,6 +25,48 @@ def _extract_key(event: dict[str, Any]) -> bytes:
     return f"ip:{ip or 'unknown'}".encode()
 
 
+def _iter_payloads(text: str) -> Iterable[tuple[str, dict[str, Any] | None, str | None]]:
+    """
+    Yield (raw_payload, event, decode_error) for each JSON value in the file.
+
+    The tracking logs are stored as pretty-printed JSON objects, sometimes with
+    many lines per object. Using raw_decode avoids brace-count parsing bugs.
+    """
+
+    decoder = json.JSONDecoder()
+    idx = 0
+    text_len = len(text)
+
+    while idx < text_len:
+        while idx < text_len and text[idx].isspace():
+            idx += 1
+        if idx >= text_len:
+            break
+
+        try:
+            event, end_idx = decoder.raw_decode(text, idx)
+            raw_payload = text[idx:end_idx].strip()
+            decode_error = None
+        except json.JSONDecodeError as err:
+            line_end = text.find("\n", idx)
+            if line_end == -1:
+                line_end = text_len
+            raw_payload = text[idx:line_end].strip()
+            event = None
+            decode_error = str(err)
+            idx = line_end + 1 if line_end < text_len else text_len
+            yield raw_payload, event, decode_error
+            continue
+
+        idx = end_idx
+
+        if not isinstance(event, dict):
+            yield raw_payload, None, "event payload must be a JSON object"
+            continue
+
+        yield raw_payload, event, None
+
+
 def iter_mooc_tracking_log_records(
     *,
     input_root: Path,
@@ -33,7 +76,7 @@ def iter_mooc_tracking_log_records(
     """
     Adapter responsibility:
     - discover tracking.log-*.json* files
-    - read and parse each JSON line into (event, time, key)
+    - read and parse each JSON object (supports JSON lines and pretty-printed)
     - perform minimal validation (required fields)
 
     It does not do Kafka routing or DLQ publishing.
@@ -48,26 +91,16 @@ def iter_mooc_tracking_log_records(
 
     for file_path in files:
         with file_path.open("r", encoding="utf-8", errors="replace") as handle:
-            for line in handle:
-                raw = line.strip()
-                if not raw:
-                    continue
-
-                decode_error: str | None = None
-                event: dict[str, Any] | None = None
+            for raw_payload, event, decode_error in _iter_payloads(handle.read()):
                 event_time = None
-                key_bytes: bytes | None = None
+                key_bytes = None
                 validation_ok = False
                 validation_reason = ""
 
-                try:
-                    event = decode_json(raw)
-                except Exception as err:  # noqa: BLE001
-                    decode_error = str(err)
-                    # Keep structural validation as failed for decode errors.
+                if decode_error is not None:
                     validation_ok = False
                     validation_reason = "decode_json_failed"
-                else:
+                elif event is not None:
                     event_time = parse_event_time(event.get("time"))
                     validation_ok, validation_reason = validate_tracking_event(event)
                     if validation_ok:
@@ -80,7 +113,7 @@ def iter_mooc_tracking_log_records(
                         return
 
                 yield ReplayRecord(
-                    raw_line=raw,
+                    raw_line=raw_payload,
                     event=event,
                     key_bytes=key_bytes,
                     event_time=event_time,
