@@ -30,10 +30,20 @@ x-spark-env: &spark-env
   SPARK_EXECUTOR_MEMORY: ${SPARK_EXECUTOR_MEMORY:-768m}
   PYSPARK_PYTHON: /opt/bitnami/python/bin/python
   PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
+  # Silver table paths
+  BRONZE_TABLE_PATH: ${BRONZE_TABLE_PATH:-s3a://lakehouse/mooc/bronze/mooc_events_raw}
+  SILVER_CHECKPOINT_BASE: ${SILVER_CHECKPOINT_BASE:-s3a://platform/mooc/silver_transformer}
+  SILVER_LEARNING_PATH: ${SILVER_LEARNING_PATH:-s3a://lakehouse/mooc/silver/learning_events}
+  SILVER_PERFORMANCE_PATH: ${SILVER_PERFORMANCE_PATH:-s3a://lakehouse/mooc/silver/performance_events}
+  SILVER_EXAM_PATH: ${SILVER_EXAM_PATH:-s3a://lakehouse/mooc/silver/exam_attempts}
+  SILVER_VIDEO_PATH: ${SILVER_VIDEO_PATH:-s3a://lakehouse/mooc/silver/video_interactions}
+  SILVER_NAVIGATION_PATH: ${SILVER_NAVIGATION_PATH:-s3a://lakehouse/mooc/silver/navigation_events}
+  SILVER_PDF_PATH: ${SILVER_PDF_PATH:-s3a://lakehouse/mooc/silver/pdf_interactions}
+  SILVER_SYSTEM_PATH: ${SILVER_SYSTEM_PATH:-s3a://lakehouse/mooc/silver/system_events}
+  SILVER_UNKNOWN_PATH: ${SILVER_UNKNOWN_PATH:-s3a://lakehouse/mooc/silver/unknown_events}
 
 x-airflow-env: &airflow-env
   AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR:-LocalExecutor}
-  AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW__CORE__LOAD_EXAMPLES:-False}
   AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: ${AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:-True}
   AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD:-airflow}@airflow-db:5432/${AIRFLOW_DB_NAME:-airflow}
   AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
@@ -54,10 +64,10 @@ x-airflow-env: &airflow-env
   MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
   MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio123456}
   MINIO_REGION: ${MINIO_REGION:-us-east-1}
-  BRONZE_TABLE_PATH: ${BRONZE_TABLE_PATH:-s3a://bronze/mooc/bronze/mooc_events_raw}
-  BRONZE_TABLE_BUCKET: ${MINIO_BUCKET_BRONZE:-bronze}
+  BRONZE_TABLE_PATH: ${BRONZE_TABLE_PATH:-s3a://lakehouse/mooc/bronze/mooc_events_raw}
+  BRONZE_TABLE_BUCKET: ${MINIO_BUCKET_DATA:-lakehouse}
   BRONZE_TABLE_PREFIX: ${BRONZE_TABLE_PREFIX:-mooc/bronze/mooc_events_raw/}
-  CHECKPOINT_BUCKET: ${MINIO_BUCKET_CHECKPOINTS:-checkpoints}
+  CHECKPOINT_BUCKET: ${MINIO_BUCKET_PLATFORM:-platform}
   CHECKPOINT_PREFIX: ${BRONZE_CHECKPOINT_PREFIX:-mooc/bronze_ingestor/offsets/}
   BRONZE_VACUUM_RETENTION_HOURS: ${BRONZE_VACUUM_RETENTION_HOURS:-168}
   BRONZE_OPTIMIZE_ENABLED: ${BRONZE_OPTIMIZE_ENABLED:-true}
@@ -236,21 +246,19 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
-      MINIO_BUCKET_BRONZE: ${MINIO_BUCKET_BRONZE:-bronze}
-      MINIO_BUCKET_CHECKPOINTS: ${MINIO_BUCKET_CHECKPOINTS:-checkpoints}
-      MINIO_BUCKET_SPARK_EVENTS: ${MINIO_BUCKET_SPARK_EVENTS:-spark-events}
+      MINIO_BUCKET_DATA: ${MINIO_BUCKET_DATA:-lakehouse}
+      MINIO_BUCKET_PLATFORM: ${MINIO_BUCKET_PLATFORM:-platform}
     entrypoint:
       - /bin/sh
       - -c
       - |
         set -e
         mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
-        mc mb --ignore-existing "local/$${MINIO_BUCKET_BRONZE}"
-        mc mb --ignore-existing "local/$${MINIO_BUCKET_CHECKPOINTS}"
-        mc mb --ignore-existing "local/$${MINIO_BUCKET_SPARK_EVENTS}"
+        mc mb --ignore-existing "local/$${MINIO_BUCKET_DATA}"
+        mc mb --ignore-existing "local/$${MINIO_BUCKET_PLATFORM}"
         touch /tmp/spark-events-log-keep
-        mc cp /tmp/spark-events-log-keep "local/$${MINIO_BUCKET_SPARK_EVENTS}/logs/.keep"
-        mc anonymous set download "local/$${MINIO_BUCKET_BRONZE}" || true
+        mc cp /tmp/spark-events-log-keep "local/$${MINIO_BUCKET_PLATFORM}/spark-events/logs/.keep"
+        mc anonymous set download "local/$${MINIO_BUCKET_DATA}" || true
     mem_limit: ${MINIO_INIT_MEM_LIMIT:-192m}
 
   spark-master:
@@ -284,6 +292,22 @@ services:
       SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-1}
     ports:
       - "8082:8081"
+    mem_limit: ${SPARK_WORKER_MEM_LIMIT:-1400m}
+
+  spark-worker-2:
+    build: *spark-build
+    image: local/spark:dev
+    container_name: lsp-spark-worker-2
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    environment:
+      <<: *spark-env
+      SPARK_MODE: worker
+      SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-1g}
+      SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-1}
+    ports:
+      - "8083:8081"
     mem_limit: ${SPARK_WORKER_MEM_LIMIT:-1400m}
 
   spark-history-server:
@@ -323,15 +347,41 @@ services:
       <<: *spark-env
       BRONZE_APP_NAME: ${BRONZE_APP_NAME:-bronze_ingestor}
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
-      KAFKA_TOPIC_RAW: ${KAFKA_TOPIC_RAW:-mooc.raw.events}
-      BRONZE_TABLE_PATH: ${BRONZE_TABLE_PATH:-s3a://bronze/mooc/bronze/mooc_events_raw}
-      BRONZE_CHECKPOINT_PATH: ${BRONZE_CHECKPOINT_PATH:-s3a://checkpoints/mooc/bronze_ingestor}
+      BRONZE_INPUT_TOPIC: ${BRONZE_INPUT_TOPIC:-mooc.raw.events}
+      BRONZE_TABLE_PATH: ${BRONZE_TABLE_PATH:-s3a://lakehouse/mooc/bronze/mooc_events_raw}
+      BRONZE_CHECKPOINT_PATH: ${BRONZE_CHECKPOINT_PATH:-s3a://platform/mooc/bronze_ingestor}
       BRONZE_QUERY_NAME: ${BRONZE_QUERY_NAME:-bronze_ingestor_raw}
     command: >
       bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
       --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
       --name \"$${BRONZE_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --conf spark.cores.max=1
       /opt/project/spark/apps/bronze_ingestor/main.py"
+    restart: unless-stopped
+    mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
+
+  silver-stream:
+    build: *spark-build
+    image: local/spark:dev
+    container_name: lsp-silver-stream
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_healthy
+      spark-worker-1:
+        condition: service_started
+      bronze-stream:
+        condition: service_started
+    environment:
+      <<: *spark-env
+      SILVER_APP_NAME: ${SILVER_APP_NAME:-silver_transformer}
+    command: >
+      bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
+      --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
+      --name \"$${SILVER_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --conf spark.cores.max=1
+      /opt/project/spark/apps/silver_transformer/main.py"
     restart: unless-stopped
     mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
 
@@ -450,7 +500,9 @@ services:
       mkdir -p /opt/airflow/logs;
       chmod -R g+rwX /opt/airflow/logs;
       airflow db migrate;
-      airflow users create --username \"${_AIRFLOW_WWW_USER_USERNAME:-admin}\" --password \"${_AIRFLOW_WWW_USER_PASSWORD:-admin}\" --firstname Admin --lastname User --role Admin --email admin@example.com || true"
+      airflow users create --username \"${_AIRFLOW_WWW_USER_USERNAME:-admin}\" --password \"${_AIRFLOW_WWW_USER_PASSWORD:-admin}\" --firstname Admin --lastname User --role Admin --email admin@example.com || true;
+      airflow pools set bronze_pool 1 'Pool for Bronze Delta tasks' || true;
+      airflow pools set silver_pool 1 'Pool for Silver Delta tasks' || true"
     depends_on:
       airflow-db:
         condition: service_healthy

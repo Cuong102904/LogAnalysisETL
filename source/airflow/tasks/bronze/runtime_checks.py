@@ -63,7 +63,7 @@ def check_kafka_ready() -> dict[str, Any]:
 
 def _list_numeric_checkpoint_keys() -> list[int]:
     s3 = _s3_client()
-    bucket = os.getenv("CHECKPOINT_BUCKET", "checkpoints")
+    bucket = os.getenv("CHECKPOINT_BUCKET", "platform")
     prefix = os.getenv("CHECKPOINT_PREFIX", "mooc/bronze_ingestor/offsets/")
     paginator = s3.get_paginator("list_objects_v2")
     numeric_ids: list[int] = []
@@ -94,7 +94,7 @@ def verify_bronze_progress() -> dict[str, Any]:
 
 def check_file_health() -> dict[str, Any]:
     s3 = _s3_client()
-    bucket = os.getenv("BRONZE_TABLE_BUCKET", "bronze")
+    bucket = os.getenv("BRONZE_TABLE_BUCKET", "lakehouse")
     prefix = os.getenv("BRONZE_TABLE_PREFIX", "mooc/bronze/mooc_events_raw/")
     small_file_bytes = env_int("BRONZE_SMALL_FILE_BYTES", 1_048_576)
     file_count_warn = env_int("BRONZE_FILE_COUNT_WARN", 5000)
@@ -130,7 +130,7 @@ def check_file_health() -> dict[str, Any]:
             f"(<= {small_file_bytes} bytes)."
         )
 
-    checkpoint_bucket = os.getenv("CHECKPOINT_BUCKET", "checkpoints")
+    checkpoint_bucket = os.getenv("CHECKPOINT_BUCKET", "platform")
     checkpoint_prefix = os.getenv("CHECKPOINT_PREFIX", "mooc/bronze_ingestor/offsets/")
     checkpoint_listing = s3.list_objects_v2(
         Bucket=checkpoint_bucket, Prefix=checkpoint_prefix, MaxKeys=1000

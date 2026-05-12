@@ -146,7 +146,7 @@ Kiểm tra file Delta đã được tạo:
 ```bash
 docker exec lsp-minio sh -c "
   mc alias set local http://minio:9000 minio minio123456 --quiet 2>/dev/null
-  mc ls --recursive local/bronze/mooc/bronze/mooc_events_raw/
+  mc ls --recursive local/lakehouse/mooc/bronze/mooc_events_raw/
 "
 ```
 
@@ -159,8 +159,8 @@ Kiểm tra checkpoint tiến triển:
 ```bash
 docker exec lsp-minio sh -c "
   mc alias set local http://minio:9000 minio minio123456 --quiet 2>/dev/null
-  mc ls local/checkpoints/mooc/bronze_ingestor/offsets/
-  mc ls local/checkpoints/mooc/bronze_ingestor/commits/
+  mc ls local/platform/mooc/bronze_ingestor/offsets/
+  mc ls local/platform/mooc/bronze_ingestor/commits/
 "
 ```
 

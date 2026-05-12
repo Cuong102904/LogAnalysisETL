@@ -24,7 +24,7 @@ from infrastructure.spark.session import build_spark
 
 spark = build_spark('spark_standalone_s3_delta_smoke')
 assert spark.sparkContext.master.startswith('spark://'), spark.sparkContext.master
-path = 's3a://bronze/smoke/spark_standalone_delta'
+path = 's3a://lakehouse/smoke/spark_standalone_delta'
 spark.range(1).withColumn('status', lit('ok')).write.format('delta').mode('overwrite').save(path)
 assert spark.read.format('delta').load(path).count() == 1
 spark.stop()
@@ -42,6 +42,6 @@ printf '{"event_type":"smoke","username":"smoke-user","time":"2026-01-01T00:00:0
 echo "Checking Bronze checkpoint prefix exists or waits for stream creation"
 compose exec -T minio sh -lc \
   "mc alias set local http://minio:9000 '${MINIO_ROOT_USER:-minio}' '${MINIO_ROOT_PASSWORD:-minio123456}' >/dev/null &&
-   mc ls 'local/${MINIO_BUCKET_CHECKPOINTS:-checkpoints}/mooc/bronze_ingestor' || true"
+   mc ls 'local/${MINIO_BUCKET_PLATFORM:-platform}/mooc/bronze_ingestor' || true"
 
 echo "Smoke checks submitted. Verify Bronze rows and History Server in the UIs."

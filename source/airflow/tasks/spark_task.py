@@ -38,6 +38,7 @@ def spark_task(
         "spark.jars.ivy": os.getenv("SPARK_IVY_DIR", "/home/airflow/.ivy2"),
         "spark.pyspark.python": python_bin,
         "spark.pyspark.driver.python": python_bin,
+        "spark.cores.max": "1",
     }
 
     app_path = f"{variables.spark_app_path}/{command}/{subcommand}.py"

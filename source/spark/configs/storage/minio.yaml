@@ -5,8 +5,5 @@ s3a:
   path_style_access: true
   ssl_enabled: false
 buckets:
-  bronze: bronze
-  silver: silver
-  gold: gold
-  checkpoints: checkpoints
-  spark_events: spark-events
+  data: lakehouse
+  platform: platform

@@ -4,10 +4,10 @@ Airflow is the orchestration layer for local Bronze operations.
 
 ## What is implemented
 
-- Runtime compose stack in `docker-compose.yaml` (CeleryExecutor).
+- Runtime compose stack is provided by `source/docker-compose.yaml`.
 - Real Bronze DAGs in `dags/bronze/`:
   - `bronze_stream_health`: Kafka offset progress + checkpoint progress + file health.
-  - `bronze_table_maintenance`: Delta OPTIMIZE compaction + VACUUM + post-health-check.
+  - `bronze_table_maintenance`: submits Delta OPTIMIZE/VACUUM as a Spark Standalone job + post-health-check.
 - Runtime task module in `tasks/bronze/runtime_checks.py`.
 - Reusable Spark wrapper task in `tasks/spark_task.py` for Bronze/Silver/Gold reuse.
 - Airflow variable adapter in `config/variables.py` for shared secrets/endpoints.
@@ -21,30 +21,26 @@ Airflow is the orchestration layer for local Bronze operations.
 
 ## Setup
 
-1. Create Airflow env file from template:
+1. Create the single root env file from template:
 
 ```bash
-cd source/airflow
+cd source
 cp .env.example .env
 ```
 
-2. Fill required secrets in `.env`:
+2. Fill required secrets in `source/.env`:
    - `FERNET_KEY`
    - `AIRFLOW__API_AUTH__JWT_SECRET`
    - `_AIRFLOW_WWW_USER_PASSWORD`
 
-3. Ensure phase1 infra stack is up and external network exists:
-   - expected network name: `mooc-streaming-phase1_default`
-   - override with `PHASE1_NETWORK` in `.env` if needed.
-
-4. Start Airflow:
+3. Start Airflow:
 
 ```bash
-cd source/airflow
-docker compose up -d --build
+cd source
+docker compose up -d --build airflow
 ```
 
-5. Open UI at [http://localhost:8080](http://localhost:8080).
+4. Open UI at [http://localhost:8089](http://localhost:8089).
 
 ## DAG behavior
 
@@ -53,11 +49,11 @@ docker compose up -d --build
   - verifies Bronze checkpoint offsets continue increasing,
   - checks Bronze file count/small-file ratio/checkpoint staleness.
 - `bronze_table_maintenance` (default every 6 hours):
-  - runs Delta compaction (`OPTIMIZE`) and `VACUUM`,
+  - runs Delta compaction (`OPTIMIZE`) through `spark-submit`,
+  - can optionally run `VACUUM` through `spark-submit` if enabled by env,
   - reruns file health checks after maintenance.
 
 ## Notes
 
-- All runtime knobs are in one file: `source/airflow/.env`.
+- All runtime knobs are in one file: `source/.env`.
 - The DAGs target Bronze only. Silver and Gold orchestration remain out of scope in this phase.
-

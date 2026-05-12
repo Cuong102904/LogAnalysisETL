@@ -6,11 +6,14 @@
 flowchart LR
   producer[Tracking log replayer] --> kafka[Kafka broker1..3]
   kafka --> bronze[bronze-stream spark-submit]
-  bronze --> bronzeDelta[(s3a://bronze/mooc/bronze/mooc_events_raw)]
+  bronze --> bronzeDelta[(s3a://lakehouse/mooc/bronze/mooc_events_raw)]
+  bronzeDelta --> silver[silver-stream spark-submit]
+  silver --> silverDelta[(s3a://lakehouse/mooc/silver/*)]
   sparkMaster[Spark Master] --> workers[Spark worker]
   bronze --> sparkMaster
+  silver --> sparkMaster
   airflow[Airflow standalone] --> sparkMaster
-  sparkMaster --> events[(s3a://spark-events)]
+  sparkMaster --> events[(s3a://platform/spark-events)]
   history[Spark History Server] --> events
   ui[Kafka UI] --> kafka
 ```
@@ -51,9 +54,10 @@ Do not run production streams with `python -m apps.*`; the stack submits Bronze 
 
 | Kafka topic | Spark service | Delta table | Checkpoint |
 | --- | --- | --- | --- |
-| `mooc.raw.events` | `bronze-stream` | `s3a://bronze/mooc/bronze/mooc_events_raw` | `s3a://checkpoints/mooc/bronze_ingestor` |
+| `mooc.raw.events` | `bronze-stream` | `s3a://lakehouse/mooc/bronze/mooc_events_raw` | `s3a://platform/mooc/bronze_ingestor` |
 
 Never delete checkpoint paths during normal restart. Structured Streaming uses them for exactly-once progress and state recovery.
+Kafka UI is still useful for topic and broker visibility, but Bronze stream progress is best observed in Spark Driver UI and the checkpoint path, not by expecting a stable consumer group entry.
 
 ## Restart Or Submit Streams
 
@@ -95,12 +99,12 @@ Manual checklist:
 
 1. Spark Master is reachable and at least one worker is registered.
 2. A `spark-submit --master spark://spark-master:7077` smoke app appears on Spark Master UI.
-3. Spark writes and reads `s3a://bronze/smoke/spark_standalone_delta`.
+3. Spark writes and reads `s3a://lakehouse/smoke/spark_standalone_delta`.
 4. Spark writes and reads that smoke path as Delta.
 5. Kafka sample event is produced to `mooc.raw.events`.
-6. Bronze checkpoint appears under `s3a://checkpoints/mooc/bronze_ingestor`.
+6. Bronze checkpoint appears under `s3a://platform/mooc/bronze_ingestor`.
 7. Airflow `bronze_table_maintenance` succeeds through Spark Standalone.
-8. Spark event logs appear in `s3a://spark-events/logs` and are visible in History Server.
+8. Spark event logs appear in `s3a://platform/spark-events/logs` and are visible in History Server.
 
 ## Send Data To Kafka
 
@@ -158,7 +162,7 @@ Kiểm tra file đã ghi vào MinIO:
 ```bash
 docker exec lsp-minio sh -c "
   mc alias set local http://minio:9000 minio minio123456 --quiet 2>/dev/null
-  mc ls --recursive local/bronze/mooc/bronze/mooc_events_raw/
+  mc ls --recursive local/lakehouse/mooc/bronze/mooc_events_raw/
 "
 ```
 
@@ -167,8 +171,8 @@ Kiểm tra checkpoint tiến triển:
 ```bash
 docker exec lsp-minio sh -c "
   mc alias set local http://minio:9000 minio minio123456 --quiet 2>/dev/null
-  mc ls local/checkpoints/mooc/bronze_ingestor/offsets/
-  mc ls local/checkpoints/mooc/bronze_ingestor/commits/
+  mc ls local/platform/mooc/bronze_ingestor/offsets/
+  mc ls local/platform/mooc/bronze_ingestor/commits/
 "
 ```
 

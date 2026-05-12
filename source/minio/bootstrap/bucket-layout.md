@@ -1,8 +1,5 @@
 # Bucket Layout
 
-- `bronze`: raw and lightly curated bronze Delta tables.
-- `silver`: normalized Silver Delta tables.
-- `gold`: aggregated Gold Delta tables.
-- `checkpoints`: structured streaming checkpoints.
-- `spark-events`: Spark event logs for History Server.
+- `lakehouse`: all bronze/silver/gold Delta tables, grouped by prefix.
+- `platform`: structured streaming checkpoints, Spark event logs, and metastore state.
 - `raw-archive` (optional future): immutable archive of source dumps.

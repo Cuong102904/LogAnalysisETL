@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from apps.config_utils import env_str, load_app_config, required_env_str
+from apps.config_utils import env_str, load_app_config, nested_value, required_env_str
 
 
 @dataclass(frozen=True)
@@ -9,11 +9,10 @@ class BronzeConfig:
     bootstrap_servers: str
     topic: str
     starting_offsets: str
-    consumer_group_id: str
-    consumer_client_id: str
     output_path: str
     checkpoint_path: str
     query_name: str
+    partition_by: tuple[str, ...]
 
     @classmethod
     def from_env(cls) -> "BronzeConfig":
@@ -23,27 +22,15 @@ class BronzeConfig:
             bootstrap_servers=required_env_str(
                 "KAFKA_BOOTSTRAP_SERVERS",
                 config,
-                "kafka",
+                "input",
                 "bootstrap_servers",
             ),
-            topic=required_env_str("KAFKA_TOPIC_RAW", config, "kafka", "input_topic"),
+            topic=required_env_str("BRONZE_INPUT_TOPIC", config, "input", "topic"),
             starting_offsets=required_env_str(
                 "BRONZE_STARTING_OFFSETS",
                 config,
-                "kafka",
+                "input",
                 "starting_offsets",
-            ),
-            consumer_group_id=required_env_str(
-                "BRONZE_CONSUMER_GROUP_ID",
-                config,
-                "kafka",
-                "consumer_group_id",
-            ),
-            consumer_client_id=required_env_str(
-                "BRONZE_CONSUMER_CLIENT_ID",
-                config,
-                "kafka",
-                "consumer_client_id",
             ),
             output_path=required_env_str(
                 "BRONZE_TABLE_PATH",
@@ -54,8 +41,8 @@ class BronzeConfig:
             checkpoint_path=required_env_str(
                 "BRONZE_CHECKPOINT_PATH",
                 config,
-                "storage",
-                "checkpoint_path",
+                "checkpoint",
+                "base_path",
             ),
             query_name=env_str(
                 "BRONZE_QUERY_NAME",
@@ -63,5 +50,14 @@ class BronzeConfig:
                 "streaming",
                 "query_name",
                 default="bronze_ingestor_raw",
+            ),
+            partition_by=tuple(
+                str(value)
+                for value in nested_value(
+                    config,
+                    "options",
+                    "partition_by",
+                    default=("ingest_date", "ingest_hour"),
+                )
             ),
         )

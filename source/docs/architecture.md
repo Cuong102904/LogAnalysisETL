@@ -15,7 +15,7 @@ flowchart LR
 
 - `kafka/`: ingest topic contract và producer replayer dữ liệu thật.
 - `spark/`: business ETL, phân lớp domain/infrastructure/apps rõ ràng.
-- `minio/`: object storage cho Delta tables và checkpoints.
+- `minio/`: object storage cho Delta tables, checkpoints và logs.
 - `docker-compose.yaml`: compose orchestration local.
 - `docs/`: chuẩn vận hành và design quyết định.
 

@@ -13,51 +13,55 @@ DEFAULT_ARGS = {
     "retries": 1,
 }
 
-
 def _enabled(env_name: str, default: str = "true") -> bool:
     return os.getenv(env_name, default).lower() == "true"
 
-
 def _maintenance_arguments() -> list[str]:
+    base_path = os.getenv("SILVER_TABLE_BASE_PATH", "s3a://lakehouse/mooc/silver")
+    table_path = f"{base_path}/exam_attempts"
+    
     arguments = [
         "--table-path",
-        os.getenv("BRONZE_TABLE_PATH", "s3a://lakehouse/mooc/bronze/mooc_events_raw"),
+        table_path,
         "--app-name",
-        os.getenv("BRONZE_MAINTENANCE_APP_NAME", "bronze_delta_maintenance"),
+        f"silver_exam_attempts_maintenance",
     ]
-    if _enabled("BRONZE_OPTIMIZE_ENABLED"):
+    if _enabled("SILVER_OPTIMIZE_ENABLED"):
         arguments.append("--optimize")
-    if _enabled("BRONZE_VACUUM_ENABLED", default="false"):
+    if _enabled("SILVER_VACUUM_ENABLED", default="false"):
         arguments.extend(
             [
                 "--vacuum",
                 "--vacuum-retention-hours",
-                os.getenv("BRONZE_VACUUM_RETENTION_HOURS", "168"),
+                os.getenv("SILVER_VACUUM_RETENTION_HOURS", "168"),
             ]
         )
     return arguments
 
-
 with DAG(
-    dag_id="bronze_table_maintenance",
-    description="Scheduled OPTIMIZE and VACUUM for Bronze Delta table",
+    dag_id=f"silver_maintenance_exam_attempts",
+    description=f"Scheduled OPTIMIZE and VACUUM for Silver Delta table: exam_attempts",
     start_date=datetime(2026, 1, 1),
-    schedule=os.getenv("BRONZE_MAINTENANCE_SCHEDULE", "0 0 * * *"),
+    schedule=os.getenv("SILVER_MAINTENANCE_SCHEDULE", "0 1 * * *"),
     catchup=False,
-    tags=["bronze", "maintenance", "delta"],
+    tags=["silver", "maintenance", "delta", "exam_attempts"],
     default_args=DEFAULT_ARGS,
-) as bronze_table_maintenance_dag:
+) as dag:
+    
     start = EmptyOperator(task_id="start")
+    
     run_maintenance = spark_task(
-        name="run_bronze_maintenance",
+        name=f"run_maintenance",
         command="apps/maintenance",
         subcommand="delta_maintenance",
-        pool="bronze_pool",
+        pool="silver_pool",
         arguments=_maintenance_arguments(),
-        execution_timeout=timedelta(hours=2),
-        spark_driver_memory=os.getenv("BRONZE_MAINTENANCE_DRIVER_MEMORY", "512m"),
-        spark_executor_memory=os.getenv("BRONZE_MAINTENANCE_EXECUTOR_MEMORY", "1g"),
-        spark_executor_cores=int(os.getenv("BRONZE_MAINTENANCE_EXECUTOR_CORES", "1")),
+        execution_timeout=timedelta(hours=1),
+        spark_driver_memory=os.getenv("SILVER_MAINTENANCE_DRIVER_MEMORY", "512m"),
+        spark_executor_memory=os.getenv("SILVER_MAINTENANCE_EXECUTOR_MEMORY", "1g"),
+        spark_executor_cores=int(os.getenv("SILVER_MAINTENANCE_EXECUTOR_CORES", "1")),
     )
+    
     end = EmptyOperator(task_id="end")
+    
     start >> run_maintenance >> end

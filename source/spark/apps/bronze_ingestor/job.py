@@ -14,8 +14,6 @@ def run(config: BronzeConfig) -> None:
         config.bootstrap_servers,
         config.topic,
         config.starting_offsets,
-        config.consumer_group_id,
-        config.consumer_client_id,
     )
     bronze = enrich_bronze(raw)
     bronze = parse_status_columns(bronze)
@@ -24,5 +22,5 @@ def run(config: BronzeConfig) -> None:
         output_path=config.output_path,
         checkpoint_path=config.checkpoint_path,
         query_name=config.query_name,
-        partition_by=["ingest_date", "ingest_hour"],
+        partition_by=list(config.partition_by),
     )

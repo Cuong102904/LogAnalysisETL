@@ -2,17 +2,13 @@
 
 MinIO la object storage cho Delta Lake:
 
-- Bronze tables
-- Silver tables
-- Gold tables
-- Streaming checkpoints
+- Delta tables under a single `lakehouse` bucket
+- Streaming checkpoints and Spark event logs under `platform`
 
 ## Buckets
 
-- `bronze`
-- `silver`
-- `gold`
-- `checkpoints`
+- `lakehouse`
+- `platform`
 
 ## Bootstrap
 
@@ -24,4 +20,3 @@ sh scripts/make_buckets.sh
 ```
 
 Chi tiet layout nam trong `bootstrap/bucket-layout.md`.
-
