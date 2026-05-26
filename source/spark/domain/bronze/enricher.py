@@ -10,7 +10,7 @@ def enrich_bronze(raw: DataFrame) -> DataFrame:
             F.col("topic").alias("kafka_topic"),
             F.col("partition").alias("kafka_partition"),
             F.col("offset").cast("string").alias("kafka_offset"),
-            parse_raw_event_time(F.col("value")).alias("time"),
+            parse_raw_event_time(F.col("value").cast("string")).alias("time"),
             F.col("key").cast("string").alias("kafka_key"),
             F.col("value").cast("string").alias("value_raw"),
         )
