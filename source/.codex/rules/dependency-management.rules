@@ -1,0 +1,24 @@
+# Keep dependency changes centralized in source/pyproject.toml.
+prefix_rule(
+    pattern = ["uv", ["add", "remove", "sync", "lock"]],
+    decision = "prompt",
+    justification = "Dependency updates should be intentional and stay aligned with source/pyproject.toml.",
+)
+
+prefix_rule(
+    pattern = ["uv", "pip"],
+    decision = "prompt",
+    justification = "Prefer the project-level uv dependency flow unless a lower-level pip operation is necessary.",
+)
+
+prefix_rule(
+    pattern = ["pip", ["install", "uninstall"]],
+    decision = "prompt",
+    justification = "Dependency updates should be intentional and stay aligned with source/pyproject.toml.",
+)
+
+prefix_rule(
+    pattern = ["pip3", ["install", "uninstall"]],
+    decision = "prompt",
+    justification = "Dependency updates should be intentional and stay aligned with source/pyproject.toml.",
+)

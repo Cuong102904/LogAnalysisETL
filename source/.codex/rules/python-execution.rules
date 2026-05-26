@@ -1,0 +1,30 @@
+# Prefer the project venv and `uv run` for Python commands.
+prefix_rule(
+    pattern = ["uv", "run"],
+    decision = "allow",
+    justification = "Use uv run as the default way to execute Python commands inside the project venv.",
+)
+
+prefix_rule(
+    pattern = ["python"],
+    decision = "prompt",
+    justification = "Prefer activating the venv and using uv run for Python commands.",
+)
+
+prefix_rule(
+    pattern = ["python3"],
+    decision = "prompt",
+    justification = "Prefer activating the venv and using uv run for Python commands.",
+)
+
+prefix_rule(
+    pattern = ["pip"],
+    decision = "prompt",
+    justification = "Prefer uv-based dependency management and keep Python execution inside the venv.",
+)
+
+prefix_rule(
+    pattern = ["pip3"],
+    decision = "prompt",
+    justification = "Prefer uv-based dependency management and keep Python execution inside the venv.",
+)

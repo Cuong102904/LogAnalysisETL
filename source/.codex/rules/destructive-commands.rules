@@ -1,0 +1,24 @@
+# Block destructive commands that can wipe or rewrite local work unexpectedly.
+prefix_rule(
+    pattern = ["rm", "-rf"],
+    decision = "forbidden",
+    justification = "Use targeted file edits or explicit review before deleting directories recursively.",
+)
+
+prefix_rule(
+    pattern = ["git", "reset", "--hard"],
+    decision = "forbidden",
+    justification = "Use a non-destructive git workflow instead of resetting local changes hard.",
+)
+
+prefix_rule(
+    pattern = ["git", "checkout", "--"],
+    decision = "forbidden",
+    justification = "Use targeted edits instead of discarding local changes with git checkout --.",
+)
+
+prefix_rule(
+    pattern = ["git", "clean", "-fdx"],
+    decision = "forbidden",
+    justification = "Use explicit cleanup steps instead of removing all untracked and ignored files.",
+)
