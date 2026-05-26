@@ -1,13 +1,13 @@
-from pyspark.sql import DataFrame, functions as F
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
 
 from domain.gold.common import rolling_anomaly_score, safe_ratio
 from domain.gold.video_anomaly.time_bucketing import bucket_video_interactions
 
 
 def build_video_anomaly_features(video_df: DataFrame, bucket_seconds: int = 5) -> DataFrame:
-    base = (
-        bucket_video_interactions(video_df, bucket_seconds)
-        .withColumn("watch_ratio", safe_ratio(F.col("current_time_s"), F.col("video_duration").cast("double")))
+    base = bucket_video_interactions(video_df, bucket_seconds).withColumn(
+        "watch_ratio", safe_ratio(F.col("current_time_s"), F.col("video_duration").cast("double"))
     )
     grouped = base.groupBy(
         "event_date",

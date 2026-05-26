@@ -1,4 +1,5 @@
-from pyspark.sql import DataFrame, functions as F
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
 
 from domain.gold.common import score_anomaly
 
@@ -40,7 +41,10 @@ def build_behavior_anomalies(
     )
 
     learning = score_anomaly(
-        learning_df.withColumn("journey_entity_id", F.concat_ws("|", F.col("course_id"), F.col("user_id").cast("string"))),
+        learning_df.withColumn(
+            "journey_entity_id",
+            F.concat_ws("|", F.col("course_id"), F.col("user_id").cast("string")),
+        ),
         anomaly_domain="journey",
         entity_type="user_course",
         entity_id_expr=F.col("journey_entity_id"),
@@ -48,6 +52,8 @@ def build_behavior_anomalies(
         extra_group_cols=["event_date", "course_id", "user_id", "journey_entity_id"],
     )
 
-    return video.unionByName(pdf, allowMissingColumns=True).unionByName(
-        performance, allowMissingColumns=True
-    ).unionByName(learning, allowMissingColumns=True)
+    return (
+        video.unionByName(pdf, allowMissingColumns=True)
+        .unionByName(performance, allowMissingColumns=True)
+        .unionByName(learning, allowMissingColumns=True)
+    )

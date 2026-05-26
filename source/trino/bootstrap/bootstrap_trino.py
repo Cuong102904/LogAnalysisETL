@@ -66,7 +66,9 @@ def execute_sql(sql: str) -> None:
 
 
 def register_gold_tables() -> None:
-    execute_sql("CREATE SCHEMA IF NOT EXISTS delta.mooc WITH (location = 's3://lakehouse/mooc/gold')")
+    execute_sql(
+        "CREATE SCHEMA IF NOT EXISTS delta.mooc WITH (location = 's3://lakehouse/mooc/gold')"
+    )
     register_statements = [
         (
             "silver_video_interactions",

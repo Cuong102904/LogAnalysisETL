@@ -1,4 +1,13 @@
-from pyspark.sql.types import BooleanType, DateType, DoubleType, LongType, StringType, StructField, StructType, TimestampType
+from pyspark.sql.types import (
+    BooleanType,
+    DateType,
+    DoubleType,
+    LongType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
+)
 
 EXAM_INTEGRITY_SIGNALS_SCHEMA = StructType(
     [

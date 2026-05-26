@@ -1,4 +1,12 @@
-from pyspark.sql.types import DateType, DoubleType, LongType, StringType, StructField, StructType, TimestampType
+from pyspark.sql.types import (
+    DateType,
+    DoubleType,
+    LongType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
+)
 
 QUIZ_ATTEMPT_METRICS_SCHEMA = StructType(
     [

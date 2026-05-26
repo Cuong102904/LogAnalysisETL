@@ -1,4 +1,11 @@
-from pyspark.sql.types import DateType, IntegerType, StringType, StructField, StructType, TimestampType
+from pyspark.sql.types import (
+    DateType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
+)
 
 BRONZE_MOOC_EVENTS_SCHEMA = StructType(
     [

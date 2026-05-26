@@ -1,5 +1,5 @@
-from datetime import datetime
 import json
+from datetime import datetime
 
 from domain.silver.normalizers.exam_attempts import normalize_exam_attempts
 

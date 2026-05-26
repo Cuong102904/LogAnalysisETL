@@ -66,7 +66,9 @@ def build_alert_events(
             ),
         )
         .withColumn("alert_domain", F.col("anomaly_domain"))
-        .withColumn("alert_severity", _severity_from_zscore(F.coalesce(F.col("z_score"), F.lit(0.0))))
+        .withColumn(
+            "alert_severity", _severity_from_zscore(F.coalesce(F.col("z_score"), F.lit(0.0)))
+        )
         .withColumn("alert_type", alert_type)
         .withColumn("alert_message", alert_message)
         .withColumn("alert_time", alert_time)

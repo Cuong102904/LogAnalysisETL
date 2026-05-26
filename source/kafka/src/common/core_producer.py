@@ -125,7 +125,9 @@ def replay_stream(
 
         if not rec.validation_ok:
             ingest_time = utc_now_iso()
-            event_snapshot = event_snapshot_for_dlq(rec.event) if isinstance(rec.event, dict) else None
+            event_snapshot = (
+                event_snapshot_for_dlq(rec.event) if isinstance(rec.event, dict) else None
+            )
             payload = build_dlq_payload(
                 ingest_time=ingest_time,
                 error_type="validation_failed",
@@ -174,7 +176,9 @@ def replay_stream(
             ingest_time = utc_now_iso()
             event_snapshot = event_snapshot_for_dlq(rec.event)
             if dlq_publish_cb is not None:
-                dlq_publish_cb({"event": rec.event, "reason": reason, "event_snapshot": event_snapshot})
+                dlq_publish_cb(
+                    {"event": rec.event, "reason": reason, "event_snapshot": event_snapshot}
+                )
             payload = build_dlq_payload(
                 ingest_time=ingest_time,
                 error_type="filtered_out",

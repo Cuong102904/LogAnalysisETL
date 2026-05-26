@@ -9,7 +9,6 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Any
 
-
 SUPERSET_HOST = os.getenv("SUPERSET_HOST", "superset")
 SUPERSET_PORT = int(os.getenv("SUPERSET_PORT", "8088"))
 SUPERSET_ADMIN_USERNAME = os.getenv("SUPERSET_ADMIN_USERNAME", "superset_admin")
@@ -288,7 +287,9 @@ def get_or_create_database(access_token: str) -> int:
         "configuration_method": "sqlalchemy_form",
         "extra": json.dumps({"allow_multi_catalog": True, "disable_data_preview": True}),
     }
-    status, created = _json_request("POST", _endpoint("/api/v1/database/"), payload=create_payload, headers=headers)
+    status, created = _json_request(
+        "POST", _endpoint("/api/v1/database/"), payload=create_payload, headers=headers
+    )
     if status not in (200, 201):
         raise RuntimeError(f"Failed to create Superset database: {created}")
     if isinstance(created, dict) and created.get("id"):
@@ -323,7 +324,9 @@ def get_or_create_dataset(access_token: str, database_id: int, spec: DatasetSpec
 
 
 def list_dashboards(access_token: str) -> list[dict[str, Any]]:
-    _, payload = _json_request("GET", _endpoint("/api/v1/dashboard/"), headers=authed_headers(access_token))
+    _, payload = _json_request(
+        "GET", _endpoint("/api/v1/dashboard/"), headers=authed_headers(access_token)
+    )
     return list((payload or {}).get("result", []))
 
 
@@ -353,7 +356,9 @@ def get_or_create_dashboard(access_token: str, title: str) -> dict[str, Any]:
         ),
         "css": "",
     }
-    status, created = _json_request("POST", _endpoint("/api/v1/dashboard/"), payload=payload, headers=headers)
+    status, created = _json_request(
+        "POST", _endpoint("/api/v1/dashboard/"), payload=payload, headers=headers
+    )
     if status not in (200, 201):
         raise RuntimeError(f"Failed to create dashboard {title}: {created}")
     if isinstance(created, dict):
@@ -362,7 +367,9 @@ def get_or_create_dashboard(access_token: str, title: str) -> dict[str, Any]:
 
 
 def list_charts(access_token: str) -> list[dict[str, Any]]:
-    _, payload = _json_request("GET", _endpoint("/api/v1/chart/"), headers=authed_headers(access_token))
+    _, payload = _json_request(
+        "GET", _endpoint("/api/v1/chart/"), headers=authed_headers(access_token)
+    )
     return list((payload or {}).get("result", []))
 
 
@@ -405,7 +412,9 @@ def create_chart(
         "query_context_generation": True,
         "description": f"Auto-generated chart for {dataset['table_name']}",
     }
-    status, created = _json_request("POST", _endpoint("/api/v1/chart/"), payload=payload, headers=headers)
+    status, created = _json_request(
+        "POST", _endpoint("/api/v1/chart/"), payload=payload, headers=headers
+    )
     if status not in (200, 201):
         raise RuntimeError(f"Failed to create chart {chart_name}: {created}")
     if not isinstance(created, dict):
@@ -414,7 +423,9 @@ def create_chart(
 
 
 def get_chart_detail(access_token: str, chart_id: int) -> dict[str, Any]:
-    _, payload = _json_request("GET", _endpoint(f"/api/v1/chart/{chart_id}"), headers=authed_headers(access_token))
+    _, payload = _json_request(
+        "GET", _endpoint(f"/api/v1/chart/{chart_id}"), headers=authed_headers(access_token)
+    )
     if not isinstance(payload, dict):
         raise RuntimeError(f"Unexpected chart detail for {chart_id}: {payload}")
     return payload
@@ -443,7 +454,9 @@ def build_position_json(charts: list[dict[str, Any]]) -> str:
     return json.dumps(position)
 
 
-def update_dashboard_layout(access_token: str, dashboard: dict[str, Any], charts: list[dict[str, Any]]) -> None:
+def update_dashboard_layout(
+    access_token: str, dashboard: dict[str, Any], charts: list[dict[str, Any]]
+) -> None:
     payload = {
         "dashboard_title": dashboard["dashboard_title"],
         "slug": dashboard.get("slug"),
@@ -451,7 +464,11 @@ def update_dashboard_layout(access_token: str, dashboard: dict[str, Any], charts
         "json_metadata": dashboard.get("json_metadata") or json.dumps({}),
         "position_json": build_position_json(charts),
         "css": dashboard.get("css", ""),
-        "owners": [owner["id"] for owner in dashboard.get("owners", []) if isinstance(owner, dict) and owner.get("id")],
+        "owners": [
+            owner["id"]
+            for owner in dashboard.get("owners", [])
+            if isinstance(owner, dict) and owner.get("id")
+        ],
     }
     status, updated = _json_request(
         "PUT",

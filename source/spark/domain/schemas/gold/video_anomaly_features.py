@@ -1,4 +1,14 @@
-from pyspark.sql.types import BooleanType, DateType, DoubleType, IntegerType, LongType, StringType, StructField, StructType, TimestampType
+from pyspark.sql.types import (
+    BooleanType,
+    DateType,
+    DoubleType,
+    IntegerType,
+    LongType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
+)
 
 VIDEO_FRICTION_SIGNALS_SCHEMA = StructType(
     [

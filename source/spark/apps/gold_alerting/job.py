@@ -11,12 +11,7 @@ def _ensure_behavior_anomaly_signals_schema(spark, path: str) -> None:
         return
 
     empty_df = spark.createDataFrame([], BEHAVIOR_ANOMALY_SIGNALS_SCHEMA)
-    (
-        empty_df.write.format("delta")
-        .mode("overwrite")
-        .option("overwriteSchema", "true")
-        .save(path)
-    )
+    (empty_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").save(path))
 
 
 def run(config: GoldAlertingConfig) -> None:

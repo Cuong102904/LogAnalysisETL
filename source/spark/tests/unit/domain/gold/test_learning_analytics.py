@@ -27,7 +27,9 @@ def _video_row(day: int, user_id: int, session_id: str) -> dict[str, object]:
     }
 
 
-def _pdf_row(day: int, event_type: str, page_number: int, scroll_direction: str | None) -> dict[str, object]:
+def _pdf_row(
+    day: int, event_type: str, page_number: int, scroll_direction: str | None
+) -> dict[str, object]:
     return {
         "event_date": date(2026, 1, day),
         "course_id": "course-a",
@@ -44,7 +46,9 @@ def _pdf_row(day: int, event_type: str, page_number: int, scroll_direction: str 
     }
 
 
-def _performance_row(day: int, event_type: str, earned: float, possible: float) -> dict[str, object]:
+def _performance_row(
+    day: int, event_type: str, earned: float, possible: float
+) -> dict[str, object]:
     return {
         "event_date": date(2026, 1, day),
         "course_id": "course-a",
@@ -59,7 +63,9 @@ def _performance_row(day: int, event_type: str, earned: float, possible: float) 
     }
 
 
-def _journey_row(day: int, event_type: str, block_type: str, block_id: str, completion_value: float) -> dict[str, object]:
+def _journey_row(
+    day: int, event_type: str, block_type: str, block_id: str, completion_value: float
+) -> dict[str, object]:
     return {
         "event_date": date(2026, 1, day),
         "course_id": "course-a",
@@ -78,7 +84,9 @@ def test_video_anomaly_features_detects_spike(spark) -> None:
     rows = [_video_row(day, 100 + day, f"s-{day}") for day in range(1, 6)]
     rows.extend(_video_row(6, 200 + (idx % 2), f"s-6-{idx}") for idx in range(120))
 
-    result = build_video_anomaly_features(spark.createDataFrame(rows)).orderBy("event_date").collect()
+    result = (
+        build_video_anomaly_features(spark.createDataFrame(rows)).orderBy("event_date").collect()
+    )
 
     assert len(result) == 6
     assert result[-1]["event_count"] == 120
@@ -201,12 +209,16 @@ def test_rolling_anomaly_score_uses_bucket_order_for_video(spark) -> None:
         for bucket in (0, 5, 10, 15, 20, 25, 30)
     ]
 
-    result = _rolling_anomaly_score(
-        spark.createDataFrame(rows),
-        ["course_id", "video_id", "action_type"],
-        "event_count",
-        ["event_date", "time_bucket_s", "wallclock_bucket_ts"],
-    ).orderBy("time_bucket_s").collect()
+    result = (
+        _rolling_anomaly_score(
+            spark.createDataFrame(rows),
+            ["course_id", "video_id", "action_type"],
+            "event_count",
+            ["event_date", "time_bucket_s", "wallclock_bucket_ts"],
+        )
+        .orderBy("time_bucket_s")
+        .collect()
+    )
 
     assert result[-1]["time_bucket_s"] == 30
     assert result[-1]["rolling_mean_7"] == 3.25

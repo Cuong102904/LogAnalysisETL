@@ -1,4 +1,5 @@
-from pyspark.sql import DataFrame, functions as F
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
 
 from domain.gold.common import PERFORMANCE_ACTIONS, VIDEO_ACTIONS, safe_ratio
 
@@ -47,36 +48,48 @@ def build_learning_journey_features(learning_df: DataFrame) -> DataFrame:
             F.col("completion_value").isNotNull() & (F.col("completion_value").cast("double") > 0),
         )
     )
-    grouped = base.groupBy("event_date", "course_id", "user_id").agg(
-        F.count("*").alias("event_count"),
-        F.approx_count_distinct("session_id").alias("distinct_sessions"),
-        F.sum((F.col("event_category") == "video").cast("int")).alias("video_event_count"),
-        F.sum((F.col("event_category") == "pdf").cast("int")).alias("pdf_event_count"),
-        F.sum((F.col("event_category") == "performance").cast("int")).alias(
-            "performance_event_count"
-        ),
-        F.sum((F.col("event_category") == "navigation").cast("int")).alias(
-            "navigation_event_count"
-        ),
-        F.sum(F.col("is_completion").cast("int")).alias("completion_event_count"),
-        F.avg("event_hour").alias("avg_event_hour"),
-        F.approx_count_distinct(F.when(F.col("block_type").isNotNull(), F.col("block_type"))).alias(
-            "distinct_block_types"
-        ),
-        F.approx_count_distinct(F.when(F.col("block_id").isNotNull(), F.col("block_id"))).alias(
-            "distinct_blocks"
-        ),
-        F.sum(F.col("completion_value").cast("double")).alias("completion_value_sum"),
-        F.min("time").alias("first_time"),
-        F.max("time").alias("last_time"),
-        F.max("time").alias("last_event_time"),
-    ).withColumn("event_span_minutes", (F.unix_timestamp("last_time") - F.unix_timestamp("first_time")) / 60.0)
-    return grouped.withColumn("video_share", safe_ratio(F.col("video_event_count"), F.col("event_count"))).withColumn(
-        "pdf_share", safe_ratio(F.col("pdf_event_count"), F.col("event_count"))
-    ).withColumn(
-        "performance_share",
-        safe_ratio(F.col("performance_event_count"), F.col("event_count")),
-    ).withColumn(
-        "navigation_share",
-        safe_ratio(F.col("navigation_event_count"), F.col("event_count")),
+    grouped = (
+        base.groupBy("event_date", "course_id", "user_id")
+        .agg(
+            F.count("*").alias("event_count"),
+            F.approx_count_distinct("session_id").alias("distinct_sessions"),
+            F.sum((F.col("event_category") == "video").cast("int")).alias("video_event_count"),
+            F.sum((F.col("event_category") == "pdf").cast("int")).alias("pdf_event_count"),
+            F.sum((F.col("event_category") == "performance").cast("int")).alias(
+                "performance_event_count"
+            ),
+            F.sum((F.col("event_category") == "navigation").cast("int")).alias(
+                "navigation_event_count"
+            ),
+            F.sum(F.col("is_completion").cast("int")).alias("completion_event_count"),
+            F.avg("event_hour").alias("avg_event_hour"),
+            F.approx_count_distinct(
+                F.when(F.col("block_type").isNotNull(), F.col("block_type"))
+            ).alias("distinct_block_types"),
+            F.approx_count_distinct(F.when(F.col("block_id").isNotNull(), F.col("block_id"))).alias(
+                "distinct_blocks"
+            ),
+            F.sum(F.col("completion_value").cast("double")).alias("completion_value_sum"),
+            F.min("time").alias("first_time"),
+            F.max("time").alias("last_time"),
+            F.max("time").alias("last_event_time"),
+        )
+        .withColumn(
+            "event_span_minutes",
+            (F.unix_timestamp("last_time") - F.unix_timestamp("first_time")) / 60.0,
+        )
+    )
+    return (
+        grouped.withColumn(
+            "video_share", safe_ratio(F.col("video_event_count"), F.col("event_count"))
+        )
+        .withColumn("pdf_share", safe_ratio(F.col("pdf_event_count"), F.col("event_count")))
+        .withColumn(
+            "performance_share",
+            safe_ratio(F.col("performance_event_count"), F.col("event_count")),
+        )
+        .withColumn(
+            "navigation_share",
+            safe_ratio(F.col("navigation_event_count"), F.col("event_count")),
+        )
     )

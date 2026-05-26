@@ -161,8 +161,13 @@ class DlqPayloadShapeTest(unittest.TestCase):
             error_type="filtered_out",
             error_message="reason",
             raw_event={"event_type": "x"},
-            raw_value="{\"event_type\": \"x\"}",
-            event_snapshot={"event_type": "x", "event_source": "browser", "name": "play_video", "context.path": "/course/1"},
+            raw_value='{"event_type": "x"}',
+            event_snapshot={
+                "event_type": "x",
+                "event_source": "browser",
+                "name": "play_video",
+                "context.path": "/course/1",
+            },
             failed_topic="mooc.raw.events",
             failed_key="missing-key",
         )

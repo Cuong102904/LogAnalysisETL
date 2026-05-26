@@ -40,8 +40,10 @@ def rolling_anomaly_score(
     metric_col: str,
     order_cols: list[str] | None = None,
 ) -> DataFrame:
-    window = Window.partitionBy(*partition_cols).orderBy(*(order_cols or ["event_date"])).rowsBetween(
-        -3, 3
+    window = (
+        Window.partitionBy(*partition_cols)
+        .orderBy(*(order_cols or ["event_date"]))
+        .rowsBetween(-3, 3)
     )
     scored = (
         df.withColumn("rolling_mean_7", F.avg(metric_col).over(window))
@@ -56,7 +58,10 @@ def rolling_anomaly_score(
     )
     return scored.withColumn(
         "is_anomaly",
-        (F.col(metric_col) >= F.col("rolling_mean_7") + F.coalesce(F.col("rolling_std_7"), F.lit(0.0)))
+        (
+            F.col(metric_col)
+            >= F.col("rolling_mean_7") + F.coalesce(F.col("rolling_std_7"), F.lit(0.0))
+        )
         & (F.col("z_score") >= F.lit(1.5)),
     )
 

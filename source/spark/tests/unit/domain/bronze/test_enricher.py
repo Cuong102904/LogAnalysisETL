@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from pyspark.sql import functions as F
-
 from domain.bronze.enricher import enrich_bronze
 from domain.bronze.time import parse_raw_event_time
+from pyspark.sql import functions as F
 
 
 def test_parse_raw_event_time_parses_valid_iso8601(spark) -> None:
@@ -11,9 +10,7 @@ def test_parse_raw_event_time_parses_valid_iso8601(spark) -> None:
     result = (
         spark.range(1)
         .select(
-            parse_raw_event_time(
-                F.lit('{"time":"2026-01-17T21:25:06.203128+00:00"}')
-            ).alias("time")
+            parse_raw_event_time(F.lit('{"time":"2026-01-17T21:25:06.203128+00:00"}')).alias("time")
         )
         .collect()
     )
