@@ -45,4 +45,5 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.pyright]
-extraPaths = ["spark"]
+extraPaths = ["spark", "airflow"]
+

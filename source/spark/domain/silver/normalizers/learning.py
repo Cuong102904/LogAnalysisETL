@@ -32,6 +32,7 @@ def normalize_learning(df: DataFrame) -> DataFrame:
 
     return base.select(
         F.col("dedup_key").alias("event_id"),
+        F.col("kafka_timestamp").alias("source_timestamp"),
         F.to_timestamp(F.get_json_object("value_raw", "$.time")).alias("ts"),
         F.to_date(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias("event_date"),
         F.hour(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias("event_hour"),

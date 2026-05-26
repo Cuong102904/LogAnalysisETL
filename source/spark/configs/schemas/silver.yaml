@@ -3,6 +3,8 @@ tables:
     partition_by: [event_date, course_bucket]
   - name: silver.performance_events
     partition_by: [event_date, course_bucket]
+  - name: silver.exam_attempts
+    partition_by: [event_date, course_id]
   - name: silver.system_events
     partition_by: [event_date, event_category]
   - name: silver.unknown_events
