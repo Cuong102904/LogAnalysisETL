@@ -12,6 +12,30 @@ x-airflow-build: &airflow-build
   context: ./airflow
   dockerfile: Dockerfile
 
+x-hive-build: &hive-build
+  context: ./hive-metastore
+  dockerfile: Dockerfile
+
+x-trino-build: &trino-build
+  context: ./trino
+  dockerfile: Dockerfile
+
+x-superset-build: &superset-build
+  context: ./superset
+  dockerfile: Dockerfile
+
+x-bootstrap-image: &bootstrap-image
+  python:3.11-slim
+
+x-superset-env: &superset-env
+  PYTHONPATH: /app/pythonpath
+  SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:-change-me-supersecret}
+  SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-superset_admin}
+  SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD:-change-me}
+  SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
+  SUPERSET_TRINO_SQLALCHEMY_URI: ${SUPERSET_TRINO_SQLALCHEMY_URI:-trino://superset@trino:8080/delta/mooc}
+  SUPERSET_PORT: ${SUPERSET_PORT:-8088}
+
 x-spark-env: &spark-env
   SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
   SPARK_APP_PATH: /opt/project/spark
@@ -27,7 +51,7 @@ x-spark-env: &spark-env
   S3A_PATH_STYLE_ACCESS: "true"
   S3A_SSL_ENABLED: "false"
   SPARK_DRIVER_MEMORY: ${SPARK_DRIVER_MEMORY:-512m}
-  SPARK_EXECUTOR_MEMORY: ${SPARK_EXECUTOR_MEMORY:-768m}
+  SPARK_EXECUTOR_MEMORY: ${SPARK_EXECUTOR_MEMORY:-384m}
   PYSPARK_PYTHON: /opt/bitnami/python/bin/python
   PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
   # Silver table paths
@@ -41,6 +65,18 @@ x-spark-env: &spark-env
   SILVER_PDF_PATH: ${SILVER_PDF_PATH:-s3a://lakehouse/mooc/silver/pdf_interactions}
   SILVER_SYSTEM_PATH: ${SILVER_SYSTEM_PATH:-s3a://lakehouse/mooc/silver/system_events}
   SILVER_UNKNOWN_PATH: ${SILVER_UNKNOWN_PATH:-s3a://lakehouse/mooc/silver/unknown_events}
+  # Gold table paths
+  GOLD_VIDEO_FRICTION_SIGNALS_PATH: ${GOLD_VIDEO_FRICTION_SIGNALS_PATH:-s3a://lakehouse/mooc/gold/video_friction_signals}
+  GOLD_PDF_ENGAGEMENT_FEATURES_PATH: ${GOLD_PDF_ENGAGEMENT_FEATURES_PATH:-s3a://lakehouse/mooc/gold/pdf_engagement_features}
+  GOLD_QUIZ_ATTEMPT_METRICS_PATH: ${GOLD_QUIZ_ATTEMPT_METRICS_PATH:-s3a://lakehouse/mooc/gold/quiz_attempt_metrics}
+  GOLD_USER_LEARNING_PROFILE_DAILY_PATH: ${GOLD_USER_LEARNING_PROFILE_DAILY_PATH:-s3a://lakehouse/mooc/gold/user_learning_profile_daily}
+  GOLD_BEHAVIOR_ANOMALY_SIGNALS_PATH: ${GOLD_BEHAVIOR_ANOMALY_SIGNALS_PATH:-s3a://lakehouse/mooc/gold/behavior_anomaly_signals}
+  GOLD_ANOMALY_ALERTS_PATH: ${GOLD_ANOMALY_ALERTS_PATH:-s3a://lakehouse/mooc/gold/anomaly_alerts}
+  GOLD_TRIGGER_INTERVAL_SECONDS: ${GOLD_TRIGGER_INTERVAL_SECONDS:-30}
+  GOLD_ALERTING_TRIGGER_INTERVAL_SECONDS: ${GOLD_ALERTING_TRIGGER_INTERVAL_SECONDS:-30}
+  GOLD_ALERTING_MIN_EVENT_COUNT: ${GOLD_ALERTING_MIN_EVENT_COUNT:-3}
+  GOLD_ALERTING_MIN_DISTINCT_USERS: ${GOLD_ALERTING_MIN_DISTINCT_USERS:-2}
+  GOLD_ALERTING_MIN_Z_SCORE: ${GOLD_ALERTING_MIN_Z_SCORE:-2.0}
 
 x-airflow-env: &airflow-env
   AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR:-LocalExecutor}
@@ -261,6 +297,110 @@ services:
         mc anonymous set download "local/$${MINIO_BUCKET_DATA}" || true
     mem_limit: ${MINIO_INIT_MEM_LIMIT:-192m}
 
+  hive-metastore:
+    build: *hive-build
+    image: local/hive-metastore:dev
+    container_name: lsp-hive-metastore
+    environment:
+      SERVICE_NAME: metastore
+    ports:
+      - "9083:9083"
+    volumes:
+      - hive-metastore-data:/opt/hive/data
+    restart: unless-stopped
+    mem_limit: ${HIVE_METASTORE_MEM_LIMIT:-512m}
+
+  trino:
+    build: *trino-build
+    image: local/trino:dev
+    container_name: lsp-trino
+    depends_on:
+      hive-metastore:
+        condition: service_started
+      minio-init:
+        condition: service_completed_successfully
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
+    ports:
+      - "8080:8080"
+    volumes:
+      - trino-data:/data/trino
+    restart: unless-stopped
+    mem_limit: ${TRINO_MEM_LIMIT:-768m}
+
+  trino-bootstrap:
+    image: *bootstrap-image
+    container_name: lsp-trino-bootstrap
+    depends_on:
+      trino:
+        condition: service_started
+      minio-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./trino/bootstrap:/bootstrap:ro
+      - ./trino/views:/views:ro
+    command: ["python", "/bootstrap/bootstrap_trino.py"]
+    restart: "no"
+    mem_limit: ${TRINO_BOOTSTRAP_MEM_LIMIT:-256m}
+
+  superset-init:
+    build: *superset-build
+    image: local/superset:dev
+    container_name: lsp-superset-init
+    depends_on:
+      trino:
+        condition: service_started
+    environment:
+      <<: *superset-env
+    volumes:
+      - superset-home:/app/superset_home
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      superset db upgrade &&
+      (superset fab create-admin
+      --username "$${SUPERSET_ADMIN_USERNAME}"
+      --firstname Superset
+      --lastname Admin
+      --email "$${SUPERSET_ADMIN_EMAIL}"
+      --password "$${SUPERSET_ADMIN_PASSWORD}" || true) &&
+      superset init
+    restart: "no"
+    mem_limit: ${SUPERSET_INIT_MEM_LIMIT:-512m}
+
+  superset:
+    build: *superset-build
+    image: local/superset:dev
+    container_name: lsp-superset
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+      trino:
+        condition: service_started
+    environment:
+      <<: *superset-env
+    volumes:
+      - superset-home:/app/superset_home
+    ports:
+      - "8088:8088"
+    command: ["sh", "-c", "superset run -h 0.0.0.0 -p 8088"]
+    restart: unless-stopped
+    mem_limit: ${SUPERSET_MEM_LIMIT:-768m}
+
+  superset-bootstrap:
+    image: *bootstrap-image
+    container_name: lsp-superset-bootstrap
+    depends_on:
+      superset:
+        condition: service_started
+      trino-bootstrap:
+        condition: service_completed_successfully
+    volumes:
+      - ./superset/bootstrap:/bootstrap:ro
+    command: ["python", "/bootstrap/bootstrap_superset.py"]
+    restart: "no"
+    mem_limit: ${SUPERSET_BOOTSTRAP_MEM_LIMIT:-256m}
+
   spark-master:
     build: *spark-build
     image: local/spark:dev
@@ -288,11 +428,11 @@ services:
     environment:
       <<: *spark-env
       SPARK_MODE: worker
-      SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-1g}
-      SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-1}
+      SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-2g}
+      SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-2}
     ports:
       - "8082:8081"
-    mem_limit: ${SPARK_WORKER_MEM_LIMIT:-1400m}
+    mem_limit: ${SPARK_WORKER_MEM_LIMIT:-2304m}
 
   spark-worker-2:
     build: *spark-build
@@ -304,11 +444,11 @@ services:
     environment:
       <<: *spark-env
       SPARK_MODE: worker
-      SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-1g}
-      SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-1}
+      SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-2g}
+      SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-2}
     ports:
       - "8083:8081"
-    mem_limit: ${SPARK_WORKER_MEM_LIMIT:-1400m}
+    mem_limit: ${SPARK_WORKER_MEM_LIMIT:-2304m}
 
   spark-history-server:
     build: *spark-build
@@ -385,6 +525,56 @@ services:
     restart: unless-stopped
     mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
 
+  gold-stream:
+    build: *spark-build
+    image: local/spark:dev
+    container_name: lsp-gold-stream
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_healthy
+      spark-worker-1:
+        condition: service_started
+      silver-stream:
+        condition: service_started
+    environment:
+      <<: *spark-env
+      GOLD_APP_NAME: ${GOLD_APP_NAME:-gold_aggregator}
+    command: >
+      bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
+      --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
+      --name \"$${GOLD_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --conf spark.cores.max=1
+      /opt/project/spark/apps/gold_aggregator/main.py"
+    restart: unless-stopped
+    mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
+
+  gold-alert-stream:
+    build: *spark-build
+    image: local/spark:dev
+    container_name: lsp-gold-alert-stream
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_healthy
+      spark-worker-1:
+        condition: service_started
+      gold-stream:
+        condition: service_started
+    environment:
+      <<: *spark-env
+      GOLD_ALERTING_APP_NAME: ${GOLD_ALERTING_APP_NAME:-gold_alerting}
+    command: >
+      bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
+      --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
+      --name \"$${GOLD_ALERTING_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --conf spark.cores.max=1
+      /opt/project/spark/apps/gold_alerting/main.py"
+    restart: unless-stopped
+    mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
+
   tracking-log-replayer:
     build:
       context: ./kafka
@@ -406,10 +596,8 @@ services:
       - mooc.raw.events
       - --anonymous-topic
       - mooc.raw.anonymous.events
-      - --max-files
-      - "10"
       - --speed
-      - "4"
+      - "100"
     restart: "no"
     mem_limit: 512m
 
@@ -521,7 +709,8 @@ services:
       airflow db migrate;
       airflow users create --username \"${_AIRFLOW_WWW_USER_USERNAME:-admin}\" --password \"${_AIRFLOW_WWW_USER_PASSWORD:-admin}\" --firstname Admin --lastname User --role Admin --email admin@example.com || true;
       airflow pools set bronze_pool 1 'Pool for Bronze Delta tasks' || true;
-      airflow pools set silver_pool 1 'Pool for Silver Delta tasks' || true"
+      airflow pools set silver_pool 1 'Pool for Silver Delta tasks' || true;
+      airflow pools set gold_pool 1 'Pool for Gold Delta tasks' || true"
     depends_on:
       airflow-db:
         condition: service_healthy
@@ -536,5 +725,8 @@ volumes:
   broker2-data:
   broker3-data:
   minio-data:
+  hive-metastore-data:
+  trino-data:
+  superset-home:
   airflow-db-data:
   airflow-logs:
