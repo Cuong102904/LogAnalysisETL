@@ -5,7 +5,7 @@ BRONZE_MOOC_EVENTS_SCHEMA = StructType(
         StructField("kafka_topic", StringType(), False),
         StructField("kafka_partition", IntegerType(), False),
         StructField("kafka_offset", StringType(), False),
-        StructField("kafka_timestamp", TimestampType(), True),
+        StructField("time", TimestampType(), True),
         StructField("kafka_key", StringType(), True),
         StructField("value_raw", StringType(), True),
         StructField("ingest_ts", TimestampType(), False),

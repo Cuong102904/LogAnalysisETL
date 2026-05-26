@@ -9,7 +9,7 @@ def test_normalize_exam_attempts_keeps_ip(spark) -> None:
         [
             {
                 "dedup_key": "k1",
-                "kafka_timestamp": datetime(2026, 1, 17, 21, 22, 17),
+                "time": datetime(2026, 1, 17, 21, 22, 17),
                 "ingest_ts": datetime(2026, 1, 17, 21, 22, 18),
                 "silver_class": "exam",
                 "value_raw": json.dumps(

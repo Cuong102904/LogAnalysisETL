@@ -1,10 +1,22 @@
 tables:
-  - name: gold.user_learning_profile
-    status: skeleton
-  - name: gold.problem_performance
-    status: skeleton
-  - name: gold.system_profile
-    status: skeleton
-  - name: gold.video_anomaly_features
+  - name: gold.video_friction_signals
     status: implemented
     partition_by: [event_date, course_id]
+  - name: gold.pdf_engagement_features
+    status: implemented
+    partition_by: [event_date, course_id]
+  - name: gold.quiz_attempt_metrics
+    status: implemented
+    partition_by: [event_date, course_id]
+  - name: gold.user_learning_profile_daily
+    status: implemented
+    partition_by: [event_date, course_id]
+  - name: gold.exam_integrity_signals
+    status: implemented
+    partition_by: [event_date, course_id]
+  - name: gold.behavior_anomaly_signals
+    status: implemented
+    partition_by: [event_date, anomaly_domain]
+  - name: gold.anomaly_alerts
+    status: implemented
+    partition_by: [event_date, alert_severity]

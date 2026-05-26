@@ -1,0 +1,12 @@
+version: 1
+rules:
+  min_video_pause_rate: 0.2
+  min_video_seek_rate: 0.15
+  min_pdf_scroll_balance: 20
+  min_problem_retry_rate: 0.3
+signals:
+  - replay_score
+  - skip_score
+  - pause_rate
+  - seek_rate
+  - difficulty_score

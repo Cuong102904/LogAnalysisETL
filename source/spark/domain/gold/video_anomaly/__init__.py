@@ -1,1 +1,1 @@
-"""Video anomaly feature generation."""
+from .aggregator import aggregate_features, build_video_anomaly_features

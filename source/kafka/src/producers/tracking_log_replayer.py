@@ -37,8 +37,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--speed",
         type=float,
-        default=1.0,
-        help="Replay speed factor from event time gaps. 1.0 is original speed, 2.0 is 2x faster.",
+        default=100.0,
+        help="Replay speed factor from event time gaps. 100.0 is 100x faster than original pace.",
     )
     return parser.parse_args()
 

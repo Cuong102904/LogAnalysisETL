@@ -1,6 +1,6 @@
 # Bronze Ingestor
 
-Consumes `mooc.raw.events`, enriches ingest metadata, and writes Delta Bronze.
+Consumes `mooc.raw.events`, parses raw `value_raw.time` into canonical `time`, enriches ingest metadata, and writes Delta Bronze.
 
 - Entry: `spark-submit --master spark://spark-master:7077 /opt/project/spark/apps/bronze_ingestor/main.py`
 - Output path: `s3a://lakehouse/mooc/bronze/mooc_events_raw`

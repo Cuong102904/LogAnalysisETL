@@ -9,4 +9,4 @@ class TablePaths:
     silver_system: str
     silver_unknown: str
     silver_video_interactions: str
-    gold_video_anomaly_features: str
+    gold_video_friction_signals: str

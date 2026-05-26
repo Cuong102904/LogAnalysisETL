@@ -1,15 +1,27 @@
 app_name: gold_aggregator
 input:
+  silver_learning_path: s3a://lakehouse/mooc/silver/learning_events
   silver_video_interactions_path: s3a://lakehouse/mooc/silver/video_interactions
+  silver_pdf_path: s3a://lakehouse/mooc/silver/pdf_interactions
+  silver_performance_path: s3a://lakehouse/mooc/silver/performance_events
+  silver_exam_attempts_path: s3a://lakehouse/mooc/silver/exam_attempts
+  silver_system_path: s3a://lakehouse/mooc/silver/system_events
 storage:
-  video_anomaly_features_path: s3a://lakehouse/mooc/gold/video_anomaly_features
-  user_learning_profile_path: s3a://lakehouse/mooc/gold/user_learning_profile
-  problem_performance_path: s3a://lakehouse/mooc/gold/problem_performance
-  system_profile_path: s3a://lakehouse/mooc/gold/system_profile
+  video_friction_signals_path: s3a://lakehouse/mooc/gold/video_friction_signals
+  pdf_engagement_features_path: s3a://lakehouse/mooc/gold/pdf_engagement_features
+  quiz_attempt_metrics_path: s3a://lakehouse/mooc/gold/quiz_attempt_metrics
+  user_learning_profile_daily_path: s3a://lakehouse/mooc/gold/user_learning_profile_daily
+  exam_integrity_signals_path: s3a://lakehouse/mooc/gold/exam_integrity_signals
+  behavior_anomaly_signals_path: s3a://lakehouse/mooc/gold/behavior_anomaly_signals
 checkpoint:
   base_path: s3a://platform/mooc/gold_aggregator
-  video_anomaly_path: s3a://platform/mooc/gold_aggregator/video_anomaly
 streaming:
-  video_anomaly_query_name: gold_video_anomaly_features
+  video_friction_signals_query_name: gold_video_friction_signals
+  pdf_engagement_query_name: gold_pdf_engagement_features
+  quiz_attempt_metrics_query_name: gold_quiz_attempt_metrics
+  user_learning_profile_daily_query_name: gold_user_learning_profile_daily
+  exam_integrity_signals_query_name: gold_exam_integrity_signals
+  behavior_anomaly_signals_query_name: gold_behavior_anomaly_signals
+  trigger_interval_seconds: 30
 options:
   bucket_seconds: 5

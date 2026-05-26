@@ -1,9 +1,19 @@
 # Gold Aggregator
 
-Trang thai:
+Materialize gold analytics and anomaly signal tables from silver event streams.
 
-- Implemented: `gold.video_anomaly_features`
-- Skeleton only: `gold.user_learning_profile`, `gold.problem_performance`, `gold.system_profile`
+Implemented tables:
+
+- Analytics
+  - `gold.video_friction_signals`
+  - `gold.pdf_engagement_features`
+  - `gold.quiz_attempt_metrics`
+  - `gold.user_learning_profile_daily`
+- Anomaly signals
+  - `gold.exam_integrity_signals`
+  - `gold.behavior_anomaly_signals`
+
+Trigger interval is configurable and defaults to a near real-time micro-batch cadence.
 
 Entry:
 

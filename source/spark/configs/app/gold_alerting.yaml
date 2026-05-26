@@ -1,0 +1,14 @@
+app_name: gold_alerting
+input:
+  behavior_anomaly_signals_path: s3a://lakehouse/mooc/gold/behavior_anomaly_signals
+storage:
+  anomaly_alerts_path: s3a://lakehouse/mooc/gold/anomaly_alerts
+checkpoint:
+  base_path: s3a://platform/mooc/gold_alerting
+streaming:
+  query_name: gold_behavior_alerts
+  trigger_interval_seconds: 30
+rules:
+  min_event_count: 3
+  min_distinct_users: 2
+  min_z_score: 2.0

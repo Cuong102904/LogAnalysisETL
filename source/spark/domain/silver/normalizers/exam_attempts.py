@@ -17,9 +17,8 @@ def normalize_exam_attempts(df: DataFrame) -> DataFrame:
 
     return base.select(
         F.col("dedup_key").alias("event_id"),
-        F.col("kafka_timestamp").alias("source_timestamp"),
-        F.to_timestamp(F.get_json_object("value_raw", "$.time")).alias("ts"),
-        F.to_date(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias("event_date"),
+        F.col("time").alias("time"),
+        F.to_date(F.col("time")).alias("event_date"),
         # State transition type: created | started | ready_to_submit | submitted
         F.regexp_extract(
             F.get_json_object("value_raw", "$.event_type"),

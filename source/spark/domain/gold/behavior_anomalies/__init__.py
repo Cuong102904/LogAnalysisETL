@@ -1,0 +1,2 @@
+from domain.gold.behavior_anomalies.aggregator import build_behavior_anomalies
+

@@ -15,9 +15,8 @@ def normalize_system(df: DataFrame) -> DataFrame:
     base = df.filter(F.col("silver_class") == "system")
     return base.select(
         F.col("dedup_key").alias("event_id"),
-        F.col("kafka_timestamp").alias("source_timestamp"),
-        F.to_timestamp(F.get_json_object("value_raw", "$.time")).alias("ts"),
-        F.to_date(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias("event_date"),
+        F.col("time").alias("time"),
+        F.to_date(F.col("time")).alias("event_date"),
         F.get_json_object("value_raw", "$.event_type").alias("event_type"),
         F.get_json_object("value_raw", "$.event_source").alias("event_source"),
         F.get_json_object("value_raw", "$.username").alias("username"),

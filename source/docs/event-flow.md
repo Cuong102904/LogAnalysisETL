@@ -7,7 +7,7 @@
 3. Bronze app đọc stream, enrich metadata, technical dedup, ghi `bronze.mooc_events_raw`.
 4. Silver app đọc bronze stream/table, classify theo `configs/rules/classification.yaml`.
 5. Silver normalizers tạo các silver tables theo domain.
-6. Gold app tổng hợp feature tables, ưu tiên `gold.video_anomaly_features`.
+6. Gold app tổng hợp feature tables như `gold.video_friction_signals` và `gold.exam_integrity_signals`.
 7. Event lỗi parse hoặc vi phạm required tối thiểu sẽ đi `mooc.dlq.events` hoặc `silver.unknown_events`.
 
 ## Ingest Coverage Notes
@@ -22,6 +22,7 @@
 
 ## Unknown/Dead-letter Strategy
 
-- Invalid JSON tại ingress: gửi Kafka DLQ.
+- Invalid JSON tại ingress: gửi Kafka DLQ, payload giữ `raw` và `raw_value` để tra ngược nội dung gốc.
 - Parse được nhưng không match rule nghiệp vụ: ghi `silver.unknown_events`.
+- DLQ Kafka giữ thêm `event_snapshot` để biết event nào bị loại, đồng thời giữ `raw`/`raw_value` để debug nhanh.
 - Hỗ trợ replay bằng cách đọc lại raw topic hoặc bronze table theo partition thời gian.

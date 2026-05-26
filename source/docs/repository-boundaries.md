@@ -19,5 +19,5 @@ Muc tieu hien tai la clean architecture cho ETL Kafka -> Spark Bronze -> MinIO D
 ## Runtime Contract
 
 - Canonical input topic: `mooc.raw.events`.
-- DLQ topic: `mooc.dlq.events`.
+- DLQ topic: `mooc.dlq.events` (payload giữ `raw`, `raw_value`, và `event_snapshot`).
 - Service DNS trong compose: `broker1:29092,broker2:29092,broker3:29092`.

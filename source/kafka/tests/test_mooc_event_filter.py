@@ -161,6 +161,8 @@ class DlqPayloadShapeTest(unittest.TestCase):
             error_type="filtered_out",
             error_message="reason",
             raw_event={"event_type": "x"},
+            raw_value="{\"event_type\": \"x\"}",
+            event_snapshot={"event_type": "x", "event_source": "browser", "name": "play_video", "context.path": "/course/1"},
             failed_topic="mooc.raw.events",
             failed_key="missing-key",
         )
@@ -168,6 +170,9 @@ class DlqPayloadShapeTest(unittest.TestCase):
         self.assertIn("error_type", payload)
         self.assertIn("error_message", payload)
         self.assertIn("raw_event", payload)
+        self.assertIn("raw_value", payload)
+        self.assertIn("raw", payload)
+        self.assertIn("event_snapshot", payload)
 
 
 class _FakeProducer:
@@ -256,6 +261,9 @@ class CoreReplayRoutingTest(unittest.TestCase):
         self.assertIn("snapshot=", payload["error_message"])
         self.assertEqual(payload["failed_topic"], "mooc.raw.events")
         self.assertEqual(payload["failed_key"], "user:test")
+        self.assertEqual(payload["raw_value"], json.dumps(event))
+        self.assertEqual(payload["event_snapshot"]["event_type"], "internal.vendor.telemetry_ping")
+        self.assertEqual(payload["event_snapshot"]["context.path"], "/")
 
     def test_allowlisted_without_identity_routes_anonymous_topic(self) -> None:
         producer = _FakeProducer()
