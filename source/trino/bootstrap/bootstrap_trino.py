@@ -58,11 +58,29 @@ def execute_sql(sql: str) -> None:
     if status != 200:
         raise RuntimeError(f"Trino statement failed with status {status}: {body.decode('utf-8')}")
     payload = json.loads(body.decode("utf-8"))
+    if payload.get("error"):
+        raise RuntimeError(json.dumps(payload["error"], sort_keys=True))
     next_uri = payload.get("nextUri")
     while next_uri:
         _, _, body = _http_request("GET", next_uri, headers={"X-Trino-User": "bootstrap"})
         payload = json.loads(body.decode("utf-8"))
+        if payload.get("error"):
+            raise RuntimeError(json.dumps(payload["error"], sort_keys=True))
         next_uri = payload.get("nextUri")
+
+
+def _is_missing_dependency_error(exc: Exception) -> bool:
+    message = str(exc).lower()
+    missing_markers = (
+        "delta log",
+        "does not exist",
+        "doesn't exist",
+        "not found",
+        "table not found",
+        "table location does not exist",
+        "no such file",
+    )
+    return any(marker in message for marker in missing_markers)
 
 
 def register_gold_tables() -> None:
@@ -114,8 +132,14 @@ def register_gold_tables() -> None:
                 execute_sql(sql)
                 break
             except (urllib.error.HTTPError, RuntimeError) as exc:
-                if time.time() >= deadline:
+                if not _is_missing_dependency_error(exc):
                     raise RuntimeError(f"Failed to register {table_name}") from exc
+                if time.time() >= deadline:
+                    print(
+                        f"skipping table registration for {table_name}: "
+                        f"{table_location} is not materialized yet"
+                    )
+                    break
                 time.sleep(5)
 
 
@@ -125,7 +149,13 @@ def apply_views() -> None:
             continue
         sql = sql_file.read_text(encoding="utf-8").strip()
         if sql:
-            execute_sql(sql)
+            try:
+                execute_sql(sql)
+            except (urllib.error.HTTPError, RuntimeError) as exc:
+                if _is_missing_dependency_error(exc):
+                    print(f"skipping view bootstrap for {sql_file.name}: dependency not ready")
+                    continue
+                raise
 
 
 def main() -> None:

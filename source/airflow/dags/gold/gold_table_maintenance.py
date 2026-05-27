@@ -14,12 +14,13 @@ DEFAULT_ARGS = {
 }
 
 GOLD_TABLES = [
-    "video_anomaly_features",
-    "pdf_behavior_features",
-    "quiz_performance_features",
-    "learning_journey_features",
-    "behavior_anomalies",
-    "alert_events",
+    "video_friction_signals",
+    "pdf_engagement_features",
+    "quiz_attempt_metrics",
+    "user_learning_profile_daily",
+    "exam_integrity_signals",
+    "behavior_anomaly_signals",
+    "anomaly_alerts",
 ]
 
 

@@ -11,9 +11,9 @@ SELECT
     event_count,
     distinct_users,
     distinct_sessions,
-    first_source_timestamp,
-    last_source_timestamp,
-    last_event_ts,
+    first_time,
+    last_time,
+    last_event_time,
     rolling_mean_7,
     rolling_std_7,
     z_score,
@@ -21,6 +21,6 @@ SELECT
     alert_severity,
     alert_type,
     alert_message,
-    alert_ts
+    alert_time
 FROM delta.mooc.anomaly_alerts
 ;
