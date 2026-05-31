@@ -8,14 +8,14 @@ Nguồn chính: `silver.video_interactions`.
 
 Các cột cốt lõi:
 - `course_id`, `video_id`
-- `ts`, `event_date`
+- `time`, `event_date`
 - `action_type` (`play`, `pause`, `seek`, `stop`, `speed_change`, `load`)
 - `current_time_s`, `from_time_s`, `to_time_s`
 - `user_id_int`, `session`
 
 ## Gold Feature Table
 
-Đích: `gold.video_anomaly_features`.
+Đích: `gold.video_friction_signals`.
 
 Grain:
 - `course_id + video_id + time_bucket_s + wallclock_bucket_ts + action_type`

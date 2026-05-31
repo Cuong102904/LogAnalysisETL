@@ -1,5 +1,5 @@
 from apps.gold_alerting.config import GoldAlertingConfig
-from apps.gold_alerting.job import run
+from pipelines.gold.alert_pipeline import run
 
 
 def main() -> None:

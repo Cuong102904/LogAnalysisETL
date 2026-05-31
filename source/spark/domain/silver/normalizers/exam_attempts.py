@@ -15,10 +15,12 @@ def normalize_exam_attempts(df: DataFrame) -> DataFrame:
     base = df.filter(F.col("silver_class") == "exam")
     ev = F.from_json(F.get_json_object("value_raw", "$.event"), "map<string,string>")
 
+    event_time = F.coalesce(F.col("time"), F.to_timestamp(F.get_json_object("value_raw", "$.time")), F.col("ingest_ts"))
+
     return base.select(
         F.col("dedup_key").alias("event_id"),
-        F.col("time").alias("time"),
-        F.to_date(F.col("time")).alias("event_date"),
+        event_time.alias("time"),
+        F.to_date(event_time).alias("event_date"),
         # State transition type: created | started | ready_to_submit | submitted
         F.regexp_extract(
             F.get_json_object("value_raw", "$.event_type"),

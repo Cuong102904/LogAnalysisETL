@@ -13,10 +13,12 @@ def normalize_system(df: DataFrame) -> DataFrame:
     Stores raw agent string for bot/device detection at Gold layer.
     """
     base = df.filter(F.col("silver_class") == "system")
+    event_time = F.coalesce(F.col("time"), F.to_timestamp(F.get_json_object("value_raw", "$.time")), F.col("ingest_ts"))
+
     return base.select(
         F.col("dedup_key").alias("event_id"),
-        F.col("time").alias("time"),
-        F.to_date(F.col("time")).alias("event_date"),
+        event_time.alias("time"),
+        F.to_date(event_time).alias("event_date"),
         F.get_json_object("value_raw", "$.event_type").alias("event_type"),
         F.get_json_object("value_raw", "$.event_source").alias("event_source"),
         F.get_json_object("value_raw", "$.username").alias("username"),

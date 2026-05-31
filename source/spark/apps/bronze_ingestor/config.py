@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from apps.config_utils import env_str, load_app_config, nested_value, required_env_str
+from shared.config_loader import env_str, load_app_config, nested_value, required_env_str
 
 
 @dataclass(frozen=True)

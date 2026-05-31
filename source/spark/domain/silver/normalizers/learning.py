@@ -30,11 +30,13 @@ def normalize_learning(df: DataFrame) -> DataFrame:
         F.get_json_object(F.get_json_object("value_raw", "$.event"), "$.completion").cast("int"),
     ).otherwise(F.lit(None).cast("int"))
 
+    event_time = F.coalesce(F.col("time"), F.to_timestamp(F.get_json_object("value_raw", "$.time")), F.col("ingest_ts"))
+
     return base.select(
         F.col("dedup_key").alias("event_id"),
-        F.col("time").alias("time"),
-        F.to_date(F.col("time")).alias("event_date"),
-        F.hour(F.col("time")).alias("event_hour"),
+        event_time.alias("time"),
+        F.to_date(event_time).alias("event_date"),
+        F.hour(event_time).alias("event_hour"),
         F.get_json_object("value_raw", "$.event_type").alias("event_type"),
         F.get_json_object("value_raw", "$.event_source").alias("event_source"),
         F.get_json_object("value_raw", "$.username").alias("username"),

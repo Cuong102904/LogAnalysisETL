@@ -1,4 +1,4 @@
-from utils.time_buckets import bucket_second
+from shared.time_buckets import bucket_second
 
 
 def test_bucket_second() -> None:
