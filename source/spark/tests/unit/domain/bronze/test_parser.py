@@ -1,4 +1,4 @@
-from utils.json_utils import parse_json_or_none
+from shared.json_utils import parse_json_or_none
 
 
 def test_parse_json_or_none_ok() -> None:

@@ -17,14 +17,14 @@ ls source/.env
 
 Sửa các giá trị `change-me` trong `.env` trước khi chạy (đặc biệt `MINIO_ROOT_PASSWORD`).
 
-## 2. Khởi động toàn bộ stack
+## 2. Khởi động full stack đến lớp gold và semantic layer
 
 ```bash
 cd source
 docker compose up -d --build
 ```
 
-Lệnh này bật: Kafka (3 broker), Kafka UI, MinIO, Spark Master + Worker, History Server, Airflow, và Bronze stream.
+Lệnh này bật: Kafka (3 broker), Kafka UI, MinIO, Hive Metastore, Trino, Superset, Spark Master + 3 Workers, History Server, Airflow, Bronze stream, Silver stream, Gold stream, Gold alert stream, và tracking-log-replayer.
 
 Kiểm tra tất cả đang chạy:
 
@@ -37,6 +37,7 @@ Các service quan trọng cần ở trạng thái `healthy` hoặc `running`:
 - `lsp-minio` — healthy
 - `lsp-spark-master` — healthy
 - `lsp-spark-worker-1` — running
+- `lsp-spark-worker-2` — running
 - `lsp-bronze-stream` — running (driver đang idle chờ data)
 
 `lsp-kafka-init` và `lsp-minio-init` sẽ ở trạng thái `exited (0)` sau khi hoàn tất bootstrap topic và bucket.
@@ -65,7 +66,7 @@ docker compose up -d tracking-log-replayer
 docker compose logs -f tracking-log-replayer
 ```
 
-Tham số mặc định trong `docker-compose.yaml`: `--max-files 10 --speed 4` (10 file đầu, replay nhanh 4x).
+Tham số mặc định hiện đọc toàn bộ file và replay nhanh 100x.
 
 Để chạy nhiều file hơn hoặc điều chỉnh tốc độ, override trực tiếp:
 
@@ -77,11 +78,10 @@ docker compose run --rm tracking-log-replayer \
   --input-root /data/activity_logs \
   --topic mooc.raw.events \
   --anonymous-topic mooc.raw.anonymous.events \
-  --max-files 20 \
-  --speed 10
+  --speed 100
 ```
 
-Tham số `--max-files 0` để replay toàn bộ file (chậm, chỉ dùng khi cần full dataset).
+Mặc định `--max-files` là 0 nên replayer đọc toàn bộ file; chỉ thêm `--max-files` khi muốn giới hạn dataset.
 
 Lưu ý:
 - `mooc.raw.events` chỉ nhận event thuộc allowlist của producer (xem `kafka/config/producer_filter.yaml`).
@@ -136,7 +136,7 @@ Khi có data vào, sẽ thấy progress block dạng:
 Kiểm tra trạng thái Spark cluster:
 
 ```bash
-docker compose ps bronze-stream spark-master spark-worker-1
+docker compose ps bronze-stream spark-master spark-worker-1 spark-worker-2
 ```
 
 ## 5. Xác nhận dữ liệu đã ghi vào MinIO (Bronze Delta)
@@ -188,6 +188,7 @@ docker compose down -v
 |---|---|---|
 | 8081 | http://localhost:8081 | Spark Master — workers, running apps |
 | 8082 | http://localhost:8082 | Spark Worker 1 — executor, tasks |
+| 8083 | http://localhost:8083 | Spark Worker 2 — executor, tasks |
 | 8085 | http://localhost:8085 | Kafka UI — topics, offset, consumer lag |
 | 9001 | http://localhost:9001 | MinIO Console — Delta files (user: minio) |
 | 18080 | http://localhost:18080 | Spark History Server — job/stage/task history |

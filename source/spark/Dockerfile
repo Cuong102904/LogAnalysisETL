@@ -5,9 +5,12 @@ USER root
 # Keep local Spark image extensible for connectors/jars in CI/CD.
 COPY conf /opt/bitnami/spark/conf
 COPY apps /opt/project/spark/apps
+COPY pipelines /opt/project/spark/pipelines
 COPY domain /opt/project/spark/domain
+COPY schemas /opt/project/spark/schemas
 COPY infrastructure /opt/project/spark/infrastructure
 COPY configs /opt/project/spark/configs
+COPY shared /opt/project/spark/shared
 COPY utils /opt/project/spark/utils
 
 ENV SPARK_APP_PATH=/opt/project/spark \

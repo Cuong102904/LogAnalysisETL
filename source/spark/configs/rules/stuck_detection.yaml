@@ -1,0 +1,11 @@
+version: 1
+rules:
+  min_sessions: 3
+  max_days_without_progress: 7
+  min_progress_velocity: 0.1
+  max_quiz_retry_pressure: 5
+signals:
+  - engagement_score
+  - progress_velocity
+  - revisit_rate
+  - quiz_retry_pressure

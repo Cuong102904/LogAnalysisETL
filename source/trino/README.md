@@ -1,16 +1,28 @@
 # Trino Repository
 
-Trino duoc giu o muc skeleton de phase sau query Delta Lake tren MinIO.
+Trino is the SQL query layer for the lakehouse semantic layer.
 
-## Hien trang
+## What is implemented
 
-- Co khung config trong `etc/`.
-- Chua bat runtime query production.
+- Compose has a `trino` service and a `trino-bootstrap` service.
+- Trino image and config live under `trino/`.
+- Hive Metastore is self-hosted in the compose stack.
+- Semantic views live in `views/`.
+- Bootstrap service `trino-bootstrap` waits for Trino, registers Delta tables, and applies semantic views.
 
-## Roadmap
+## Semantic Layer
 
-- Bo sung catalog Delta/Hive ket noi MinIO.
-- Tao views cho bang Silver/Gold.
-- Toi uu truy van dashboard/anomaly exploration.
+- `video_friction_view`
+- `exam_anomaly_view`
+- `pdf_engagement_view`
+- `quiz_difficulty_view`
+- `course_improvement_view`
+- `learner_health_view`
+- `behavior_anomaly_view`
+- `alert_events_view`
 
-Trang thai: DEFERRED runtime.
+## Notes
+
+- Trino uses Hive Metastore plus MinIO-backed S3 storage for the Delta catalog.
+- The bootstrap currently registers `silver_video_interactions` and the Gold Delta tables needed by the semantic layer.
+- Views are stored as SQL files so they can be bootstrapped from CLI or consumed by Superset SQL Lab.

@@ -9,9 +9,12 @@ flowchart LR
   bronze --> bronzeDelta[(s3a://lakehouse/mooc/bronze/mooc_events_raw)]
   bronzeDelta --> silver[silver-stream spark-submit]
   silver --> silverDelta[(s3a://lakehouse/mooc/silver/*)]
+  silverDelta --> gold[gold-stream / gold-alert-stream]
+  gold --> goldDelta[(s3a://lakehouse/mooc/gold/*)]
   sparkMaster[Spark Master] --> workers[Spark worker]
   bronze --> sparkMaster
   silver --> sparkMaster
+  gold --> sparkMaster
   airflow[Airflow standalone] --> sparkMaster
   sparkMaster --> events[(s3a://platform/spark-events)]
   history[Spark History Server] --> events
@@ -33,7 +36,7 @@ cd source
 docker compose up -d --build
 ```
 
-Default mode starts Kafka, Kafka UI, MinIO, Spark Master/Worker, History Server, Airflow, and Bronze stream. Optional replay is behind the `replay` profile:
+Default mode starts Kafka, Kafka UI, MinIO, Hive Metastore, Trino, Superset, Spark Master/Worker, History Server, Airflow, Bronze stream, Silver stream, Gold stream, Gold alert stream, and the replay service. The stack now includes the query/dashboard layer in the same compose file:
 
 ```bash
 docker compose up -d tracking-log-replayer
@@ -45,16 +48,26 @@ Do not run production streams with `python -m apps.*`; the stack submits Bronze 
 
 - Spark Master UI: `http://localhost:8081`
 - Spark Worker 1 UI: `http://localhost:8082`
+- Spark Worker 2 UI: `http://localhost:8083`
 - Kafka UI: `http://localhost:8085`
 - Spark History Server: `http://localhost:18080`
 - Airflow UI: `http://localhost:8089`
 - MinIO Console: `http://localhost:9001`
+- Trino: `http://localhost:8080`
+- Superset: `http://localhost:8088`
+
+The full stack now includes the query/dashboard layer. Trino is available at `http://localhost:8080` and Superset at `http://localhost:8088`.
 
 ## Streaming Jobs
 
-| Kafka topic | Spark service | Delta table | Checkpoint |
+| Source | Spark service | Delta table | Checkpoint |
 | --- | --- | --- | --- |
 | `mooc.raw.events` | `bronze-stream` | `s3a://lakehouse/mooc/bronze/mooc_events_raw` | `s3a://platform/mooc/bronze_ingestor` |
+| `s3a://lakehouse/mooc/bronze/mooc_events_raw` | `silver-stream` | `s3a://lakehouse/mooc/silver/*` | `s3a://platform/mooc/silver_transformer` |
+| `s3a://lakehouse/mooc/silver/*` | `gold-stream` | `s3a://lakehouse/mooc/gold/*` | `s3a://platform/mooc/gold_aggregator` |
+| `s3a://lakehouse/mooc/gold/behavior_anomaly_signals` | `gold-alert-stream` | `s3a://lakehouse/mooc/gold/anomaly_alerts` | `s3a://platform/mooc/gold_alerting` |
+
+Gold tables are written straight to MinIO and remain available for downstream consumers.
 
 Never delete checkpoint paths during normal restart. Structured Streaming uses them for exactly-once progress and state recovery.
 Kafka UI is still useful for topic and broker visibility, but Bronze stream progress is best observed in Spark Driver UI and the checkpoint path, not by expecting a stable consumer group entry.
@@ -116,7 +129,7 @@ docker compose up -d tracking-log-replayer
 docker compose logs -f tracking-log-replayer
 ```
 
-Mặc định replay 10 file đầu ở tốc độ 4x. Để thay đổi tham số:
+Mặc định replay toàn bộ file ở tốc độ 100x. Để thay đổi tham số:
 
 ```bash
 docker compose run --rm tracking-log-replayer \
@@ -125,8 +138,7 @@ docker compose run --rm tracking-log-replayer \
   --input-root /data/activity_logs \
   --topic mooc.raw.events \
   --anonymous-topic mooc.raw.anonymous.events \
-  --max-files 20 \
-  --speed 10
+  --speed 100
 ```
 
 ### Fake data — smoke test nhanh

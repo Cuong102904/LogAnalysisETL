@@ -8,6 +8,7 @@ from typing import Any
 from kafka.src.common.actor_identity import event_has_subject_identity
 from kafka.src.common.encoding import encode_json
 from kafka.src.common.time_utils import utc_now_iso
+from kafka.src.filters.mooc_event_filter import event_snapshot_for_dlq
 from kafka.src.models.replay_record import ReplayRecord
 from kafka.src.producers.replayer.pacing import sleep_by_anchor_clock
 
@@ -18,6 +19,9 @@ def build_dlq_payload(
     error_type: str,
     error_message: str,
     raw_event: Any,
+    raw_value: str | None = None,
+    raw: str | None = None,
+    event_snapshot: dict[str, Any] | None = None,
     failed_topic: str | None = None,
     failed_key: str | None = None,
 ) -> dict[str, Any]:
@@ -26,7 +30,11 @@ def build_dlq_payload(
         "error_type": error_type,
         "error_message": error_message,
         "raw_event": raw_event,
+        "raw_value": raw_value if raw_value is not None else raw_event,
+        "raw": raw if raw is not None else (raw_value if raw_value is not None else raw_event),
     }
+    if event_snapshot is not None:
+        payload["event_snapshot"] = event_snapshot
     if failed_topic is not None:
         payload["failed_topic"] = failed_topic
     if failed_key is not None:
@@ -99,6 +107,8 @@ def replay_stream(
                 error_type="decode_failed",
                 error_message=f"decode failed: {rec.decode_error}",
                 raw_event=rec.raw_line,
+                raw_value=rec.raw_line,
+                raw=rec.raw_line,
                 failed_topic=dlq_failed_topic,
                 failed_key=key_str,
             )
@@ -115,11 +125,17 @@ def replay_stream(
 
         if not rec.validation_ok:
             ingest_time = utc_now_iso()
+            event_snapshot = (
+                event_snapshot_for_dlq(rec.event) if isinstance(rec.event, dict) else None
+            )
             payload = build_dlq_payload(
                 ingest_time=ingest_time,
                 error_type="validation_failed",
                 error_message=f"validation failed: {rec.validation_reason}",
                 raw_event=rec.event or rec.raw_line,
+                raw_value=rec.raw_line,
+                raw=rec.raw_line,
+                event_snapshot=event_snapshot,
                 failed_topic=dlq_failed_topic,
                 failed_key=key_str,
             )
@@ -158,25 +174,23 @@ def replay_stream(
             producer.poll(0)
         else:
             ingest_time = utc_now_iso()
-            snapshot = {}
-            # Snapshot is expected to be handled by filter module; keep minimal here.
+            event_snapshot = event_snapshot_for_dlq(rec.event)
             if dlq_publish_cb is not None:
-                dlq_publish_cb({"event": rec.event, "reason": reason})
+                dlq_publish_cb(
+                    {"event": rec.event, "reason": reason, "event_snapshot": event_snapshot}
+                )
             payload = build_dlq_payload(
                 ingest_time=ingest_time,
                 error_type="filtered_out",
                 error_message=reason,
                 raw_event=rec.event,
+                raw_value=rec.raw_line,
+                raw=rec.raw_line,
+                event_snapshot=event_snapshot,
                 failed_topic=dlq_failed_topic,
                 failed_key=key_str,
             )
-            # Snapshot enrich: include common fields if present.
-            snapshot["event_type"] = str(rec.event.get("event_type", ""))
-            snapshot["event_source"] = str(rec.event.get("event_source", ""))
-            snapshot["name"] = str(rec.event.get("name", ""))
-            ctx = rec.event.get("context") if isinstance(rec.event.get("context"), dict) else {}
-            snapshot["context.path"] = str(ctx.get("path", ""))
-            payload["error_message"] = f"{reason} | snapshot={snapshot}"
+            payload["error_message"] = f"{reason} | snapshot={event_snapshot}"
             producer.produce(
                 dlq_topic,
                 key=rec.key_bytes or key_str.encode("utf-8"),

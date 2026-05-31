@@ -8,11 +8,13 @@ def normalize_unknown(df: DataFrame) -> DataFrame:
     Stores a raw preview for debugging and schema evolution.
     """
     base = df.filter(F.col("silver_class") == "unknown")
+    event_time = F.coalesce(F.col("time"), F.to_timestamp(F.get_json_object("value_raw", "$.time")), F.col("ingest_ts"))
+
     return base.select(
         F.col("dedup_key").alias("event_id"),
         F.col("silver_class"),
-        F.to_timestamp(F.get_json_object("value_raw", "$.time")).alias("ts"),
-        F.to_date(F.to_timestamp(F.get_json_object("value_raw", "$.time"))).alias("event_date"),
+        event_time.alias("time"),
+        F.to_date(event_time).alias("event_date"),
         F.get_json_object("value_raw", "$.event_source").alias("event_source"),
         F.get_json_object("value_raw", "$.event_type").alias("event_type"),
         F.get_json_object("value_raw", "$.username").alias("username"),

@@ -1,6 +1,8 @@
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
+from domain.bronze.time import parse_raw_event_time
+
 
 def enrich_bronze(raw: DataFrame) -> DataFrame:
     return (
@@ -8,7 +10,7 @@ def enrich_bronze(raw: DataFrame) -> DataFrame:
             F.col("topic").alias("kafka_topic"),
             F.col("partition").alias("kafka_partition"),
             F.col("offset").cast("string").alias("kafka_offset"),
-            F.col("timestamp").alias("kafka_timestamp"),
+            parse_raw_event_time(F.col("value").cast("string")).alias("time"),
             F.col("key").cast("string").alias("kafka_key"),
             F.col("value").cast("string").alias("value_raw"),
         )

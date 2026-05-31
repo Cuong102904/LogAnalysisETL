@@ -1,13 +1,12 @@
 from dataclasses import dataclass
 
-from apps.config_utils import env_str, load_app_config, required_env_str
+from shared.config_loader import env_str, load_app_config, required_env_str
 
 
 @dataclass(frozen=True)
 class SilverConfig:
     app_name: str
     input_path: str
-    # Silver table paths
     learning_path: str
     performance_path: str
     exam_path: str
@@ -16,9 +15,7 @@ class SilverConfig:
     pdf_path: str
     system_path: str
     unknown_path: str
-    # Checkpoint
     checkpoint_base: str
-    # Query names
     learning_query_name: str
     performance_query_name: str
     exam_query_name: str
@@ -34,7 +31,6 @@ class SilverConfig:
         return cls(
             app_name=env_str("SILVER_APP_NAME", config, "app_name", default="silver_transformer"),
             input_path=required_env_str("BRONZE_TABLE_PATH", config, "input", "bronze_table_path"),
-            # paths
             learning_path=required_env_str(
                 "SILVER_LEARNING_PATH", config, "storage", "learning_path"
             ),
@@ -49,11 +45,9 @@ class SilverConfig:
             pdf_path=required_env_str("SILVER_PDF_PATH", config, "storage", "pdf_path"),
             system_path=required_env_str("SILVER_SYSTEM_PATH", config, "storage", "system_path"),
             unknown_path=required_env_str("SILVER_UNKNOWN_PATH", config, "storage", "unknown_path"),
-            # checkpoint
             checkpoint_base=required_env_str(
                 "SILVER_CHECKPOINT_BASE", config, "checkpoint", "base_path"
             ),
-            # query names
             learning_query_name=env_str(
                 "SILVER_LEARNING_QUERY_NAME",
                 config,

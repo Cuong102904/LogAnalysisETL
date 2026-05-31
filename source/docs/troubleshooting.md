@@ -19,3 +19,4 @@
 
 - Skew tại một course: kiểm tra `course_bucket`.
 - Microbatch chậm: giảm trigger interval hoặc tối ưu partition writes.
+- `INVALID_DRIVER_MEMORY`: tăng `SPARK_DRIVER_MEMORY` lên ít nhất `512m`. Mức `256m` là quá thấp cho Bronze/Silver/Gold trong repo này.

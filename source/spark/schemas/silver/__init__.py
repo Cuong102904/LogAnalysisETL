@@ -1,0 +1,2 @@
+"""Silver schema definitions."""
+

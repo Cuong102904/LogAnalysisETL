@@ -41,7 +41,7 @@ source/kafka/
 
 - `mooc.raw.events`: raw lines that pass the allowlist and have `username` or `context.user_id`.
 - `mooc.raw.anonymous.events`: allowlisted rows missing both identifiers (same JSON value encoding as raw).
-- `mooc.dlq.events`: failed events.
+- `mooc.dlq.events`: failed events. DLQ payload keeps `raw_event`, `raw_value`, `raw`, and `event_snapshot` for quick inspection.
 
 ## Chay local nhanh
 
@@ -70,13 +70,13 @@ uv run python -m kafka.src.producers.tracking_log_replayer --brokers localhost:9
 Them tuy chon toc do replay theo event-time:
 
 ```bash
-uv run python -m kafka.src.producers.tracking_log_replayer --brokers localhost:9092,localhost:9093,localhost:9094 --input-root ../BK_activity_logs_unzipped --topic mooc.raw.events --speed 2.0
+uv run python -m kafka.src.producers.tracking_log_replayer --brokers localhost:9092,localhost:9093,localhost:9094 --input-root ../BK_activity_logs_unzipped --topic mooc.raw.events --speed 100.0
 ```
 
-- `--speed 1.0`: phat theo khoang cach thoi gian goc cua truong `time`.
-- `--speed 2.0`: nhanh gap doi so voi khoang cach thoi gian goc.
+- `--speed 100.0`: nhanh hon 100 lan so voi khoang cach thoi gian goc.
 - Replay su dung moc thoi gian tu event hop le dau tien, sau do map timeline event vao dong ho chay hien tai.
-- Producer duoc allowlist theo `kafka/config/producer_filter.yaml`. Su kien khong thuoc allowlist duoc publish vao `mooc.dlq.events` voi `error_type=filtered_out`.
+- Mặc định replayer đọc toàn bộ file; chỉ thêm `--max-files` khi muốn giới hạn dataset.
+- Producer duoc allowlist theo `kafka/config/producer_filter.yaml`. Su kien khong thuoc allowlist duoc publish vao `mooc.dlq.events` voi `error_type=filtered_out` va co `event_snapshot` de nhan dien event.
 
 ## Integration test
 

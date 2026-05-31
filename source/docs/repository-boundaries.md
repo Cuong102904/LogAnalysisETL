@@ -8,7 +8,7 @@ Muc tieu hien tai la clean architecture cho ETL Kafka -> Spark Bronze -> MinIO D
   - Data ingress contracts va replay producer doc tu tracking logs thuc.
   - Topic canonical: `mooc.raw.events`, `mooc.dlq.events`.
 - `spark`
-  - ETL Bronze theo clean layers: `apps/`, `domain/`, `infrastructure/`, `configs/`, `utils/`.
+  - ETL Bronze/Silver/Gold theo clean layers: `apps/`, `pipelines/`, `domain/`, `schemas/`, `infrastructure/`, `shared/`, `configs/`.
 - `minio`
   - Bucket layout, scripts bootstrap, policy placeholders.
 - `docs`
@@ -19,5 +19,5 @@ Muc tieu hien tai la clean architecture cho ETL Kafka -> Spark Bronze -> MinIO D
 ## Runtime Contract
 
 - Canonical input topic: `mooc.raw.events`.
-- DLQ topic: `mooc.dlq.events`.
+- DLQ topic: `mooc.dlq.events` (payload giữ `raw`, `raw_value`, và `event_snapshot`).
 - Service DNS trong compose: `broker1:29092,broker2:29092,broker3:29092`.

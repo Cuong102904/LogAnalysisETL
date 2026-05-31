@@ -25,7 +25,7 @@ def normalize_video_interactions(learning_df: DataFrame) -> DataFrame:
 
     return learning_df.filter(video_events).select(
         F.col("event_id"),
-        F.col("ts"),
+        F.col("time"),
         F.col("event_date"),
         F.col("event_type"),
         F.col("username"),
