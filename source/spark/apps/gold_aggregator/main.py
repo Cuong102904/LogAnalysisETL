@@ -1,5 +1,6 @@
-from apps.gold_aggregator.config import GoldConfig
 from pipelines.gold.aggregation_pipeline import run
+
+from apps.gold_aggregator.config import GoldConfig
 
 
 def main() -> None:

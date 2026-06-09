@@ -10,7 +10,6 @@ from kafka.src.common import validate_tracking_event
 from kafka.src.models.replay_record import ReplayRecord
 from kafka.src.producers.replayer.pacing import parse_event_time
 
-
 TRACKING_FILE_RE = re.compile(r"^tracking\.log-(\d{8})-(\d+)(?:\.json.*)?$")
 TRACKING_FILE_GLOB = "tracking.log-*"
 DEFAULT_READ_CHUNK_SIZE = 1024 * 1024

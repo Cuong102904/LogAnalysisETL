@@ -1,5 +1,6 @@
-from apps.bronze_ingestor.config import BronzeConfig
 from pipelines.bronze.ingest_pipeline import run
+
+from apps.bronze_ingestor.config import BronzeConfig
 
 
 def main() -> None:

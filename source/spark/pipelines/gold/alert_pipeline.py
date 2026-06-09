@@ -1,8 +1,8 @@
 from apps.gold_alerting.config import GoldAlertingConfig
 from delta.tables import DeltaTable
 from domain.gold.alerts import build_alert_events
-from schemas.gold.behavior_anomalies import BEHAVIOR_ANOMALY_SIGNALS_SCHEMA
 from infrastructure.spark.session import build_spark
+from schemas.gold.behavior_anomalies import BEHAVIOR_ANOMALY_SIGNALS_SCHEMA
 
 
 def _ensure_behavior_anomaly_signals_schema(spark, path: str) -> None:

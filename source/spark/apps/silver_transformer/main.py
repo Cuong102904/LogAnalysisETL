@@ -1,5 +1,6 @@
-from apps.silver_transformer.config import SilverConfig
 from pipelines.silver.transform_pipeline import run
+
+from apps.silver_transformer.config import SilverConfig
 
 
 def main() -> None:
