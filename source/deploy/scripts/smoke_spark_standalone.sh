@@ -5,16 +5,17 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COMPOSE_FILE="${COMPOSE_FILE:-${ROOT_DIR}/../docker-compose.yaml}"
 COMPOSE_DIR="$(dirname "${COMPOSE_FILE}")"
 SPARK_MASTER_URL="${SPARK_MASTER_URL:-spark://spark-master:7077}"
+SPARK_MASTER_UI_HOST="${SPARK_MASTER_UI_HOST:-${LINUX_DOCKER_HOST:-localhost}}"
 
 compose() {
   docker compose --project-directory "${COMPOSE_DIR}" -f "${COMPOSE_FILE}" "$@"
 }
 
 echo "Checking Spark Master UI"
-curl -fsS "http://localhost:8081" >/dev/null
+curl -fsS "http://${SPARK_MASTER_UI_HOST}:8081" >/dev/null
 
 echo "Checking Spark workers registered"
-curl -fsS "http://localhost:8081/json/" | grep -q '"workers"'
+curl -fsS "http://${SPARK_MASTER_UI_HOST}:8081/json/" | grep -q '"workers"'
 
 echo "Running Spark Standalone + S3A + Delta smoke job"
 compose exec -T spark-master bash -lc "cat >/tmp/smoke_s3_delta.py <<'PY'

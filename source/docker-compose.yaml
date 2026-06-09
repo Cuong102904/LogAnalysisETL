@@ -111,7 +111,7 @@ x-airflow-env: &airflow-env
   PYTHONPATH: /opt/airflow:/opt/project/spark
   _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
   _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-admin}
-  AIRFLOW_CONN_SPARK_DEFAULT: spark://spark-master:7077
+  AIRFLOW_CONN_SPARK_DEFAULT: ${AIRFLOW_CONN_SPARK_DEFAULT:-spark://spark-master:7077}
 
 services:
   broker1:
@@ -408,6 +408,7 @@ services:
     environment:
       <<: *spark-env
       SPARK_MODE: master
+      SPARK_MASTER_HOST: ${SPARK_MASTER_HOST:-spark-master}
     ports:
       - "7077:7077"
       - "8081:8080"
