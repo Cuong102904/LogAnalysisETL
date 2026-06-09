@@ -1,1 +1,0 @@
-"""Bronze schema namespace."""

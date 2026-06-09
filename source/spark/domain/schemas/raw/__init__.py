@@ -1,1 +1,0 @@
-"""Raw schema namespace."""

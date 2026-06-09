@@ -4,11 +4,13 @@ Spark ETL da duoc refactor theo clean architecture cho medallion lakehouse.
 
 ## Cac nhom thu muc chinh
 
-- `apps/`: app entrypoints (`bronze_ingestor`, `silver_transformer`, `gold_aggregator`, `gold_alerting`, `maintenance`).
-- `domain/`: schemas va logic Bronze/Silver/Gold.
+- `apps/`: runtime entrypoints (`bronze_ingestor`, `silver_transformer`, `gold_aggregator`, `gold_alerting`, `maintenance`).
+- `pipelines/`: orchestration for read-transform-write and materialization flows.
+- `domain/`: business logic for Bronze/Silver/Gold.
+- `schemas/`: canonical raw/bronze/silver/gold table contracts.
 - `infrastructure/`: Spark/Kafka/Delta adapters.
+- `shared/`: generic helpers for config loading, JSON, logging, and UDFs.
 - `configs/`: app config, rules, schemas, storage.
-- `utils/`: helper dung chung.
 - `tests/`: unit/integration fixtures.
 - `conf/`: Spark runtime defaults.
 - `jars/`: local jar cache.

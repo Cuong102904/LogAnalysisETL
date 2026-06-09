@@ -11,7 +11,6 @@ COPY schemas /opt/project/spark/schemas
 COPY infrastructure /opt/project/spark/infrastructure
 COPY configs /opt/project/spark/configs
 COPY shared /opt/project/spark/shared
-COPY utils /opt/project/spark/utils
 
 ENV SPARK_APP_PATH=/opt/project/spark \
     SPARK_CONF_DIR=/opt/bitnami/spark/conf \

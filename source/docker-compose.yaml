@@ -37,7 +37,8 @@ x-superset-env: &superset-env
   SUPERSET_PORT: ${SUPERSET_PORT:-8088}
 
 x-spark-env: &spark-env
-  SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+  SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
+  SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://100.120.19.23:7077}
   SPARK_APP_PATH: /opt/project/spark
   SPARK_CONF_DIR: /opt/bitnami/spark/conf
   SPARK_JARS_PACKAGES: ${SPARK_JARS_PACKAGES:-io.delta:delta-spark_2.12:3.2.0,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262}
@@ -88,7 +89,8 @@ x-airflow-env: &airflow-env
   AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
   AIRFLOW__SCHEDULER__STANDALONE_DAG_PROCESSOR: "true"
   AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-webserver:8080/execution/
-  SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+  SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
+  SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://100.120.19.23:7077}
   SPARK_APP_PATH: /opt/project/spark
   SPARK_CONF_DIR: /opt/project/spark/conf
   SPARK_JARS_PACKAGES: ${SPARK_JARS_PACKAGES:-io.delta:delta-spark_2.12:3.2.0,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262}
@@ -111,7 +113,7 @@ x-airflow-env: &airflow-env
   PYTHONPATH: /opt/airflow:/opt/project/spark
   _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
   _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-admin}
-  AIRFLOW_CONN_SPARK_DEFAULT: ${AIRFLOW_CONN_SPARK_DEFAULT:-spark://spark-master:7077}
+  AIRFLOW_CONN_SPARK_DEFAULT: ${AIRFLOW_CONN_SPARK_DEFAULT:-spark://100.120.19.23:7077}
 
 services:
   broker1:
@@ -408,7 +410,8 @@ services:
     environment:
       <<: *spark-env
       SPARK_MODE: master
-      SPARK_MASTER_HOST: ${SPARK_MASTER_HOST:-spark-master}
+      SPARK_PUBLIC_DNS: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
+      SPARK_MASTER_HOST: ${SPARK_MASTER_BIND_HOST:-spark-master}
     ports:
       - "7077:7077"
       - "8081:8080"
@@ -423,6 +426,8 @@ services:
     build: *spark-build
     image: local/spark:dev
     container_name: lsp-spark-worker-1
+    profiles:
+      - local-workers
     depends_on:
       spark-master:
         condition: service_healthy
@@ -439,6 +444,8 @@ services:
     build: *spark-build
     image: local/spark:dev
     container_name: lsp-spark-worker-2
+    profiles:
+      - local-workers
     depends_on:
       spark-master:
         condition: service_healthy
@@ -482,11 +489,10 @@ services:
         condition: service_completed_successfully
       spark-master:
         condition: service_healthy
-      spark-worker-1:
-        condition: service_started
     environment:
       <<: *spark-env
       BRONZE_APP_NAME: ${BRONZE_APP_NAME:-bronze_ingestor}
+      SPARK_UI_PORT: ${BRONZE_SPARK_UI_PORT:-4040}
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
       BRONZE_INPUT_TOPIC: ${BRONZE_INPUT_TOPIC:-mooc.raw.events}
       BRONZE_TABLE_PATH: ${BRONZE_TABLE_PATH:-s3a://lakehouse/mooc/bronze/mooc_events_raw}
@@ -496,8 +502,11 @@ services:
       bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
       --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
       --name \"$${BRONZE_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
       --conf spark.cores.max=1
       /opt/project/spark/apps/bronze_ingestor/main.py"
+    ports:
+      - "${BRONZE_SPARK_UI_PORT:-4040}:4040"
     restart: unless-stopped
     mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
 
@@ -510,19 +519,21 @@ services:
         condition: service_completed_successfully
       spark-master:
         condition: service_healthy
-      spark-worker-1:
-        condition: service_started
       bronze-stream:
         condition: service_started
     environment:
       <<: *spark-env
       SILVER_APP_NAME: ${SILVER_APP_NAME:-silver_transformer}
+      SPARK_UI_PORT: ${SILVER_SPARK_UI_PORT:-4041}
     command: >
       bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
       --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
       --name \"$${SILVER_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
       --conf spark.cores.max=1
       /opt/project/spark/apps/silver_transformer/main.py"
+    ports:
+      - "${SILVER_SPARK_UI_PORT:-4041}:4041"
     restart: unless-stopped
     mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
 
@@ -535,19 +546,21 @@ services:
         condition: service_completed_successfully
       spark-master:
         condition: service_healthy
-      spark-worker-1:
-        condition: service_started
       silver-stream:
         condition: service_started
     environment:
       <<: *spark-env
       GOLD_APP_NAME: ${GOLD_APP_NAME:-gold_aggregator}
+      SPARK_UI_PORT: ${GOLD_SPARK_UI_PORT:-4042}
     command: >
       bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
       --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
       --name \"$${GOLD_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
       --conf spark.cores.max=1
       /opt/project/spark/apps/gold_aggregator/main.py"
+    ports:
+      - "${GOLD_SPARK_UI_PORT:-4042}:4042"
     restart: unless-stopped
     mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
 
@@ -560,19 +573,21 @@ services:
         condition: service_completed_successfully
       spark-master:
         condition: service_healthy
-      spark-worker-1:
-        condition: service_started
       gold-stream:
         condition: service_started
     environment:
       <<: *spark-env
       GOLD_ALERTING_APP_NAME: ${GOLD_ALERTING_APP_NAME:-gold_alerting}
+      SPARK_UI_PORT: ${GOLD_ALERTING_SPARK_UI_PORT:-4043}
     command: >
       bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
       --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
       --name \"$${GOLD_ALERTING_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
       --conf spark.cores.max=1
       /opt/project/spark/apps/gold_alerting/main.py"
+    ports:
+      - "${GOLD_ALERTING_SPARK_UI_PORT:-4043}:4043"
     restart: unless-stopped
     mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
 
