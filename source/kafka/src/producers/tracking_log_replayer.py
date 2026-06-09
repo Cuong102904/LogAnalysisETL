@@ -35,6 +35,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-files", type=int, default=0, help="0 means all files")
     parser.add_argument("--max-lines", type=int, default=0, help="0 means all lines")
     parser.add_argument(
+        "--skip-decode-errors",
+        action="store_true",
+        help="Ignore malformed JSON events instead of routing them to DLQ.",
+    )
+    parser.add_argument(
         "--speed",
         type=float,
         default=100.0,
@@ -57,6 +62,7 @@ def main() -> int:
         input_root=input_root,
         max_files=args.max_files,
         max_lines=args.max_lines,
+        skip_decode_errors=args.skip_decode_errors,
     )
 
     producer = make_producer(args.brokers)
