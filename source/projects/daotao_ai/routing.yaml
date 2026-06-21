@@ -1,0 +1,454 @@
+routes:
+  - id: daotao-noise-heartbeat
+    priority: 1000
+    match:
+      any:
+        - field: raw_payload.event_type
+          equals: /heartbeat
+        - field: raw_payload.context.path
+          equals: /heartbeat
+    event_group: system
+    normalized_type: system.noise.heartbeat
+    action: heartbeat
+    object_type: system
+    learning_relevance: noise
+    is_noise: true
+    targets:
+      - silver_system_events
+    extractor: daotao_system_event
+
+  - id: daotao-noise-auth-bot
+    priority: 950
+    match:
+      any:
+        - field: raw_payload.agent
+          regex: (?i)(bot|crawler|spider|prefetch)
+        - field: raw_payload.event_type
+          regex: ^/(robots\.txt|wp-login\.php|xmlrpc\.php|\.git|\.env)
+        - field: raw_payload.context.path
+          regex: ^/(robots\.txt|wp-login\.php|xmlrpc\.php|\.git|\.env)
+    event_group: system
+    normalized_type: system.noise.scanner
+    action: noise
+    object_type: system
+    learning_relevance: noise
+    is_noise: true
+    targets:
+      - silver_system_events
+    extractor: daotao_system_event
+
+  - id: daotao-auth
+    priority: 900
+    match:
+      any:
+        - field: raw_payload.event_type
+          regex: ^/(auth/|login|logout|register|user_api/)
+        - field: raw_payload.context.path
+          regex: ^/(auth/|login|logout|register|user_api/)
+    event_group: auth
+    normalized_type: auth.session.http
+    action: authenticate
+    object_type: account
+    learning_relevance: non_learning
+    targets:
+      - silver_auth_events
+    extractor: daotao_auth_event
+
+  - id: daotao-assessment-browser-submit
+    priority: 850
+    match:
+      all:
+        - field: raw_payload.event_source
+          equals: browser
+        - any:
+            - field: raw_payload.name
+              equals: problem_check
+            - field: raw_payload.event_type
+              equals: problem_check
+    event_group: assessment
+    normalized_type: assessment.answer.submit.browser
+    action: submit
+    object_type: problem
+    learning_relevance: learning
+    targets:
+      - silver_assessment_events
+    extractor: daotao_assessment_event
+
+  - id: daotao-assessment-browser-graded
+    priority: 845
+    match:
+      all:
+        - field: raw_payload.event_source
+          equals: browser
+        - any:
+            - field: raw_payload.name
+              equals: problem_graded
+            - field: raw_payload.event_type
+              equals: problem_graded
+    event_group: assessment
+    normalized_type: assessment.answer.graded.browser
+    action: grade_feedback
+    object_type: problem
+    learning_relevance: learning
+    targets:
+      - silver_assessment_events
+    extractor: daotao_assessment_event
+
+  - id: daotao-assessment-grade-persisted
+    priority: 840
+    match:
+      any:
+        - field: raw_payload.name
+          equals: edx.grades.problem.submitted
+        - field: raw_payload.event_type
+          equals: edx.grades.problem.submitted
+    event_group: assessment
+    normalized_type: assessment.grade.persisted.server
+    action: grade
+    object_type: problem
+    learning_relevance: learning
+    targets:
+      - silver_assessment_events
+    extractor: daotao_assessment_event
+
+  - id: daotao-assessment-server-check
+    priority: 835
+    match:
+      all:
+        - field: raw_payload.event_source
+          equals: server
+        - any:
+            - field: raw_payload.name
+              equals: problem_check
+            - field: raw_payload.event_type
+              equals: problem_check
+    event_group: assessment
+    normalized_type: assessment.answer.check.server
+    action: check
+    object_type: problem
+    learning_relevance: learning
+    targets:
+      - silver_assessment_events
+    extractor: daotao_assessment_event
+
+  - id: daotao-assessment-endpoint
+    priority: 830
+    match:
+      any:
+        - field: raw_payload.name
+          regex: /handler/xmodule_handler/problem_check$
+        - field: raw_payload.event_type
+          regex: /handler/xmodule_handler/problem_check$
+    event_group: assessment
+    normalized_type: assessment.answer.submit.endpoint
+    action: submit
+    object_type: problem
+    learning_relevance: learning
+    targets:
+      - silver_assessment_events
+    extractor: daotao_assessment_event
+
+  - id: daotao-assessment-input-ajax
+    priority: 825
+    match:
+      any:
+        - field: raw_payload.name
+          regex: /handler/xmodule_handler/input_ajax$
+        - field: raw_payload.event_type
+          regex: /handler/xmodule_handler/input_ajax$
+    event_group: assessment
+    normalized_type: assessment.answer.input-ajax.endpoint
+    action: input_ajax
+    object_type: problem
+    learning_relevance: learning
+    targets:
+      - silver_assessment_events
+    extractor: daotao_assessment_event
+
+  - id: daotao-video-browser
+    priority: 800
+    match:
+      any:
+        - field: raw_payload.name
+          in:
+            - play_video
+            - pause_video
+            - stop_video
+            - load_video
+            - seek_video
+            - speed_change_video
+        - field: raw_payload.event_type
+          in:
+            - play_video
+            - pause_video
+            - stop_video
+            - load_video
+            - seek_video
+            - speed_change_video
+    event_group: video
+    normalized_type: video.browser.interaction
+    action: interact
+    object_type: video
+    learning_relevance: learning
+    targets:
+      - silver_video_events
+    extractor: daotao_video_event
+
+  - id: daotao-video-save-state
+    priority: 795
+    match:
+      any:
+        - field: raw_payload.name
+          regex: /type@video\+block@.*/handler/xmodule_handler/save_user_state$
+        - field: raw_payload.event_type
+          regex: /type@video\+block@.*/handler/xmodule_handler/save_user_state$
+    event_group: video
+    normalized_type: video.server.save-position
+    action: save_position
+    object_type: video
+    learning_relevance: learning
+    targets:
+      - silver_video_events
+    extractor: daotao_video_event
+
+  - id: daotao-video-transcript
+    priority: 790
+    match:
+      any:
+        - field: raw_payload.name
+          regex: /type@video\+block@.*/handler/transcript/
+        - field: raw_payload.event_type
+          regex: /type@video\+block@.*/handler/transcript/
+    event_group: video
+    normalized_type: video.server.transcript
+    action: transcript
+    object_type: video
+    learning_relevance: learning
+    targets:
+      - silver_video_events
+    extractor: daotao_video_event
+
+  - id: daotao-video-completion
+    priority: 785
+    match:
+      any:
+        - field: raw_payload.name
+          regex: /type@video\+block@.*/handler/publish_completion$
+        - field: raw_payload.event_type
+          regex: /type@video\+block@.*/handler/publish_completion$
+    event_group: course_content
+    normalized_type: video.server.completion
+    action: complete
+    object_type: video
+    learning_relevance: learning
+    targets:
+      - silver_video_events
+      - silver_course_content_events
+    extractor: daotao_video_completion_event
+
+  - id: daotao-document-browser
+    priority: 760
+    match:
+      any:
+        - field: raw_payload.name
+          equals: book
+        - field: raw_payload.event_type
+          equals: book
+        - field: raw_payload.name
+          starts_with: textbook.pdf.
+        - field: raw_payload.event_type
+          starts_with: textbook.pdf.
+    event_group: document
+    normalized_type: document.browser.interaction
+    action: view
+    object_type: document
+    learning_relevance: learning
+    targets:
+      - silver_document_events
+    extractor: daotao_document_event
+
+  - id: daotao-document-pdfbook-page
+    priority: 755
+    match:
+      any:
+        - field: raw_payload.name
+          regex: /pdfbook/
+        - field: raw_payload.event_type
+          regex: /pdfbook/
+        - field: raw_payload.context.path
+          regex: /pdfbook/
+    event_group: document
+    normalized_type: document.server.pdfbook-page
+    action: load
+    object_type: document
+    learning_relevance: learning
+    targets:
+      - silver_document_events
+    extractor: daotao_document_event
+
+  - id: daotao-exam-timed
+    priority: 730
+    match:
+      any:
+        - field: raw_payload.name
+          starts_with: edx.special_exam.timed.
+        - field: raw_payload.event_type
+          starts_with: edx.special_exam.timed.
+    event_group: exam
+    normalized_type: exam.timed.lifecycle
+    action: lifecycle
+    object_type: exam
+    learning_relevance: learning
+    targets:
+      - silver_exam_events
+    extractor: daotao_exam_event
+
+  - id: daotao-exam-proctoring
+    priority: 725
+    match:
+      any:
+        - field: raw_payload.name
+          starts_with: /api/edx_proctoring/
+        - field: raw_payload.event_type
+          starts_with: /api/edx_proctoring/
+        - field: raw_payload.context.path
+          starts_with: /api/edx_proctoring/
+    event_group: exam
+    normalized_type: exam.proctoring.api
+    action: proctoring
+    object_type: exam
+    learning_relevance: non_learning
+    targets:
+      - silver_exam_events
+    extractor: daotao_exam_event
+
+  - id: daotao-exam-quiz-navigation
+    priority: 720
+    match:
+      any:
+        - field: raw_payload.name
+          contains: quiz_navigation
+        - field: raw_payload.event_type
+          contains: quiz_navigation
+        - field: raw_payload.context.path
+          contains: quiz_navigation
+    event_group: exam
+    normalized_type: exam.quiz-navigation.endpoint
+    action: navigate_quiz
+    object_type: exam
+    learning_relevance: learning
+    targets:
+      - silver_exam_events
+    extractor: daotao_exam_event
+
+  - id: daotao-navigation-ui
+    priority: 700
+    match:
+      any:
+        - field: raw_payload.name
+          in:
+            - seq_next
+            - seq_prev
+        - field: raw_payload.event_type
+          in:
+            - seq_next
+            - seq_prev
+        - field: raw_payload.name
+          equals: edx.ui.lms.link_clicked
+        - field: raw_payload.event_type
+          equals: edx.ui.lms.link_clicked
+        - field: raw_payload.name
+          starts_with: edx.ui.lms.sequence.
+        - field: raw_payload.event_type
+          starts_with: edx.ui.lms.sequence.
+        - field: raw_payload.name
+          equals: edx.course.home.resume_course.clicked
+        - field: raw_payload.event_type
+          equals: edx.course.home.resume_course.clicked
+        - field: raw_payload.name
+          starts_with: edx.bi.course.upgrade.
+        - field: raw_payload.event_type
+          starts_with: edx.bi.course.upgrade.
+    event_group: navigation
+    normalized_type: navigation.browser.ui
+    action: navigate
+    object_type: page
+    learning_relevance: learning
+    targets:
+      - silver_navigation_events
+    extractor: daotao_navigation_event
+
+  - id: daotao-course-content
+    priority: 650
+    match:
+      all:
+        - field: raw_payload.event_source
+          equals: server
+        - any:
+            - field: raw_payload.name
+              regex: ^/courses/.+/(course/|courseware/|jump_to/|progress|about|cohorts/)
+            - field: raw_payload.event_type
+              regex: ^/courses/.+/(course/|courseware/|jump_to/|progress|about|cohorts/)
+            - field: raw_payload.context.path
+              regex: ^/courses/.+/(course/|courseware/|jump_to/|progress|about|cohorts/)
+    event_group: course_content
+    normalized_type: course-content.server.route
+    action: view
+    object_type: course_content
+    learning_relevance: learning
+    targets:
+      - silver_course_content_events
+    extractor: daotao_course_content_event
+
+  - id: daotao-authoring-studio
+    priority: 620
+    match:
+      any:
+        - field: raw_payload.host
+          equals: studio.daotao.ai
+        - field: raw_payload.name
+          starts_with: /xblock/
+        - field: raw_payload.name
+          starts_with: /library/
+        - field: raw_payload.name
+          starts_with: /container/
+        - field: raw_payload.event_type
+          starts_with: /xblock/
+        - field: raw_payload.context.path
+          starts_with: /xblock/
+    event_group: authoring
+    normalized_type: authoring.studio.route
+    action: author
+    object_type: authoring
+    learning_relevance: non_learning
+    targets:
+      - silver_authoring_events
+    extractor: daotao_authoring_event
+
+  - id: daotao-system-fallback
+    priority: 500
+    match:
+      all:
+        - field: raw_payload.event_source
+          equals: server
+        - any:
+            - field: raw_payload.name
+              in:
+                - /
+                - /dashboard
+                - /home/
+                - /courses
+            - field: raw_payload.event_type
+              in:
+                - /
+                - /dashboard
+                - /home/
+                - /courses
+    event_group: system
+    normalized_type: system.route.shell
+    action: shell
+    object_type: system
+    learning_relevance: non_learning
+    targets:
+      - silver_system_events
+    extractor: daotao_system_event

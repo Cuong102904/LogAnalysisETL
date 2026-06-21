@@ -1,28 +1,28 @@
 # Overall Architecture
 
-Pipeline target: Kafka -> Spark Structured Streaming Bronze -> MinIO Delta Lake.
+Pipeline target: replay/file input -> Kafka raw topic -> LearnLake Bronze/Silver/Gold apps -> MinIO-backed Delta -> Trino/Superset serving.
 
 ```mermaid
 flowchart LR
-    dataFiles[BK_activity_logs_unzipped] --> replayer[kafka tracking_log_replayer]
-    replayer --> kafkaRaw[Kafka mooc.raw.events]
-    kafkaRaw --> bronzeApp[spark apps/bronze_ingestor]
-    bronzeApp --> bronzeDelta[Delta bronze.mooc_events_raw]
-    kafkaRaw --> dlq[Kafka mooc.dlq.events]
+    dataFiles[BK_activity_logs_unzipped] --> replayer[apps/replay/replay_to_kafka.py]
+    replayer --> kafkaRaw[Kafka learnlake.daotao.raw]
+    kafkaRaw --> bronzeApp[apps/spark/run_bronze.py]
+    bronzeApp --> bronzeDelta[Delta bronze_events]
+    bronzeDelta --> silverApp[apps/spark/run_silver.py]
+    silverApp --> silverDelta[Delta silver_event_index + fact tables]
+    silverDelta --> goldApp[apps/spark/run_gold.py]
 ```
 
-## Service Boundaries
+## Responsibility Boundaries
 
-- `kafka/`: ingest topic contract và producer replayer dữ liệu thật.
-- `spark/`: business ETL, phân lớp domain/infrastructure/apps rõ ràng.
-- `minio/`: object storage cho Delta tables, checkpoints và logs.
-- `docker-compose.yaml`: compose orchestration local.
-- `docs/`: chuẩn vận hành và design quyết định.
+- `src/learnlake/`: framework core.
+- `catalog/`: source profiles, mappings, metrics, quality rules, and workflow definitions.
+- `apps/`: thin runtime entrypoints.
+- `projects/daotao_ai/`: use-case semantics, transforms, and use-case-specific Gold code.
+- `platform/local/`: Kafka, Spark, MinIO, Hive Metastore, and shared platform assets.
+- `orchestration/airflow/`: scheduling and maintenance DAGs.
+- `serving/`: Trino and Superset assets.
 
-## Clean Architecture in Spark
+## Canonical Layout Rule
 
-- `apps/`: entrypoint job theo use case.
-- `domain/`: logic ETL thuần nghiệp vụ (classify, normalize, dedup, aggregate).
-- `infrastructure/`: Spark session, Kafka IO, Delta IO, path resolver.
-- `configs/`: quy tắc classify/dedup/anomaly không hard-code.
-- `utils/`: helper dùng chung.
+The responsibility-first tree is the source of truth. New code must not restore top-level technology ownership such as `spark/`, `kafka/`, `airflow/`, `trino/`, or `superset/`.

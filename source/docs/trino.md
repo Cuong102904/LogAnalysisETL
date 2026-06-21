@@ -4,11 +4,11 @@ Trino is the SQL query layer for the lakehouse semantic layer. It reads Delta ta
 
 ## What is implemented
 
-- The Trino image is pinned in `trino/Dockerfile` to `trinodb/trino:455`.
-- Catalog and runtime config live in `trino/etc/`.
+- The Trino image is pinned in `serving/trino/Dockerfile` to `trinodb/trino:455`.
+- Catalog and runtime config live in `serving/trino/etc/`.
 - `delta` catalog uses the Delta Lake connector with Hive Metastore and MinIO-backed S3 storage.
 - `hive` catalog is also configured for Hive Metastore access and non-managed table writes.
-- The `trino-bootstrap` service waits for Trino, registers Delta tables in `delta.mooc`, and applies the SQL files in `trino/views/`.
+- The `trino-bootstrap` service waits for Trino, registers Delta tables in `delta.mooc`, and applies the SQL files in `serving/trino/views/`.
 
 ## Registered tables
 
@@ -34,7 +34,7 @@ The bootstrap currently registers these tables in the `delta.mooc` schema:
 - `behavior_anomaly_view`
 - `alert_events_view`
 
-`trino/views/00_create_semantic_schema.sql` creates the semantic schema, and the remaining SQL files define the views above.
+`serving/trino/views/00_create_semantic_schema.sql` creates the semantic schema, and the remaining SQL files define the views above.
 
 ## Notes
 

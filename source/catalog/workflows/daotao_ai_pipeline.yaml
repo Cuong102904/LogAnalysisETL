@@ -1,0 +1,39 @@
+workflow_id: daotao_ai_pipeline
+source_id: daotao_ai
+tasks:
+  - task_id: bronze_ingest
+    runner: spark
+    entrypoint: apps/spark/run_bronze.py
+    args:
+      - --source
+      - daotao_ai
+  - task_id: silver_normalize
+    runner: spark
+    entrypoint: apps/spark/run_silver.py
+    after:
+      - bronze_ingest
+    args:
+      - --source
+      - daotao_ai
+  - task_id: gold_course_activity_summary
+    runner: spark
+    entrypoint: apps/spark/run_gold.py
+    after:
+      - silver_normalize
+    args:
+      - --source
+      - daotao_ai
+      - --metric
+      - gold_course_activity_summary
+  - task_id: delta_maintenance
+    runner: spark
+    entrypoint: apps/maintenance/delta_maintenance.py
+    after:
+      - silver_normalize
+    priority: 500
+    args:
+      - --table-path
+      - /tmp/learnlake/silver_event_index
+      - --app-name
+      - silver_event_index_maintenance
+      - --optimize

@@ -39,16 +39,22 @@ docker compose up -d --build
 Default mode starts Kafka, Kafka UI, MinIO, Hive Metastore, Trino, Superset, Spark Master/Worker, History Server, Airflow, Bronze stream, Silver stream, Gold stream, Gold alert stream, and the replay service. The stack now includes the query/dashboard layer in the same compose file:
 
 ```bash
-docker compose up -d tracking-log-replayer
+docker compose up -d bronze-stream silver-stream tracking-log-replayer spark-master spark-worker-1
 ```
 
-Do not run production streams with `python -m apps.*`; the stack submits Bronze with `spark-submit --master spark://spark-master:7077`.
+Compose will auto-start the required dependencies for that subset: Kafka brokers, `kafka-init`, MinIO, and `minio-init`. The bootstrap steps run inside containers, so the normal path does not require manual `mc` or topic-creation commands.
+
+Do not run production streams with `python -m apps.*`; the stack submits LearnLake Bronze/Silver with `spark-submit --master spark://spark-master:7077`.
 
 ## Services And UIs
 
 - Spark Master UI: `http://localhost:8081`
 - Spark Worker 1 UI: `http://localhost:8082`
 - Spark Worker 2 UI: `http://localhost:8083`
+- Bronze Spark Driver UI: `http://localhost:4040`
+- Silver Spark Driver UI: `http://localhost:4041`
+- Gold Spark Driver UI: `http://localhost:4042`
+- Gold Alert Spark Driver UI: `http://localhost:4043`
 - Kafka UI: `http://localhost:8085`
 - Spark History Server: `http://localhost:18080`
 - Airflow UI: `http://localhost:8089`
@@ -63,7 +69,7 @@ The full stack now includes the query/dashboard layer. Trino is available at `ht
 | Source | Spark service | Delta table | Checkpoint |
 | --- | --- | --- | --- |
 | `mooc.raw.events` | `bronze-stream` | `s3a://lakehouse/mooc/bronze/mooc_events_raw` | `s3a://platform/mooc/bronze_ingestor` |
-| `s3a://lakehouse/mooc/bronze/mooc_events_raw` | `silver-stream` | `s3a://lakehouse/mooc/silver/*` | `s3a://platform/mooc/silver_transformer` |
+| `s3a://lakehouse/mooc/bronze/mooc_events_raw` | `silver-stream` | `s3a://lakehouse/learnlake/silver/*` | `s3a://platform/learnlake/checkpoints/silver/daotao_ai` |
 | `s3a://lakehouse/mooc/silver/*` | `gold-stream` | `s3a://lakehouse/mooc/gold/*` | `s3a://platform/mooc/gold_aggregator` |
 | `s3a://lakehouse/mooc/gold/behavior_anomaly_signals` | `gold-alert-stream` | `s3a://lakehouse/mooc/gold/anomaly_alerts` | `s3a://platform/mooc/gold_alerting` |
 
@@ -71,6 +77,8 @@ Gold tables are written straight to MinIO and remain available for downstream co
 
 Never delete checkpoint paths during normal restart. Structured Streaming uses them for exactly-once progress and state recovery.
 Kafka UI is still useful for topic and broker visibility, but Bronze stream progress is best observed in Spark Driver UI and the checkpoint path, not by expecting a stable consumer group entry.
+
+For live performance checks, open the driver UI that matches the app you want to inspect. The `Structured Streaming` tab shows query progress, while `Jobs`, `Stages`, and `Executors` let you inspect micro-batch task scheduling and runtime.
 
 ## Restart Or Submit Streams
 
@@ -85,8 +93,8 @@ Manual submit for debugging:
 ```bash
 docker compose exec -T spark-master \
   /opt/bitnami/spark/bin/spark-submit --master spark://spark-master:7077 \
-  --conf spark.executorEnv.PYTHONPATH=/opt/project/spark \
-  /opt/project/spark/apps/bronze_ingestor/main.py
+  --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project \
+  /opt/project/apps/spark/run_bronze.py --source daotao_ai
 ```
 
 ## Airflow Maintenance
@@ -99,13 +107,13 @@ docker compose exec airflow \
   airflow dags trigger bronze_table_maintenance
 ```
 
-The maintenance DAG calls `spark-submit` for `spark/apps/maintenance/delta_maintenance.py`. Default `OPTIMIZE` is on and `VACUUM` is off unless enabled by env.
+The maintenance DAG calls `spark-submit` for `apps/maintenance/delta_maintenance.py`. Default `OPTIMIZE` is on and `VACUUM` is off unless enabled by env.
 
 ## Smoke Validation
 
 ```bash
 cd source
-deploy/scripts/smoke_spark_standalone.sh
+platform/local/scripts/scripts/smoke_spark_standalone.sh
 ```
 
 Manual checklist:
@@ -133,11 +141,11 @@ Mặc định replay toàn bộ file ở tốc độ 100x. Để thay đổi tha
 
 ```bash
 docker compose run --rm tracking-log-replayer \
-  python -m kafka.src.producers.tracking_log_replayer \
+  /opt/bitnami/python/bin/python apps/replay/replay_to_kafka.py \
+  --source daotao_ai \
   --brokers broker1:29092,broker2:29092,broker3:29092 \
-  --input-root /data/activity_logs \
-  --topic mooc.raw.events \
-  --anonymous-topic mooc.raw.anonymous.events \
+  --input /data/activity_logs \
+  --topic ${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw} \
   --speed 100
 ```
 

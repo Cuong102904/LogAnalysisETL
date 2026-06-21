@@ -17,6 +17,11 @@ ls source/.env
 
 Sửa các giá trị `change-me` trong `.env` trước khi chạy (đặc biệt `MINIO_ROOT_PASSWORD`).
 
+Với mô hình 2 máy hiện tại:
+- Máy Linux `100.120.19.23` chạy Docker Compose stack.
+- Máy Windows `100.121.19.84` chỉ nên chạy Spark worker ngoài Docker nếu cần.
+- Các biến `KAFKA_EXTERNAL_HOST`, `KAFKA_BOOTSTRAP_SERVERS_HOST`, `SPARK_MASTER_HOST`, `SPARK_MASTER_URL`, và `AIRFLOW_CONN_SPARK_DEFAULT` nên trỏ về máy Linux, không phải `localhost`.
+
 ## 2. Khởi động full stack đến lớp gold và semantic layer
 
 ```bash
@@ -25,6 +30,14 @@ docker compose up -d --build
 ```
 
 Lệnh này bật: Kafka (3 broker), Kafka UI, MinIO, Hive Metastore, Trino, Superset, Spark Master + 3 Workers, History Server, Airflow, Bronze stream, Silver stream, Gold stream, Gold alert stream, và tracking-log-replayer.
+
+Nếu chỉ muốn test LearnLake stream path, chỉ cần:
+
+```bash
+docker compose up -d bronze-stream silver-stream tracking-log-replayer spark-master spark-worker-1
+```
+
+Compose sẽ tự kéo các dependency cần thiết như broker, `kafka-init`, `minio`, và `minio-init`. Flow chuẩn không cần chạy thêm `mc` hoặc script tạo topic ở ngoài compose.
 
 Kiểm tra tất cả đang chạy:
 
@@ -73,18 +86,18 @@ Tham số mặc định hiện đọc toàn bộ file và replay nhanh 100x.
 ```bash
 cd source
 docker compose run --rm tracking-log-replayer \
-  python -m kafka.src.producers.tracking_log_replayer \
+  /opt/bitnami/python/bin/python apps/replay/replay_to_kafka.py \
+  --source daotao_ai \
   --brokers broker1:29092,broker2:29092,broker3:29092 \
-  --input-root /data/activity_logs \
-  --topic mooc.raw.events \
-  --anonymous-topic mooc.raw.anonymous.events \
+  --input /data/activity_logs \
+  --topic ${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw} \
   --speed 100
 ```
 
 Mặc định `--max-files` là 0 nên replayer đọc toàn bộ file; chỉ thêm `--max-files` khi muốn giới hạn dataset.
 
 Lưu ý:
-- `mooc.raw.events` chỉ nhận event thuộc allowlist của producer (xem `kafka/config/producer_filter.yaml`).
+- `mooc.raw.events` chỉ nhận event thuộc allowlist của producer (xem `platform/local/kafka/config/producer_filter.yaml`).
 - Event bị loại hoặc lỗi decode/validation được đẩy vào `mooc.dlq.events`.
 - Event có `username` hoặc `context.user_id` trống được đẩy sang `mooc.raw.anonymous.events`.
 

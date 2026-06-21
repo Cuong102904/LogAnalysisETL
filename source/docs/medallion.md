@@ -9,14 +9,22 @@
 
 ## Silver
 
-- Chuẩn hóa và phân loại event thành:
-  - `silver.learning_events`
-  - `silver.performance_events`
-  - `silver.exam_attempts`
-  - `silver.system_events`
-  - `silver.unknown_events`
-  - `silver.video_interactions`
-- Áp dụng schema permissive, xử lý schema drift, parse nested `event`.
+- Chuẩn hóa một raw source event thành:
+  - `silver_event_index`
+  - zero hoặc nhiều domain facts theo semantic domain
+    - `silver_assessment_events`
+    - `silver_video_events`
+    - `silver_document_events`
+    - `silver_navigation_events`
+    - `silver_exam_events`
+    - `silver_course_content_events`
+    - `silver_authoring_events`
+    - `silver_auth_events`
+    - `silver_system_events`
+    - `silver_unknown_events`
+- `silver_event_index` giữ lineage, common dimensions, normalized type, quality status.
+- Domain fact tables chỉ giữ typed analytics-ready fields cho từng domain.
+- `silver_invalid_events` giữ record fail contract hoặc quality.
 - `time` là event-time canonical dùng cho analytics và watermark/dedup.
 - Áp dụng stream/window dedup và business dedup theo rule config.
 

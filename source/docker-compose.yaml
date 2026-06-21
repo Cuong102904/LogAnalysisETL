@@ -1,27 +1,27 @@
 name: log-streaming-platform
 
 x-kafka-build: &kafka-build
-  context: ./kafka
+  context: ./platform/local/kafka
   dockerfile: Dockerfile
 
 x-spark-build: &spark-build
-  context: ./spark
-  dockerfile: Dockerfile
+  context: .
+  dockerfile: platform/local/spark/Dockerfile
 
 x-airflow-build: &airflow-build
-  context: ./airflow
+  context: ./orchestration/airflow
   dockerfile: Dockerfile
 
 x-hive-build: &hive-build
-  context: ./hive-metastore
+  context: ./platform/local/hive-metastore
   dockerfile: Dockerfile
 
 x-trino-build: &trino-build
-  context: ./trino
+  context: ./serving/trino
   dockerfile: Dockerfile
 
 x-superset-build: &superset-build
-  context: ./superset
+  context: ./serving/superset
   dockerfile: Dockerfile
 
 x-bootstrap-image: &bootstrap-image
@@ -37,12 +37,20 @@ x-superset-env: &superset-env
   SUPERSET_PORT: ${SUPERSET_PORT:-8088}
 
 x-spark-env: &spark-env
-  SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
-  SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://100.120.19.23:7077}
-  SPARK_APP_PATH: /opt/project/spark
+  SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
+  SPARK_MASTER_URL: ${LEARNLAKE_SPARK_MASTER_URL:-spark://spark-master:7077}
+  SPARK_APP_PATH: /opt/project
   SPARK_CONF_DIR: /opt/bitnami/spark/conf
-  SPARK_JARS_PACKAGES: ${SPARK_JARS_PACKAGES:-io.delta:delta-spark_2.12:3.2.0,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262}
-  PYTHONPATH: /opt/project/spark
+  PYTHONPATH: /opt/project/src:/opt/project
+  # Generic object-store envs for LearnLake. MinIO is the local S3-compatible provider.
+  AWS_ENDPOINT_URL_S3: ${AWS_ENDPOINT_URL_S3:-http://minio:9000}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-minio}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-minio123456}
+  OBJECT_STORE_ENDPOINT: ${OBJECT_STORE_ENDPOINT:-http://minio:9000}
+  OBJECT_STORE_ACCESS_KEY: ${OBJECT_STORE_ACCESS_KEY:-minio}
+  OBJECT_STORE_SECRET_KEY: ${OBJECT_STORE_SECRET_KEY:-minio123456}
+  OBJECT_STORE_PATH_STYLE_ACCESS: "true"
+  OBJECT_STORE_SSL_ENABLED: "false"
   MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
   MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
   MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
@@ -55,29 +63,23 @@ x-spark-env: &spark-env
   SPARK_EXECUTOR_MEMORY: ${SPARK_EXECUTOR_MEMORY:-384m}
   PYSPARK_PYTHON: /opt/bitnami/python/bin/python
   PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
-  # Silver table paths
-  BRONZE_TABLE_PATH: ${BRONZE_TABLE_PATH:-s3a://lakehouse/mooc/bronze/mooc_events_raw}
-  SILVER_CHECKPOINT_BASE: ${SILVER_CHECKPOINT_BASE:-s3a://platform/mooc/silver_transformer}
-  SILVER_LEARNING_PATH: ${SILVER_LEARNING_PATH:-s3a://lakehouse/mooc/silver/learning_events}
-  SILVER_PERFORMANCE_PATH: ${SILVER_PERFORMANCE_PATH:-s3a://lakehouse/mooc/silver/performance_events}
-  SILVER_EXAM_PATH: ${SILVER_EXAM_PATH:-s3a://lakehouse/mooc/silver/exam_attempts}
-  SILVER_VIDEO_PATH: ${SILVER_VIDEO_PATH:-s3a://lakehouse/mooc/silver/video_interactions}
-  SILVER_NAVIGATION_PATH: ${SILVER_NAVIGATION_PATH:-s3a://lakehouse/mooc/silver/navigation_events}
-  SILVER_PDF_PATH: ${SILVER_PDF_PATH:-s3a://lakehouse/mooc/silver/pdf_interactions}
-  SILVER_SYSTEM_PATH: ${SILVER_SYSTEM_PATH:-s3a://lakehouse/mooc/silver/system_events}
-  SILVER_UNKNOWN_PATH: ${SILVER_UNKNOWN_PATH:-s3a://lakehouse/mooc/silver/unknown_events}
-  # Gold table paths
-  GOLD_VIDEO_FRICTION_SIGNALS_PATH: ${GOLD_VIDEO_FRICTION_SIGNALS_PATH:-s3a://lakehouse/mooc/gold/video_friction_signals}
-  GOLD_PDF_ENGAGEMENT_FEATURES_PATH: ${GOLD_PDF_ENGAGEMENT_FEATURES_PATH:-s3a://lakehouse/mooc/gold/pdf_engagement_features}
-  GOLD_QUIZ_ATTEMPT_METRICS_PATH: ${GOLD_QUIZ_ATTEMPT_METRICS_PATH:-s3a://lakehouse/mooc/gold/quiz_attempt_metrics}
-  GOLD_USER_LEARNING_PROFILE_DAILY_PATH: ${GOLD_USER_LEARNING_PROFILE_DAILY_PATH:-s3a://lakehouse/mooc/gold/user_learning_profile_daily}
-  GOLD_BEHAVIOR_ANOMALY_SIGNALS_PATH: ${GOLD_BEHAVIOR_ANOMALY_SIGNALS_PATH:-s3a://lakehouse/mooc/gold/behavior_anomaly_signals}
-  GOLD_ANOMALY_ALERTS_PATH: ${GOLD_ANOMALY_ALERTS_PATH:-s3a://lakehouse/mooc/gold/anomaly_alerts}
-  GOLD_TRIGGER_INTERVAL_SECONDS: ${GOLD_TRIGGER_INTERVAL_SECONDS:-30}
-  GOLD_ALERTING_TRIGGER_INTERVAL_SECONDS: ${GOLD_ALERTING_TRIGGER_INTERVAL_SECONDS:-30}
-  GOLD_ALERTING_MIN_EVENT_COUNT: ${GOLD_ALERTING_MIN_EVENT_COUNT:-3}
-  GOLD_ALERTING_MIN_DISTINCT_USERS: ${GOLD_ALERTING_MIN_DISTINCT_USERS:-2}
-  GOLD_ALERTING_MIN_Z_SCORE: ${GOLD_ALERTING_MIN_Z_SCORE:-2.0}
+  # LearnLake vertical-slice paths
+  BRONZE_TABLE_PATH: ${LEARNLAKE_BRONZE_TABLE_PATH:-s3a://lakehouse/learnlake/bronze/bronze_events}
+  BRONZE_CHECKPOINT_PATH: ${LEARNLAKE_BRONZE_CHECKPOINT_PATH:-s3a://platform/learnlake/checkpoints/bronze/daotao_ai}
+  SILVER_CHECKPOINT_PATH: ${LEARNLAKE_SILVER_CHECKPOINT_PATH:-s3a://platform/learnlake/checkpoints/silver/daotao_ai}
+  SILVER_EVENT_INDEX_PATH: ${LEARNLAKE_SILVER_EVENT_INDEX_PATH:-s3a://lakehouse/learnlake/silver/silver_event_index}
+  SILVER_LEARNING_PATH: ${LEARNLAKE_SILVER_EVENT_INDEX_PATH:-s3a://lakehouse/learnlake/silver/silver_event_index}
+  SILVER_ASSESSMENT_PATH: ${LEARNLAKE_SILVER_ASSESSMENT_PATH:-s3a://lakehouse/learnlake/silver/silver_assessment_events}
+  SILVER_VIDEO_PATH: ${LEARNLAKE_SILVER_VIDEO_PATH:-s3a://lakehouse/learnlake/silver/silver_video_events}
+  SILVER_DOCUMENT_PATH: ${LEARNLAKE_SILVER_DOCUMENT_PATH:-s3a://lakehouse/learnlake/silver/silver_document_events}
+  SILVER_NAVIGATION_PATH: ${LEARNLAKE_SILVER_NAVIGATION_PATH:-s3a://lakehouse/learnlake/silver/silver_navigation_events}
+  SILVER_EXAM_PATH: ${LEARNLAKE_SILVER_EXAM_PATH:-s3a://lakehouse/learnlake/silver/silver_exam_events}
+  SILVER_COURSE_CONTENT_PATH: ${LEARNLAKE_SILVER_COURSE_CONTENT_PATH:-s3a://lakehouse/learnlake/silver/silver_course_content_events}
+  SILVER_AUTHORING_PATH: ${LEARNLAKE_SILVER_AUTHORING_PATH:-s3a://lakehouse/learnlake/silver/silver_authoring_events}
+  SILVER_AUTH_PATH: ${LEARNLAKE_SILVER_AUTH_PATH:-s3a://lakehouse/learnlake/silver/silver_auth_events}
+  SILVER_SYSTEM_PATH: ${LEARNLAKE_SILVER_SYSTEM_PATH:-s3a://lakehouse/learnlake/silver/silver_system_events}
+  SILVER_UNKNOWN_PATH: ${LEARNLAKE_SILVER_UNKNOWN_PATH:-s3a://lakehouse/learnlake/silver/silver_unknown_events}
+  SILVER_INVALID_PATH: ${LEARNLAKE_SILVER_INVALID_PATH:-s3a://lakehouse/learnlake/silver/silver_invalid_events}
 
 x-airflow-env: &airflow-env
   AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR:-LocalExecutor}
@@ -91,9 +93,8 @@ x-airflow-env: &airflow-env
   AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-webserver:8080/execution/
   SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
   SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://100.120.19.23:7077}
-  SPARK_APP_PATH: /opt/project/spark
-  SPARK_CONF_DIR: /opt/project/spark/conf
-  SPARK_JARS_PACKAGES: ${SPARK_JARS_PACKAGES:-io.delta:delta-spark_2.12:3.2.0,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262}
+  SPARK_APP_PATH: /opt/project
+  SPARK_CONF_DIR: /opt/project/platform/local/spark/conf
   KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
   KAFKA_TOPIC_RAW: ${KAFKA_TOPIC_RAW:-mooc.raw.events}
   MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
@@ -110,7 +111,7 @@ x-airflow-env: &airflow-env
   BRONZE_VACUUM_RETENTION_HOURS: ${BRONZE_VACUUM_RETENTION_HOURS:-168}
   BRONZE_OPTIMIZE_ENABLED: ${BRONZE_OPTIMIZE_ENABLED:-true}
   BRONZE_VACUUM_ENABLED: ${BRONZE_VACUUM_ENABLED:-false}
-  PYTHONPATH: /opt/airflow:/opt/project/spark
+  PYTHONPATH: /opt/airflow:/opt/project:/opt/project/src
   _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
   _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-admin}
   AIRFLOW_CONN_SPARK_DEFAULT: ${AIRFLOW_CONN_SPARK_DEFAULT:-spark://100.120.19.23:7077}
@@ -246,15 +247,19 @@ services:
         condition: service_healthy
     environment:
       BOOTSTRAP_SERVER: broker1:29092
+      LEARNLAKE_RAW_TOPIC: ${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw}
+      LEARNLAKE_ANONYMOUS_TOPIC: ${LEARNLAKE_ANONYMOUS_TOPIC:-learnlake.daotao.raw.anonymous}
+      LEARNLAKE_DLQ_TOPIC: ${LEARNLAKE_DLQ_TOPIC:-learnlake.daotao.dlq}
     volumes:
-      - ./kafka/scripts:/scripts:ro
+      - ./platform/local/kafka/scripts:/scripts:ro
     entrypoint: ["/bin/bash", "-lc"]
     command: "/scripts/create_topics.sh"
+    restart: "no"
     mem_limit: ${KAFKA_INIT_MEM_LIMIT:-256m}
 
   minio:
     build:
-      context: ./minio
+      context: ./platform/local/minio
       dockerfile: Dockerfile
     image: local/minio:dev
     container_name: lsp-minio
@@ -309,7 +314,7 @@ services:
       - "9083:9083"
     volumes:
       - hive-metastore-data:/opt/hive/data
-    restart: unless-stopped
+    restart: "no"
     mem_limit: ${HIVE_METASTORE_MEM_LIMIT:-512m}
 
   trino:
@@ -328,7 +333,7 @@ services:
       - "8080:8080"
     volumes:
       - trino-data:/data/trino
-    restart: unless-stopped
+    restart: "no"
     mem_limit: ${TRINO_MEM_LIMIT:-768m}
 
   trino-bootstrap:
@@ -340,8 +345,8 @@ services:
       minio-init:
         condition: service_completed_successfully
     volumes:
-      - ./trino/bootstrap:/bootstrap:ro
-      - ./trino/views:/views:ro
+      - ./serving/trino/bootstrap:/bootstrap:ro
+      - ./serving/trino/views:/views:ro
     command: ["python", "/bootstrap/bootstrap_trino.py"]
     restart: "no"
     mem_limit: ${TRINO_BOOTSTRAP_MEM_LIMIT:-256m}
@@ -398,7 +403,7 @@ services:
       trino-bootstrap:
         condition: service_completed_successfully
     volumes:
-      - ./superset/bootstrap:/bootstrap:ro
+      - ./serving/superset/bootstrap:/bootstrap:ro
     command: ["python", "/bootstrap/bootstrap_superset.py"]
     restart: "no"
     mem_limit: ${SUPERSET_BOOTSTRAP_MEM_LIMIT:-256m}
@@ -491,20 +496,21 @@ services:
         condition: service_healthy
     environment:
       <<: *spark-env
-      BRONZE_APP_NAME: ${BRONZE_APP_NAME:-bronze_ingestor}
+      BRONZE_APP_NAME: ${BRONZE_APP_NAME:-learnlake_bronze_ingestion}
       SPARK_UI_PORT: ${BRONZE_SPARK_UI_PORT:-4040}
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
-      BRONZE_INPUT_TOPIC: ${BRONZE_INPUT_TOPIC:-mooc.raw.events}
-      BRONZE_TABLE_PATH: ${BRONZE_TABLE_PATH:-s3a://lakehouse/mooc/bronze/mooc_events_raw}
-      BRONZE_CHECKPOINT_PATH: ${BRONZE_CHECKPOINT_PATH:-s3a://platform/mooc/bronze_ingestor}
+      BRONZE_INPUT_TOPIC: ${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw}
+      KAFKA_STARTING_OFFSETS: ${LEARNLAKE_KAFKA_STARTING_OFFSETS:-earliest}
+      BRONZE_TABLE_PATH: ${LEARNLAKE_BRONZE_TABLE_PATH:-s3a://lakehouse/learnlake/bronze/bronze_events}
+      BRONZE_CHECKPOINT_PATH: ${LEARNLAKE_BRONZE_CHECKPOINT_PATH:-s3a://platform/learnlake/checkpoints/bronze/daotao_ai}
       BRONZE_QUERY_NAME: ${BRONZE_QUERY_NAME:-bronze_ingestor_raw}
     command: >
       bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
       --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
-      --name \"$${BRONZE_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --name \"$${BRONZE_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
       --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
       --conf spark.cores.max=1
-      /opt/project/spark/apps/bronze_ingestor/main.py"
+      /opt/project/apps/spark/run_bronze.py --source daotao_ai --stream"
     ports:
       - "${BRONZE_SPARK_UI_PORT:-4040}:4040"
     restart: unless-stopped
@@ -523,15 +529,15 @@ services:
         condition: service_started
     environment:
       <<: *spark-env
-      SILVER_APP_NAME: ${SILVER_APP_NAME:-silver_transformer}
+      SILVER_APP_NAME: ${SILVER_APP_NAME:-learnlake_silver_normalization}
       SPARK_UI_PORT: ${SILVER_SPARK_UI_PORT:-4041}
     command: >
       bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
       --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
-      --name \"$${SILVER_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --name \"$${SILVER_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
       --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
       --conf spark.cores.max=1
-      /opt/project/spark/apps/silver_transformer/main.py"
+      /opt/project/apps/spark/run_silver.py --source daotao_ai --stream"
     ports:
       - "${SILVER_SPARK_UI_PORT:-4041}:4041"
     restart: unless-stopped
@@ -555,10 +561,10 @@ services:
     command: >
       bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
       --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
-      --name \"$${GOLD_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --name \"$${GOLD_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
       --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
       --conf spark.cores.max=1
-      /opt/project/spark/apps/gold_aggregator/main.py"
+      /opt/project/apps/spark/run_gold.py --source daotao_ai --metric gold_course_activity_summary"
     ports:
       - "${GOLD_SPARK_UI_PORT:-4042}:4042"
     restart: unless-stopped
@@ -582,36 +588,39 @@ services:
     command: >
       bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
       --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
-      --name \"$${GOLD_ALERTING_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/spark
+      --name \"$${GOLD_ALERTING_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
       --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
       --conf spark.cores.max=1
-      /opt/project/spark/apps/gold_alerting/main.py"
+      /opt/project/apps/spark/run_task.py --source daotao_ai --plan"
     ports:
       - "${GOLD_ALERTING_SPARK_UI_PORT:-4043}:4043"
     restart: unless-stopped
     mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
 
   tracking-log-replayer:
-    build:
-      context: ./kafka
-      dockerfile: Dockerfile.app
+    build: *spark-build
+    image: local/spark:dev
     depends_on:
       kafka-init:
         condition: service_completed_successfully
+      bronze-stream:
+        condition: service_started
+    environment:
+      <<: *spark-env
     volumes:
-      - ../BK_activity_logs_unzipped:/data/activity_logs:ro
+      - /home/cuong/Desktop/DATN/BK_activity_logs_unzipped:/data/activity_logs:ro
     command:
-      - python
+      - /opt/bitnami/python/bin/python
       - -m
-      - kafka.src.producers.tracking_log_replayer
+      - apps/replay/replay_to_kafka.py
+      - --source
+      - daotao_ai
       - --brokers
       - broker1:29092,broker2:29092,broker3:29092
-      - --input-root
-      - /data/activity_logs
       - --topic
-      - mooc.raw.events
-      - --anonymous-topic
-      - mooc.raw.anonymous.events
+      - ${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw}
+      - --input
+      - /data/activity_logs
       - --speed
       - "100"
     restart: "no"
@@ -643,11 +652,11 @@ services:
       <<: *airflow-env
     volumes:
       - airflow-logs:/opt/airflow/logs
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/tasks:/opt/airflow/tasks
-      - ./airflow/config:/opt/airflow/config
-      - ./airflow/utils:/opt/airflow/utils
-      - ./spark:/opt/project/spark:ro
+      - ./orchestration/airflow/dags:/opt/airflow/dags
+      - ./orchestration/airflow/tasks:/opt/airflow/tasks
+      - ./orchestration/airflow/config:/opt/airflow/config
+      - ./orchestration/airflow/utils:/opt/airflow/utils
+      - ./:/opt/project:ro
     ports:
       - "8089:8080"
     depends_on:
@@ -674,11 +683,11 @@ services:
       <<: *airflow-env
     volumes:
       - airflow-logs:/opt/airflow/logs
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/tasks:/opt/airflow/tasks
-      - ./airflow/config:/opt/airflow/config
-      - ./airflow/utils:/opt/airflow/utils
-      - ./spark:/opt/project/spark:ro
+      - ./orchestration/airflow/dags:/opt/airflow/dags
+      - ./orchestration/airflow/tasks:/opt/airflow/tasks
+      - ./orchestration/airflow/config:/opt/airflow/config
+      - ./orchestration/airflow/utils:/opt/airflow/utils
+      - ./:/opt/project:ro
     command: "airflow dags reserialize -v"
     restart: "no"
 
@@ -691,11 +700,11 @@ services:
       <<: *airflow-env
     volumes:
       - airflow-logs:/opt/airflow/logs
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/tasks:/opt/airflow/tasks
-      - ./airflow/config:/opt/airflow/config
-      - ./airflow/utils:/opt/airflow/utils
-      - ./spark:/opt/project/spark:ro
+      - ./orchestration/airflow/dags:/opt/airflow/dags
+      - ./orchestration/airflow/tasks:/opt/airflow/tasks
+      - ./orchestration/airflow/config:/opt/airflow/config
+      - ./orchestration/airflow/utils:/opt/airflow/utils
+      - ./:/opt/project:ro
     depends_on:
       airflow-init:
         condition: service_completed_successfully

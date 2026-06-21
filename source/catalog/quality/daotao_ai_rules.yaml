@@ -1,0 +1,12 @@
+rules:
+  - id: bot_events_are_ignored
+    type: boolean_flag
+    field: is_bot
+    status: ignored
+    message: bot_or_crawler_event
+  - id: unknown_events_warn
+    type: mark_when_equals
+    field: learning_relevance
+    value: unknown
+    status: warning
+    message: unknown_learning_relevance

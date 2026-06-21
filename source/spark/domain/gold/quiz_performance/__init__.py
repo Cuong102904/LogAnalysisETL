@@ -1,3 +1,0 @@
-from domain.gold.quiz_performance.aggregator import (
-    build_quiz_performance_features as build_quiz_performance_features,
-)

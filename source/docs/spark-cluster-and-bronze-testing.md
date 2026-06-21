@@ -6,7 +6,7 @@ Tài liệu này giải thích chi tiết cách Spark cluster chia một streami
 
 ## 1. Topology cluster local
 
-Cluster trong `docker-compose.yaml` chỉ có 1 master + 1 worker, chạy ở chế độ Spark Standalone:
+Cluster trong `docker-compose.yaml` có 1 master + 2 workers, chạy ở chế độ Spark Standalone:
 
 ```mermaid
 flowchart LR
@@ -18,18 +18,28 @@ flowchart LR
         masterProc["Cluster Manager"]
     end
 
-    subgraph worker["spark-worker-1 :8082"]
-        executor["Executor JVM<br/>cores: 1<br/>executor-memory: 768m"]
+    subgraph workers["spark-worker-1 :8082 / spark-worker-2 :8083"]
+        executor1["Executor JVM<br/>cores: 1<br/>executor-memory: 384m"]
+        executor2["Executor JVM<br/>cores: 1<br/>executor-memory: 384m"]
+        executor3["Executor JVM<br/>cores: 1<br/>executor-memory: 384m"]
     end
 
     kafka["Kafka<br/>broker1/2/3<br/>topic mooc.raw.events<br/>12 partitions"]
-    minio["MinIO (s3a)<br/>bronze + checkpoints"]
+    minio["MinIO (s3a)<br/>lakehouse + platform"]
 
     driver -- "register app" --> masterProc
-    masterProc -- "launch executor" --> executor
-    driver -- "schedule tasks" --> executor
-    kafka -- "consume" --> executor
-    executor -- "write Delta" --> minio
+    masterProc -- "launch executor" --> executor1
+    masterProc -- "launch executor" --> executor2
+    masterProc -- "launch executor" --> executor3
+    driver -- "schedule tasks" --> executor1
+    driver -- "schedule tasks" --> executor2
+    driver -- "schedule tasks" --> executor3
+    kafka -- "consume" --> executor1
+    kafka -- "consume" --> executor2
+    kafka -- "consume" --> executor3
+    executor1 -- "write Delta" --> minio
+    executor2 -- "write Delta" --> minio
+    executor3 -- "write Delta" --> minio
     driver -. "read offsets / commit" .-> minio
 ```
 
@@ -38,14 +48,19 @@ Các tham số quan trọng (lấy từ `docker-compose.yaml` và `spark/conf/sp
 | Tham số | Giá trị | Ý nghĩa |
 |---|---|---|
 | `SPARK_MASTER_URL` | `spark://spark-master:7077` | Driver đăng ký app với master này |
-| `SPARK_WORKER_CORES` | `1` | Số core worker dành cho executor |
-| `SPARK_WORKER_MEMORY` | `1g` | RAM tối đa cho mọi executor trên worker |
+| `SPARK_WORKER_CORES` | `2` | Số core mỗi worker dành cho executor |
+| `SPARK_WORKER_MEMORY` | `2g` | RAM tối đa cho mọi executor trên mỗi worker |
+| `SPARK_WORKER_MEM_LIMIT` | `2304m` | Giới hạn RAM container cho mỗi worker |
 | `SPARK_DRIVER_MEMORY` | `512m` | RAM driver |
-| `SPARK_EXECUTOR_MEMORY` | `768m` | RAM mỗi executor |
+| `SPARK_EXECUTOR_MEMORY` | `384m` | RAM mỗi executor |
 | `spark.sql.shuffle.partitions` | `200` | Mặc định khi có shuffle (bronze không shuffle nên không dùng) |
 | `spark.sql.adaptive.enabled` | `true` | AQE: gộp partition shuffle khi runtime |
 
-`bronze-stream` chạy `spark-submit --deploy-mode client`, nên driver process nằm ngay trong container đó, executor mới được phát động ở `spark-worker-1`.
+`bronze-stream` chạy `spark-submit --deploy-mode client`, nên driver process nằm ngay trong container đó, executor mới được phát động ở `spark-worker-1` hoặc `spark-worker-2`.
+
+Lưu ý:
+- `Spark Master` hiển thị `0 Used` là bình thường khi chưa có job chạy.
+- Nếu gặp `INVALID_DRIVER_MEMORY`, driver đang bị cấp quá thấp. Với repo này, giữ `SPARK_DRIVER_MEMORY` tối thiểu `512m`.
 
 ---
 
@@ -71,11 +86,11 @@ Quy tắc:
 
 ### 2.2 Áp dụng vào bronze pipeline
 
-Pipeline bronze trong `spark/apps/bronze_ingestor/job.py`:
+Bronze pipeline trong `spark/pipelines/bronze/ingest_pipeline.py`:
 
 ```text
 read_kafka_stream
-  -> enrich_bronze   (select/withColumn/sha2)        narrow
+  -> enrich_bronze   (select/withColumn/sha2/time)   narrow
   -> parse_status    (from_json/withColumn/drop)     narrow
   -> writeStream Delta (sink)
 ```
@@ -113,10 +128,10 @@ flowchart LR
 
 ### 2.3 Tính song song thực tế
 
-Worker chỉ có 1 core (`SPARK_WORKER_CORES=1`), nên dù có 12 task trong một stage, executor chỉ chạy được 1 task tại mỗi thời điểm. 11 task còn lại nằm trong queue của TaskScheduler và lần lượt vào slot khi task trước hoàn thành.
+Mỗi worker có 2 core (`SPARK_WORKER_CORES=2`), nên dù có 12 task trong một stage, mỗi worker có thể chạy song song 2 task. Các task còn lại nằm trong queue của TaskScheduler và lần lượt vào slot khi task trước hoàn thành.
 
 Hệ quả:
-- Throughput bị giới hạn bởi 1 core. Muốn tăng song song hãy tăng `SPARK_WORKER_CORES` hoặc thêm worker.
+- Throughput bị giới hạn bởi tổng core khả dụng. Muốn tăng song song hãy tăng `SPARK_WORKER_CORES` hoặc thêm worker.
 - Latency mỗi micro-batch xấp xỉ tổng thời gian của 12 task.
 - Vì stage không shuffle, Spark không tạo thêm task ngoài số partition Kafka, kể cả khi `spark.sql.shuffle.partitions=200`.
 
@@ -124,11 +139,11 @@ Hệ quả:
 
 `write_delta_stream` dùng `outputMode("append")` và `partitionBy("ingest_date","ingest_hour")`. Mỗi task sẽ:
 
-1. Tạo writer cho path tương ứng (`s3a://bronze/.../ingest_date=YYYY-MM-DD/ingest_hour=HH/`).
+1. Tạo writer cho path tương ứng (`s3a://lakehouse/.../ingest_date=YYYY-MM-DD/ingest_hour=HH/`).
 2. Ghi 1 hoặc nhiều file `part-*.parquet`.
 3. Driver commit 1 transaction Delta cho cả batch (file `_delta_log/000....json`).
 
-Checkpoint trong `s3a://checkpoints/mooc/bronze_ingestor` chứa:
+Checkpoint trong `s3a://platform/mooc/bronze_ingestor` chứa:
 - `offsets/` (offset Kafka đã đọc cho mỗi batch),
 - `commits/` (các batch đã commit thành công),
 - `sources/` và `state/` (nếu có stateful op).
@@ -153,7 +168,7 @@ Bạn đã có:
 - File compose `source/docker-compose.yaml`.
 - Spark image bitnami 3.5 build sẵn.
 - Topic Kafka `mooc.raw.events` được khởi tạo bởi `kafka-init` (`kafka/scripts/create_topics.sh`).
-- Bucket MinIO `bronze`, `checkpoints`, `spark-events` được khởi tạo bởi `minio-init`.
+- Bucket MinIO `lakehouse`, `platform` được khởi tạo bởi `minio-init`.
 
 Tất cả lệnh chạy ở thư mục `source/`.
 
@@ -161,7 +176,7 @@ Tất cả lệnh chạy ở thư mục `source/`.
 
 ```bash
 cd source
-docker compose up -d --build broker1 broker2 broker3 kafka-init minio minio-init spark-master spark-worker-1 spark-history-server bronze-stream
+docker compose up -d --build broker1 broker2 broker3 kafka-init minio minio-init spark-master spark-worker-1 spark-worker-2 spark-history-server bronze-stream
 ```
 
 Đợi healthcheck:
@@ -170,7 +185,7 @@ docker compose up -d --build broker1 broker2 broker3 kafka-init minio minio-init
 docker compose ps
 ```
 
-Cần thấy `lsp-broker1/2/3`, `lsp-minio`, `lsp-spark-master`, `lsp-spark-worker-1`, `lsp-bronze-stream` ở trạng thái `healthy`/`running`. `lsp-kafka-init` và `lsp-minio-init` sẽ ở trạng thái `exited (0)` (đã hoàn tất).
+Cần thấy `lsp-broker1/2/3`, `lsp-minio`, `lsp-spark-master`, `lsp-spark-worker-1`, `lsp-spark-worker-2`, `lsp-bronze-stream` ở trạng thái `healthy`/`running`. `lsp-kafka-init` và `lsp-minio-init` sẽ ở trạng thái `exited (0)` (đã hoàn tất).
 
 ### 3.3 Bước 2 - Kiểm tra Spark đã đăng ký app
 
@@ -189,13 +204,18 @@ docker logs -f lsp-bronze-stream
 
 ### 3.4 Bước 3 - Mở Spark Driver UI cho query đang chạy
 
-Driver UI nằm trong container `lsp-bronze-stream`. Mặc định cổng `4040` không expose ra host, mở thêm bằng cách:
+Driver UI của từng streaming app được expose qua port riêng:
+
+- Bronze: <http://localhost:4040>
+- Silver: <http://localhost:4041>
+- Gold: <http://localhost:4042>
+- Gold Alert: <http://localhost:4043>
+
+Nếu muốn xác nhận driver đang lắng nghe port nào trong container:
 
 ```bash
 docker exec lsp-bronze-stream bash -lc "ss -ltn | grep 4040"
 ```
-
-Cách đơn giản hơn: thêm `ports: ["4040:4040"]` vào service `bronze-stream` rồi `docker compose up -d bronze-stream` lại. Sau đó mở <http://localhost:4040>.
 
 Trong Driver UI có:
 - Tab "Streaming Query" hoặc "Structured Streaming": liệt kê query `bronze_ingestor_raw`, hiển thị batch id, input rows/second, processed rows/second, batch duration.
@@ -207,12 +227,12 @@ Trong Driver UI có:
 
 ### 3.5 Bước 4 - Đẩy dữ liệu vào Kafka
 
-Bronze chạy `starting_offsets: latest` (xem `configs/app/bronze_ingestor.yaml`), nên phải có data mới sau khi app đã subscribe.
+Bronze chạy `input.starting_offsets: latest` (xem `configs/app/bronze_ingestor.yaml`), nên phải có data mới sau khi app đã subscribe.
 
 Cách 1, dùng replayer có sẵn (đọc `BK_activity_logs_unzipped`):
 
 ```bash
-docker compose --profile replay up -d tracking-log-replayer
+docker compose up -d tracking-log-replayer
 docker logs -f lsp-source-tracking-log-replayer-1
 ```
 
@@ -229,7 +249,7 @@ Quan sát Kafka UI tại <http://localhost:8085> để chắc chắn message đ�
 
 ### 3.6 Bước 5 - Quan sát Spark xử lý
 
-Trên Driver UI (`:4040` -> Streaming Query):
+Trên Driver UI của app tương ứng (`:4040` / `:4041` / `:4042` / `:4043` -> Streaming Query):
 - Cột "Input Rate" sẽ tăng > 0.
 - Cột "Batch Duration" hiển thị thời gian của micro-batch gần nhất.
 - Bấm vào tên query để xem detail từng batch (Source: Kafka offsets in/out, Sink: numOutputRows).
@@ -241,7 +261,7 @@ Trên tab Jobs/Stages:
 
 Mở MinIO Console: <http://localhost:9001> (user `minio`, pass `minio123456`).
 
-Vào bucket `bronze`, đường dẫn:
+Vào bucket `lakehouse`, đường dẫn:
 
 ```text
 mooc/bronze/mooc_events_raw/
@@ -288,15 +308,15 @@ docker exec -it lsp-spark-master bash -lc \
 Trong shell:
 
 ```python
-df = spark.read.format("delta").load("s3a://bronze/mooc/bronze/mooc_events_raw")
+df = spark.read.format("delta").load("s3a://lakehouse/mooc/bronze/mooc_events_raw")
 df.printSchema()
 df.count()
 df.groupBy("parse_status").count().show()
-df.select("kafka_topic","kafka_partition","kafka_offset","ingest_date","ingest_hour").show(5, truncate=False)
+df.select("kafka_topic","kafka_partition","kafka_offset","time","ingest_date","ingest_hour").show(5, truncate=False)
 ```
 
 Tiêu chí pass:
-- `printSchema` khớp `BRONZE_MOOC_EVENTS_SCHEMA` trong `domain/schemas/bronze/mooc_bronze.py` (12 cột).
+- `printSchema` khớp `BRONZE_MOOC_EVENTS_SCHEMA` trong `spark/schemas/bronze/mooc_bronze.py` (12 cột).
 - `count()` > 0 và tăng dần khi bạn gửi thêm message.
 - `parse_status` chỉ có 2 giá trị: `ok` cho JSON hợp lệ và `invalid_json` cho payload không phải JSON dạng `map<string,string>`.
 
@@ -333,22 +353,24 @@ Test integration `spark/tests/integration/test_end_to_end_smoke.py` chạy bronz
 | Kiểm tra | Nơi xem | Tiêu chí pass |
 |---|---|---|
 | Kafka topic tồn tại | Kafka UI :8085 | `mooc.raw.events` có 12 partitions, leader đầy đủ |
-| Bucket sẵn sàng | MinIO :9001 | Tồn tại `bronze`, `checkpoints`, `spark-events` |
-| Worker đăng ký | Spark Master :8081 | 1 worker ALIVE, 1 core free |
+| Bucket sẵn sàng | MinIO :9001 | Tồn tại `lakehouse`, `platform` |
+| Worker đăng ký | Spark Master :8081 | 2 workers ALIVE, tổng 4 cores free |
 | App đang chạy | Spark Master :8081 | App `bronze_ingestor` ở Running, có executor |
-| Streaming query | Driver UI :4040 | Query `bronze_ingestor_raw` ở `ACTIVE`, batch id tăng |
+| Streaming query | Bronze Driver UI :4040 | Query `bronze_ingestor_raw` ở `ACTIVE`, batch id tăng |
 | Có dữ liệu | Kafka UI / replayer log | Offset cuối topic > 0 |
-| Bronze được ghi | MinIO bucket `bronze` | Có `part-*.parquet` + `_delta_log/*.json` |
-| Checkpoint tiến triển | MinIO bucket `checkpoints` | `offsets/N` và `commits/N` tăng dần |
+| Bronze được ghi | MinIO bucket `lakehouse` | Có `part-*.parquet` + `_delta_log/*.json` |
+| Checkpoint tiến triển | MinIO bucket `platform` | `offsets/N` và `commits/N` tăng dần |
 | Schema đúng | pyspark read delta | 12 cột khớp `BRONZE_MOOC_EVENTS_SCHEMA` |
 | Idempotent | restart `bronze-stream` | Không trùng version `_delta_log`, không lỗi replay |
+
+Kafka UI nên được dùng để xác nhận topic/partitions/message, còn trạng thái Bronze stream nên đọc ở Spark Driver UI và checkpoint MinIO; đừng dùng consumer-group view của Kafka UI làm nguồn sự thật cho Spark Structured Streaming.
 
 ---
 
 ## 5. Tinh chỉnh khi muốn tăng song song
 
-- Tăng song song trong cùng 1 worker: chỉnh `SPARK_WORKER_CORES=4` (và `SPARK_WORKER_MEMORY` đủ lớn để executor 768m vẫn chạy được). Sau đó restart `spark-worker-1`. Trong Driver UI sẽ thấy executor có 4 cores, 1 batch chạy song song tới 4 task.
-- Thêm worker thứ 2: copy service `spark-worker-1` thành `spark-worker-2` trong compose, executor sẽ được driver phát động ở cả 2 worker.
+- Tăng song song trong cùng 1 worker: chỉnh `SPARK_WORKER_CORES=4` (và `SPARK_WORKER_MEMORY` đủ lớn để executor 1g vẫn chạy được). Sau đó restart `spark-worker-1`. Trong Driver UI sẽ thấy executor có 4 cores, 1 batch chạy song song tới 4 task.
+- Nếu muốn mở rộng cluster, copy service `spark-worker-2` thành `spark-worker-3` trong compose.
 - Ép số partition Kafka đầu vào batch: dùng `spark.readStream...option("minPartitions", "12")` (hữu ích khi 1 Kafka partition quá to và bạn muốn chia nhỏ).
 - Ép số file đầu ra Delta: thêm `repartition(N, "ingest_date", "ingest_hour")` trước sink để tránh quá nhiều file nhỏ. Bước này tạo shuffle, sẽ sinh stage thứ 2 (200 task theo `spark.sql.shuffle.partitions`, hoặc ít hơn khi AQE bật).
 
@@ -359,13 +381,13 @@ Test integration `spark/tests/integration/test_end_to_end_smoke.py` chạy bronz
 | Mục | Đường dẫn |
 |---|---|
 | Driver entry | `spark/apps/bronze_ingestor/main.py` |
-| Job pipeline | `spark/apps/bronze_ingestor/job.py` |
+| Job pipeline | `spark/pipelines/bronze/ingest_pipeline.py` |
 | Config loader | `spark/apps/bronze_ingestor/config.py` |
 | Kafka source | `spark/infrastructure/kafka/reader.py` |
 | Delta sink | `spark/infrastructure/storage/delta.py` |
 | Enrich logic | `spark/domain/bronze/enricher.py` |
 | Parse logic | `spark/domain/bronze/parser.py` |
-| Schema | `spark/domain/schemas/bronze/mooc_bronze.py` |
+| Schema | `spark/schemas/bronze/mooc_bronze.py` |
 | Spark defaults | `spark/conf/spark-defaults.conf` |
 | Compose cluster | `docker-compose.yaml` |
 | Kafka topic config | `kafka/scripts/create_topics.sh` |

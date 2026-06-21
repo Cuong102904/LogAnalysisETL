@@ -1,0 +1,42 @@
+mappings:
+  play_video:
+    action: play
+    object_type: video
+    event_category: learning
+    learning_relevance: learning
+  pause_video:
+    action: pause
+    object_type: video
+    event_category: learning
+    learning_relevance: learning
+  seq_next:
+    action: navigate_next
+    object_type: course_unit
+    event_category: navigation
+    learning_relevance: learning
+  edx.grades.problem.submitted:
+    action: submit
+    object_type: problem
+    event_category: assessment
+    learning_relevance: learning
+  textbook.pdf.page.navigated:
+    action: navigate
+    object_type: document
+    event_category: learning
+    learning_relevance: learning
+  /heartbeat:
+    action: heartbeat
+    object_type: system
+    event_category: system
+    learning_relevance: noise
+  /courses/course-v1:BK+TEST+2026/xblock/block-v1:BK+TEST+2026+type@video+block@abc/handler/publish_completion:
+    action: complete
+    object_type: video
+    event_category: learning
+    learning_relevance: learning
+
+unknown:
+  action: unknown
+  object_type: unknown
+  event_category: unknown
+  learning_relevance: unknown
