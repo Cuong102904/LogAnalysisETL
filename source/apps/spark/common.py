@@ -50,6 +50,12 @@ def load_profile(source_id: str):
         if topic:
             input_updates["topic"] = topic
         input_updates["starting_offsets"] = os.getenv("KAFKA_STARTING_OFFSETS", "earliest")
+        max_offsets_per_trigger = os.getenv("KAFKA_MAX_OFFSETS_PER_TRIGGER")
+        if max_offsets_per_trigger:
+            input_updates["max_offsets_per_trigger"] = int(max_offsets_per_trigger)
+        trigger_processing_time = os.getenv("KAFKA_TRIGGER_PROCESSING_TIME")
+        if trigger_processing_time:
+            input_updates["trigger_processing_time"] = trigger_processing_time
 
     if os.getenv("BRONZE_TABLE_PATH"):
         bronze_updates["path"] = os.environ["BRONZE_TABLE_PATH"]

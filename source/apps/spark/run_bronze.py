@@ -69,8 +69,6 @@ def _write_delta_batch(
     if partition_by:
         writer = writer.partitionBy(*partition_by)
     writer.save(output_path)
-
-
 def run_stream() -> int:
     args = parse_args()
     profile = load_profile(args.source)
@@ -87,6 +85,7 @@ def run_stream() -> int:
         profile.input.bootstrap_servers,
         profile.input.topic,
         profile.input.starting_offsets,
+        profile.input.max_offsets_per_trigger,
     ).selectExpr(
         "CAST(value AS STRING) AS raw_json",
         "topic AS kafka_topic",
@@ -95,8 +94,9 @@ def run_stream() -> int:
     )
 
     def process_batch(batch_df: DataFrame, batch_id: int) -> None:
-        payloads = []
-        for row in batch_df.collect():
+        payloads: list[dict[str, Any]] = []
+        total_written = 0
+        for row in batch_df.toLocalIterator():
             payload = json.loads(row.raw_json)
             envelope = build_bronze_envelope(
                 payload,
@@ -107,17 +107,34 @@ def run_stream() -> int:
                 kafka_offset=row.kafka_offset,
             )
             payloads.append(envelope.as_record())
-        _write_delta_batch(spark, payloads, args.output or profile.bronze.path, profile.bronze.partition_by)
+            if len(payloads) >= 500:
+                _write_delta_batch(
+                    spark,
+                    payloads,
+                    args.output or profile.bronze.path,
+                    profile.bronze.partition_by,
+                )
+                total_written += len(payloads)
+                payloads.clear()
         if payloads:
-            print(f"learnlake bronze batch_id={batch_id} wrote {len(payloads)} records", flush=True)
+            _write_delta_batch(
+                spark,
+                payloads,
+                args.output or profile.bronze.path,
+                profile.bronze.partition_by,
+            )
+            total_written += len(payloads)
+        if total_written:
+            print(f"learnlake bronze batch_id={batch_id} wrote {total_written} records", flush=True)
 
-    (
+    writer = (
         source_df.writeStream.option("checkpointLocation", profile.bronze.checkpoint)
         .foreachBatch(process_batch)
         .queryName("learnlake_bronze_ingestion")
-        .start()
-        .awaitTermination()
     )
+    if profile.input.trigger_processing_time:
+        writer = writer.trigger(processingTime=profile.input.trigger_processing_time)
+    writer.start().awaitTermination()
     return 0
 
 

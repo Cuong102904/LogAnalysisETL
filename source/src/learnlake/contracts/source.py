@@ -14,6 +14,8 @@ class InputConfig(BaseModel):
     path: str | None = None
     bootstrap_servers: str | None = None
     starting_offsets: str = "latest"
+    max_offsets_per_trigger: int | None = None
+    trigger_processing_time: str | None = None
     event_time_field: str
     event_type_field: str | None = None
 

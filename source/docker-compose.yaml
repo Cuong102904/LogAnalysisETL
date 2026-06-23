@@ -431,8 +431,6 @@ services:
     build: *spark-build
     image: local/spark:dev
     container_name: lsp-spark-worker-1
-    profiles:
-      - local-workers
     depends_on:
       spark-master:
         condition: service_healthy
@@ -498,9 +496,12 @@ services:
       <<: *spark-env
       BRONZE_APP_NAME: ${BRONZE_APP_NAME:-learnlake_bronze_ingestion}
       SPARK_UI_PORT: ${BRONZE_SPARK_UI_PORT:-4040}
+      SPARK_DRIVER_MEMORY: ${BRONZE_SPARK_DRIVER_MEMORY:-1024m}
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
       BRONZE_INPUT_TOPIC: ${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw}
       KAFKA_STARTING_OFFSETS: ${LEARNLAKE_KAFKA_STARTING_OFFSETS:-earliest}
+      KAFKA_MAX_OFFSETS_PER_TRIGGER: ${BRONZE_MAX_OFFSETS_PER_TRIGGER:-1000}
+      KAFKA_TRIGGER_PROCESSING_TIME: ${BRONZE_TRIGGER_PROCESSING_TIME:-1 second}
       BRONZE_TABLE_PATH: ${LEARNLAKE_BRONZE_TABLE_PATH:-s3a://lakehouse/learnlake/bronze/bronze_events}
       BRONZE_CHECKPOINT_PATH: ${LEARNLAKE_BRONZE_CHECKPOINT_PATH:-s3a://platform/learnlake/checkpoints/bronze/daotao_ai}
       BRONZE_QUERY_NAME: ${BRONZE_QUERY_NAME:-bronze_ingestor_raw}
@@ -514,7 +515,7 @@ services:
     ports:
       - "${BRONZE_SPARK_UI_PORT:-4040}:4040"
     restart: unless-stopped
-    mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
+    mem_limit: ${BRONZE_SPARK_STREAM_DRIVER_MEM_LIMIT:-1536m}
 
   silver-stream:
     build: *spark-build
@@ -600,6 +601,8 @@ services:
   tracking-log-replayer:
     build: *spark-build
     image: local/spark:dev
+    profiles:
+      - replay
     depends_on:
       kafka-init:
         condition: service_completed_successfully
@@ -612,7 +615,7 @@ services:
     command:
       - /opt/bitnami/python/bin/python
       - -m
-      - apps/replay/replay_to_kafka.py
+      - apps.replay.replay_to_kafka
       - --source
       - daotao_ai
       - --brokers

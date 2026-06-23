@@ -30,6 +30,8 @@ from learnlake.contracts import EventIndex, FACT_MODEL_BY_TARGET
 from learnlake.normalization import normalize_bronze_records
 from learnlake.runtime import build_spark
 
+SILVER_BATCH_CHUNK_SIZE = 500
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run LearnLake Silver normalization.")
@@ -157,27 +159,42 @@ def run_stream() -> int:
     bronze_stream = spark.readStream.format("delta").load(input_path)
 
     def process_batch(batch_df: DataFrame, batch_id: int) -> None:
-        bronze_records = [_decode_bronze_record(row.asDict(recursive=True)) for row in batch_df.collect()]
-        batch_result = normalize_bronze_records(
-            bronze_records,
-            mapping,
-            evaluator,
-            routes,
-            validation_rules=rules,
-            processing_time=datetime.now(timezone.utc),
-        )
-        _write_delta_targets(spark, batch_result.records_by_target, output_paths)
-        _write_delta_batch(
-            spark,
-            profile.silver.invalid.table if profile.silver.invalid is not None else "silver_invalid_events",
-            batch_result.invalid_records,
-            invalid_path,
-        )
-        total_valid = sum(len(records) for records in batch_result.records_by_target.values())
-        total = total_valid + len(batch_result.invalid_records)
+        chunk: list[dict[str, Any]] = []
+        total_valid = 0
+        total_invalid = 0
+
+        def flush_chunk(records: list[dict[str, Any]]) -> None:
+            nonlocal total_valid, total_invalid
+            if not records:
+                return
+            batch_result = normalize_bronze_records(
+                records,
+                mapping,
+                evaluator,
+                routes,
+                validation_rules=rules,
+                processing_time=datetime.now(timezone.utc),
+            )
+            _write_delta_targets(spark, batch_result.records_by_target, output_paths)
+            _write_delta_batch(
+                spark,
+                profile.silver.invalid.table if profile.silver.invalid is not None else "silver_invalid_events",
+                batch_result.invalid_records,
+                invalid_path,
+            )
+            total_valid += sum(len(records) for records in batch_result.records_by_target.values())
+            total_invalid += len(batch_result.invalid_records)
+
+        for row in batch_df.toLocalIterator():
+            chunk.append(_decode_bronze_record(row.asDict(recursive=True)))
+            if len(chunk) >= SILVER_BATCH_CHUNK_SIZE:
+                flush_chunk(chunk)
+                chunk = []
+        flush_chunk(chunk)
+        total = total_valid + total_invalid
         if total:
             print(
-                f"learnlake silver batch_id={batch_id} wrote valid={total_valid} invalid={len(batch_result.invalid_records)}",
+                f"learnlake silver batch_id={batch_id} wrote valid={total_valid} invalid={total_invalid}",
                 flush=True,
             )
 
