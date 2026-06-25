@@ -51,7 +51,11 @@ Primary UIs:
 - Kafka UI: `http://localhost:8085`
 - Spark Master: `http://localhost:8081`
 - Spark History Server: `http://localhost:18080`
+- Marquez UI: `http://localhost:3000` (start with `--profile lineage`)
+- Marquez API: `http://localhost:5000`
 - Airflow: `http://localhost:8089`
 - MinIO: `http://localhost:9001`
 - Trino: `http://localhost:8080`
 - Superset: `http://localhost:8088`
+
+OpenLineage is enabled for the initial Kafka -> Bronze -> Silver streaming path. The lineage backend is optional and runs only when the `lineage` profile is enabled.

@@ -31,6 +31,20 @@ docker compose up -d --build
 
 Lệnh này bật: Kafka (3 broker), Kafka UI, MinIO, Hive Metastore, Trino, Superset, Spark Master + 3 Workers, History Server, Airflow, Bronze stream, Silver stream, Gold stream, Gold alert stream, và tracking-log-replayer.
 
+Nếu muốn xem OpenLineage graph, bật thêm profile `lineage`:
+
+```bash
+cd source
+docker compose --profile lineage up -d --build
+```
+
+Hoặc bật riêng backend/UI lineage khi stack chính đã chạy:
+
+```bash
+cd source
+docker compose --profile lineage up -d marquez-db marquez-api marquez-web
+```
+
 Nếu chỉ muốn test LearnLake stream path, chỉ cần:
 
 ```bash
@@ -38,6 +52,8 @@ docker compose up -d bronze-stream silver-stream tracking-log-replayer spark-mas
 ```
 
 Compose sẽ tự kéo các dependency cần thiết như broker, `kafka-init`, `minio`, và `minio-init`. Flow chuẩn không cần chạy thêm `mc` hoặc script tạo topic ở ngoài compose.
+
+Lineage backend là một service bổ sung nên sẽ tốn thêm RAM. Nếu máy yếu, chỉ bật profile này khi cần inspect graph.
 
 Kiểm tra tất cả đang chạy:
 
@@ -205,4 +221,6 @@ docker compose down -v
 | 8085 | http://localhost:8085 | Kafka UI — topics, offset, consumer lag |
 | 9001 | http://localhost:9001 | MinIO Console — Delta files (user: minio) |
 | 18080 | http://localhost:18080 | Spark History Server — job/stage/task history |
+| 3000 | http://localhost:3000 | Marquez UI — OpenLineage graph |
+| 5000 | http://localhost:5000 | Marquez API — lineage ingestion |
 | 8089 | http://localhost:8089 | Airflow — maintenance DAGs |

@@ -42,6 +42,9 @@ x-spark-env: &spark-env
   SPARK_APP_PATH: /opt/project
   SPARK_CONF_DIR: /opt/bitnami/spark/conf
   PYTHONPATH: /opt/project/src:/opt/project
+  OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+  OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+  OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
   # Generic object-store envs for LearnLake. MinIO is the local S3-compatible provider.
   AWS_ENDPOINT_URL_S3: ${AWS_ENDPOINT_URL_S3:-http://minio:9000}
   AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-minio}
@@ -115,6 +118,14 @@ x-airflow-env: &airflow-env
   _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
   _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-admin}
   AIRFLOW_CONN_SPARK_DEFAULT: ${AIRFLOW_CONN_SPARK_DEFAULT:-spark://100.120.19.23:7077}
+
+x-marquez-env: &marquez-env
+  MARQUEZ_TAG: ${MARQUEZ_TAG:-0.49.0}
+  MARQUEZ_API_PORT: ${MARQUEZ_API_PORT:-5000}
+  MARQUEZ_ADMIN_PORT: ${MARQUEZ_ADMIN_PORT:-5001}
+  MARQUEZ_WEB_PORT: ${MARQUEZ_WEB_PORT:-3000}
+  MARQUEZ_DB_PORT: ${MARQUEZ_DB_PORT:-5432}
+  MARQUEZ_SEARCH_ENABLED: ${MARQUEZ_SEARCH_ENABLED:-false}
 
 services:
   broker1:
@@ -408,6 +419,83 @@ services:
     restart: "no"
     mem_limit: ${SUPERSET_BOOTSTRAP_MEM_LIMIT:-256m}
 
+  marquez-db:
+    image: postgres:14
+    container_name: lsp-marquez-db
+    hostname: postgres
+    profiles:
+      - lineage
+    environment:
+      POSTGRES_DB: ${MARQUEZ_DB:-marquez}
+      POSTGRES_USER: ${MARQUEZ_POSTGRES_USER:-marquez}
+      POSTGRES_PASSWORD: ${MARQUEZ_POSTGRES_PASSWORD:-marquez}
+      MARQUEZ_DB: ${MARQUEZ_DB:-marquez}
+      MARQUEZ_USER: ${MARQUEZ_USER:-marquez}
+      MARQUEZ_PASSWORD: ${MARQUEZ_PASSWORD:-marquez}
+    ports:
+      - "${MARQUEZ_DB_HOST_PORT:-15432}:5432"
+    volumes:
+      - marquez-db-data:/var/lib/postgresql/data
+    networks:
+      default:
+        aliases:
+          - postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MARQUEZ_POSTGRES_USER:-postgres} -d ${MARQUEZ_DB:-marquez}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    mem_limit: ${MARQUEZ_DB_MEM_LIMIT:-512m}
+
+  marquez-api:
+    image: "marquezproject/marquez:${MARQUEZ_TAG:-0.49.0}"
+    container_name: lsp-marquez-api
+    profiles:
+      - lineage
+    depends_on:
+      marquez-db:
+        condition: service_healthy
+    environment:
+      MARQUEZ_PORT: ${MARQUEZ_API_PORT:-5000}
+      MARQUEZ_ADMIN_PORT: ${MARQUEZ_ADMIN_PORT:-5001}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: ${MARQUEZ_DB_PORT:-5432}
+      SEARCH_ENABLED: ${MARQUEZ_SEARCH_ENABLED:-false}
+    ports:
+      - "${MARQUEZ_API_PORT:-5000}:5000"
+      - "${MARQUEZ_ADMIN_PORT:-5001}:5001"
+    volumes:
+      - marquez-api-data:/opt/marquez
+    entrypoint:
+      - /bin/bash
+      - -lc
+      - |
+        until (echo >/dev/tcp/postgres/${MARQUEZ_DB_PORT:-5432}) >/dev/null 2>&1; do
+          sleep 1
+        done
+        exec ./entrypoint.sh
+    restart: unless-stopped
+    mem_limit: ${MARQUEZ_API_MEM_LIMIT:-768m}
+
+  marquez-web:
+    image: "marquezproject/marquez-web:${MARQUEZ_TAG:-0.49.0}"
+    container_name: lsp-marquez-web
+    profiles:
+      - lineage
+    depends_on:
+      marquez-api:
+        condition: service_started
+    environment:
+      MARQUEZ_HOST: marquez-api
+      MARQUEZ_PORT: ${MARQUEZ_API_PORT:-5000}
+      WEB_PORT: ${MARQUEZ_WEB_PORT:-3000}
+      REACT_APP_ADVANCED_SEARCH: ${MARQUEZ_SEARCH_ENABLED:-false}
+    ports:
+      - "${MARQUEZ_WEB_PORT:-3000}:3000"
+    restart: unless-stopped
+    mem_limit: ${MARQUEZ_WEB_MEM_LIMIT:-384m}
+
   spark-master:
     build: *spark-build
     image: local/spark:dev
@@ -610,8 +698,6 @@ services:
         condition: service_started
     environment:
       <<: *spark-env
-    volumes:
-      - /home/cuong/Desktop/DATN/BK_activity_logs_unzipped:/data/activity_logs:ro
     command:
       - /opt/bitnami/python/bin/python
       - -m
@@ -622,8 +708,6 @@ services:
       - broker1:29092,broker2:29092,broker3:29092
       - --topic
       - ${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw}
-      - --input
-      - /data/activity_logs
       - --speed
       - "100"
     restart: "no"
@@ -758,3 +842,5 @@ volumes:
   superset-home:
   airflow-db-data:
   airflow-logs:
+  marquez-db-data:
+  marquez-api-data:

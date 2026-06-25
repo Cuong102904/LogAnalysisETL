@@ -5,6 +5,8 @@ import sys
 
 from pyspark.sql import SparkSession
 
+from learnlake.runtime.openlineage import configure_openlineage
+
 
 def _first_env(*names: str) -> str | None:
     for name in names:
@@ -21,6 +23,7 @@ def build_spark(app_name: str) -> SparkSession:
     if master_url:
         builder = builder.master(master_url)
 
+    builder = configure_openlineage(builder)
     builder = builder.config("spark.pyspark.driver.python", sys.executable)
     builder = builder.config(
         "spark.sql.extensions",
