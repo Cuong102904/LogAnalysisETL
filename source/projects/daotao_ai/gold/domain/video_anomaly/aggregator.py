@@ -3,11 +3,14 @@ from pyspark.sql import functions as F
 
 from projects.daotao_ai.gold.domain.common import rolling_anomaly_score, safe_ratio
 from projects.daotao_ai.gold.domain.video_anomaly.time_bucketing import bucket_video_interactions
+from projects.daotao_ai.gold.schemas.video_anomaly_features import (
+    VIDEO_FRICTION_SIGNALS_SCHEMA,
+)
 
 
 def build_video_anomaly_features(video_df: DataFrame, bucket_seconds: int = 5) -> DataFrame:
     base = bucket_video_interactions(video_df, bucket_seconds).withColumn(
-        "watch_ratio", safe_ratio(F.col("current_time_s"), F.col("video_duration").cast("double"))
+        "watch_ratio", safe_ratio(F.col("current_time_s"), F.col("video_duration"))
     )
     grouped = base.groupBy(
         "event_date",
@@ -47,6 +50,7 @@ def build_video_anomaly_features(video_df: DataFrame, bucket_seconds: int = 5) -
             & (F.col("distinct_users") >= F.lit(2))
             & (F.col("event_count") >= F.lit(3)),
         )
+        .select(*[field.name for field in VIDEO_FRICTION_SIGNALS_SCHEMA])
     )
 
 

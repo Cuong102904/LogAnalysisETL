@@ -34,4 +34,3 @@ SELECT
         ELSE 'low'
     END AS stuck_risk_band
 FROM delta.mooc.user_learning_profile_daily
-;

@@ -18,4 +18,3 @@ SELECT
     z_score,
     is_anomaly
 FROM delta.mooc.behavior_anomaly_signals
-;

@@ -2,30 +2,53 @@ from pyspark.sql import DataFrame, Window
 from pyspark.sql import functions as F
 
 VIDEO_ACTIONS = (
-    "play_video",
-    "pause_video",
-    "seek_video",
-    "stop_video",
-    "speed_change_video",
-    "load_video",
+    "interact",
+    "save_position",
+    "transcript",
 )
 
 PDF_ACTION_PREFIXES = (
-    "textbook.pdf.page.scrolled",
-    "textbook.pdf.display.scaled",
-    "textbook.pdf.zoom.buttons.changed",
+    "view",
+    "scroll",
+    "zoom",
+    "load",
+    "search",
 )
 
 PERFORMANCE_ACTIONS = (
-    "edx.grades.problem.submitted",
-    "problem_check",
-    "problem_graded",
-    "problem_save",
-    "problem_show",
-    "showanswer",
+    "submit",
+    "check",
+    "grade",
+    "grade_feedback",
+    "input_ajax",
+)
+
+NAVIGATION_ACTIONS = (
+    "navigate",
+    "sequence_next",
+    "sequence_previous",
+    "link_clicked",
+    "resume_course",
+    "sequence_tab",
+    "display",
+)
+
+COMPLETION_ACTIONS = (
+    "complete",
+    "completed",
+    "finish",
+    "finished",
+    "passed",
 )
 
 EXAM_STATE_WATERMARK = "1 day"
+
+
+def ensure_event_date(df: DataFrame, time_column: str = "time") -> DataFrame:
+    event_date_expr = F.to_date(F.col(time_column))
+    if "event_date" in df.columns:
+        event_date_expr = F.coalesce(F.col("event_date"), event_date_expr)
+    return df.withColumn("event_date", event_date_expr)
 
 
 def safe_ratio(numerator: F.Column, denominator: F.Column) -> F.Column:
@@ -100,17 +123,17 @@ def score_anomaly(
 
 
 def filter_exam_security_events(system_df: DataFrame) -> DataFrame:
-    event_type = F.lower(F.coalesce(F.col("event_type"), F.lit("")))
+    system_action = F.lower(F.coalesce(F.col("system_action"), F.lit("")))
     path = F.lower(F.coalesce(F.col("path"), F.lit("")))
+    reason = F.lower(F.coalesce(F.col("reason"), F.lit("")))
     return system_df.filter(
-        F.col("ip").isNotNull()
-        & (
-            event_type.contains("login")
-            | event_type.contains("logout")
-            | event_type.contains("proctoring")
-            | event_type.contains("proctored_exam")
-            | event_type.startswith("/api/edx_proctoring/")
-            | path.contains("/login")
-            | path.contains("/logout")
-        )
+        path.contains("/login")
+        | path.contains("/logout")
+        | path.contains("/api/edx_proctoring/")
+        | system_action.contains("login")
+        | system_action.contains("logout")
+        | system_action.contains("proctoring")
+        | reason.contains("login")
+        | reason.contains("logout")
+        | reason.contains("proctoring")
     )

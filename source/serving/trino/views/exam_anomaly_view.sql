@@ -45,4 +45,4 @@ SELECT
     entity_id,
     metric_name,
     metric_value
-FROM delta.mooc.exam_integrity_signals;
+FROM delta.mooc.exam_integrity_signals

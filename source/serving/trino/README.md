@@ -24,5 +24,6 @@ Trino is the SQL query layer for the lakehouse semantic layer.
 ## Notes
 
 - Trino uses Hive Metastore plus MinIO-backed S3 storage for the Delta catalog.
-- The bootstrap currently registers `silver_video_interactions` and the Gold Delta tables needed by the semantic layer.
+- Trino 455 uses the native S3 file system, enabled with `fs.native-s3.enabled=true`.
+- The bootstrap registers the Gold Delta tables needed by the semantic layer under `s3://lakehouse/learnlake/gold/...`.
 - Views are stored as SQL files so they can be bootstrapped from CLI or consumed by Superset SQL Lab.

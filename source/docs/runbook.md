@@ -8,13 +8,19 @@ flowchart LR
   kafka --> bronze[bronze-stream spark-submit]
   bronze --> bronzeDelta[(s3a://lakehouse/mooc/bronze/mooc_events_raw)]
   bronzeDelta --> silver[silver-stream spark-submit]
-  silver --> silverDelta[(s3a://lakehouse/mooc/silver/*)]
-  silverDelta --> gold[gold-stream / gold-alert-stream]
-  gold --> goldDelta[(s3a://lakehouse/mooc/gold/*)]
+  silver --> silverDelta[(s3a://lakehouse/learnlake/silver/*)]
+  silverDelta --> gold[gold-stream]
+  silverDelta --> goldBatch[gold-dashboard batch entrypoint]
+  gold --> goldAlert[gold-alert-stream]
+  gold --> goldDelta[(s3a://lakehouse/learnlake/gold/*)]
+  goldBatch --> goldDelta
+  goldAlert --> goldDelta
   sparkMaster[Spark Master] --> workers[Spark worker]
   bronze --> sparkMaster
   silver --> sparkMaster
   gold --> sparkMaster
+  goldBatch --> sparkMaster
+  goldAlert --> sparkMaster
   airflow[Airflow standalone] --> sparkMaster
   sparkMaster --> events[(s3a://platform/spark-events)]
   history[Spark History Server] --> events
@@ -26,7 +32,7 @@ flowchart LR
 - Spark/PySpark: `3.5.1` runtime with Scala `2.12`.
 - Delta Lake: `io.delta:delta-spark_2.12:3.2.0`.
 - Kafka connector: `org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1`.
-- S3A: `org.apache.hadoop:hadoop-aws:3.3.4`.
+- S3A: `org.apache.hadoop:hadoop-aws:3.3.5` in Trino and `3.3.6` in Hive Metastore.
 - AWS SDK bundle: `com.amazonaws:aws-java-sdk-bundle:1.12.262`.
 
 ## Start Full Stack
@@ -70,8 +76,9 @@ The full stack now includes the query/dashboard layer. Trino is available at `ht
 | --- | --- | --- | --- |
 | `mooc.raw.events` | `bronze-stream` | `s3a://lakehouse/mooc/bronze/mooc_events_raw` | `s3a://platform/mooc/bronze_ingestor` |
 | `s3a://lakehouse/mooc/bronze/mooc_events_raw` | `silver-stream` | `s3a://lakehouse/learnlake/silver/*` | `s3a://platform/learnlake/checkpoints/silver/daotao_ai` |
-| `s3a://lakehouse/mooc/silver/*` | `gold-stream` | `s3a://lakehouse/mooc/gold/*` | `s3a://platform/mooc/gold_aggregator` |
-| `s3a://lakehouse/mooc/gold/behavior_anomaly_signals` | `gold-alert-stream` | `s3a://lakehouse/mooc/gold/anomaly_alerts` | `s3a://platform/mooc/gold_alerting` |
+| `s3a://lakehouse/learnlake/silver/*` | `gold-stream` | `s3a://lakehouse/learnlake/gold/*` | `s3a://platform/learnlake/gold_aggregator` |
+| `s3a://lakehouse/learnlake/silver/*` | `gold-dashboard batch entrypoint` | `s3a://lakehouse/learnlake/gold/*` | scheduled / manual batch trigger |
+| `s3a://lakehouse/learnlake/gold/behavior_anomaly_signals` | `gold-alert-stream` | `s3a://lakehouse/learnlake/gold/anomaly_alerts` | `s3a://platform/learnlake/gold_alerting` |
 
 Gold tables are written straight to MinIO and remain available for downstream consumers.
 
@@ -79,6 +86,22 @@ Never delete checkpoint paths during normal restart. Structured Streaming uses t
 Kafka UI is still useful for topic and broker visibility, but Bronze stream progress is best observed in Spark Driver UI and the checkpoint path, not by expecting a stable consumer group entry.
 
 For live performance checks, open the driver UI that matches the app you want to inspect. The `Structured Streaming` tab shows query progress, while `Jobs`, `Stages`, and `Executors` let you inspect micro-batch task scheduling and runtime.
+
+## Gold Serving Contract
+
+- Streaming outputs refresh through micro-batches with a light trigger interval:
+  - `video_friction_signals`
+  - `exam_integrity_signals`
+  - `behavior_anomaly_signals`
+- Batch outputs are recomputed on a scheduled/manual cadence:
+  - `pdf_engagement_features`
+  - `quiz_attempt_metrics`
+  - `user_learning_profile_daily`
+- `anomaly_alerts` remains a streaming derivative of `behavior_anomaly_signals` with watermark + dedup.
+- Superset uses two dashboards:
+  - `Live Ops`: one dashboard with tabs/sections, auto-refresh around 30 seconds, manual refresh allowed.
+  - `Learning Analytics`: manual refresh only after batch jobs complete.
+- If Superset does not auto-create the declared dashboards during bootstrap, run the Playwright fallback to log in and materialize them from the registry.
 
 ## Restart Or Submit Streams
 

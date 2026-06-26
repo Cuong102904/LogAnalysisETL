@@ -1,0 +1,44 @@
+app_name: gold_dashboard_serving
+outputs:
+  - name: video_friction_signals
+    mode: streaming
+    input_keys: [video]
+    partition_by: [event_date, course_id]
+    trigger_policy:
+      kind: processing_time
+      seconds: 30
+  - name: exam_integrity_signals
+    mode: streaming
+    input_keys: [exam_attempts, system]
+    partition_by: [event_date, course_id]
+    trigger_policy:
+      kind: processing_time
+      seconds: 30
+  - name: behavior_anomaly_signals
+    mode: streaming
+    input_keys: [video, pdf, performance, learning]
+    partition_by: [event_date, anomaly_domain]
+    trigger_policy:
+      kind: processing_time
+      seconds: 30
+  - name: pdf_engagement_features
+    mode: batch
+    input_keys: [pdf]
+    partition_by: [event_date, course_id]
+    trigger_policy:
+      kind: scheduled
+      schedule: daily
+  - name: quiz_attempt_metrics
+    mode: batch
+    input_keys: [performance]
+    partition_by: [event_date, course_id]
+    trigger_policy:
+      kind: scheduled
+      schedule: daily
+  - name: user_learning_profile_daily
+    mode: batch
+    input_keys: [learning]
+    partition_by: [event_date, course_id]
+    trigger_policy:
+      kind: scheduled
+      schedule: daily

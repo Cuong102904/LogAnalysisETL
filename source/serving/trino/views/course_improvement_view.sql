@@ -19,8 +19,8 @@ video AS (
         event_date,
         course_id,
         SUM(event_count) AS video_events,
-        SUM(CASE WHEN action_type = 'pause_video' THEN event_count ELSE 0 END) AS pause_events,
-        SUM(CASE WHEN action_type = 'seek_video' THEN event_count ELSE 0 END) AS seek_events,
+        SUM(CASE WHEN action_type IN ('pause', 'stop') THEN event_count ELSE 0 END) AS pause_events,
+        SUM(CASE WHEN action_type = 'seek' THEN event_count ELSE 0 END) AS seek_events,
         AVG(avg_watch_ratio) AS avg_watch_ratio,
         MAX(z_score) AS max_video_z_score
     FROM delta.mooc.video_friction_signals
@@ -95,4 +95,4 @@ FULL OUTER JOIN quiz
    AND COALESCE(journey.course_id, video.course_id, pdf.course_id) = quiz.course_id
 FULL OUTER JOIN anomaly
     ON COALESCE(journey.event_date, video.event_date, pdf.event_date, quiz.event_date) = anomaly.event_date
-   AND COALESCE(journey.course_id, video.course_id, pdf.course_id, quiz.course_id) = anomaly.course_id;
+   AND COALESCE(journey.course_id, video.course_id, pdf.course_id, quiz.course_id) = anomaly.course_id

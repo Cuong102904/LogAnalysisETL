@@ -30,14 +30,21 @@
 
 ## Gold
 
-- Tổng hợp profile phục vụ analytics:
-  - `gold.user_learning_profile` (skeleton)
-  - `gold.problem_performance` (skeleton)
-  - `gold.system_profile` (skeleton)
-  - `gold.video_friction_signals` (implemented)
-  - `gold.pdf_engagement_features` (implemented)
-  - `gold.quiz_attempt_metrics` (implemented)
-  - `gold.user_learning_profile_daily` (implemented)
-- Chuẩn bị anomaly signals cho dashboard và rule engine:
-  - `gold.exam_integrity_signals` (implemented)
-  - `gold.behavior_anomaly_signals` (implemented)
+- Gold được chia thành 2 cadence:
+  - `streaming`: `gold.video_friction_signals`, `gold.exam_integrity_signals`, `gold.behavior_anomaly_signals`
+  - `batch`: `gold.pdf_engagement_features`, `gold.quiz_attempt_metrics`, `gold.user_learning_profile_daily`
+- `gold.anomaly_alerts` là stream dẫn xuất từ `gold.behavior_anomaly_signals`, giữ watermark + dedup riêng cho alerting.
+- Gold chỉ consume từ Silver, không đọc bronze/Kafka/raw.
+- Superset không đọc physical gold tables trực tiếp; nó đọc semantic views trong Trino:
+  - `video_friction_view`
+  - `exam_anomaly_view`
+  - `pdf_engagement_view`
+  - `quiz_difficulty_view`
+  - `course_improvement_view`
+  - `learner_health_view`
+  - `behavior_anomaly_view`
+  - `alert_events_view`
+- Dashboard serving split:
+  - `Live Ops`: one dashboard with multiple sections/tabs, auto-refresh around 30 seconds, manual refresh allowed.
+  - `Learning Analytics`: manual refresh only after batch jobs finish.
+- If Superset bootstrap/API does not materialize the declared dashboards automatically, the repo can fall back to Playwright to create the dashboard surfaces and sections.

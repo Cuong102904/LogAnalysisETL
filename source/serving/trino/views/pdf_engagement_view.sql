@@ -2,15 +2,22 @@ CREATE OR REPLACE VIEW delta.mooc.pdf_engagement_view AS
 SELECT
     event_date,
     course_id,
+    user_id,
     content_id,
     chapter,
-    SUM(event_count) AS event_count,
-    SUM(distinct_sessions) AS distinct_sessions,
-    SUM(scroll_count) AS scroll_count,
-    SUM(zoom_count) AS zoom_count,
-    SUM(scroll_up_count) AS scroll_up_count,
-    SUM(scroll_down_count) AS scroll_down_count,
-    AVG(avg_scale_amount) AS avg_scale_amount,
-    AVG(scroll_balance) AS avg_scroll_balance
+    event_count,
+    distinct_sessions,
+    scroll_count,
+    zoom_count,
+    scroll_up_count,
+    scroll_down_count,
+    distinct_pages,
+    avg_page_number,
+    max_page_number,
+    min_page_number,
+    avg_scale_amount,
+    scroll_balance AS avg_scroll_balance,
+    first_time,
+    last_time,
+    last_event_time
 FROM delta.mooc.pdf_engagement_features
-GROUP BY 1, 2, 3, 4;

@@ -1,14 +1,21 @@
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
-from projects.daotao_ai.gold.domain.common import safe_ratio
+from projects.daotao_ai.gold.domain.common import ensure_event_date, safe_ratio
+from projects.daotao_ai.gold.schemas.quiz_performance_features import (
+    QUIZ_ATTEMPT_METRICS_SCHEMA,
+)
 
 
 def build_quiz_performance_features(performance_df: DataFrame) -> DataFrame:
+    assessment_action = F.lower(F.coalesce(F.col("assessment_action"), F.lit("")))
     base = (
-        performance_df.withColumn("is_submit", F.lower(F.col("event_type")).contains("submit"))
-        .withColumn("is_check", F.lower(F.col("event_type")).contains("check"))
-        .withColumn("is_graded", F.lower(F.col("event_type")).contains("graded"))
+        performance_df.withColumn("user_id", F.col("actor_id").cast("long"))
+        .withColumn("time", F.col("event_time"))
+        .withColumn("problem_type", F.coalesce(F.col("response_type"), F.col("input_type")))
+        .withColumn("is_submit", assessment_action == F.lit("submit"))
+        .withColumn("is_check", assessment_action == F.lit("check"))
+        .withColumn("is_graded", assessment_action.isin("grade", "grade_feedback"))
         .withColumn(
             "score_ratio",
             safe_ratio(
@@ -16,6 +23,7 @@ def build_quiz_performance_features(performance_df: DataFrame) -> DataFrame:
             ),
         )
     )
+    base = ensure_event_date(base)
     return (
         base.groupBy("event_date", "course_id", "user_id", "problem_id", "problem_type")
         .agg(
@@ -37,4 +45,5 @@ def build_quiz_performance_features(performance_df: DataFrame) -> DataFrame:
             "attempt_count",
             F.col("submit_count") + F.col("check_count"),
         )
+        .select(*[field.name for field in QUIZ_ATTEMPT_METRICS_SCHEMA])
     )

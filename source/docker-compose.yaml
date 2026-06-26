@@ -344,8 +344,8 @@ services:
       - "8080:8080"
     volumes:
       - trino-data:/data/trino
-    restart: "no"
-    mem_limit: ${TRINO_MEM_LIMIT:-768m}
+    restart: unless-stopped
+    mem_limit: ${TRINO_MEM_LIMIT:-1536m}
 
   trino-bootstrap:
     image: *bootstrap-image
@@ -411,8 +411,10 @@ services:
     depends_on:
       superset:
         condition: service_started
-      trino-bootstrap:
-        condition: service_completed_successfully
+      trino:
+        condition: service_healthy
+    environment:
+      <<: *superset-env
     volumes:
       - ./serving/superset/bootstrap:/bootstrap:ro
     command: ["python", "/bootstrap/bootstrap_superset.py"]
@@ -647,17 +649,18 @@ services:
       <<: *spark-env
       GOLD_APP_NAME: ${GOLD_APP_NAME:-gold_aggregator}
       SPARK_UI_PORT: ${GOLD_SPARK_UI_PORT:-4042}
+      SPARK_DRIVER_MEMORY: ${GOLD_STREAM_SPARK_DRIVER_MEMORY:-1024m}
     command: >
       bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
       --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
       --name \"$${GOLD_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
       --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
       --conf spark.cores.max=1
-      /opt/project/apps/spark/run_gold.py --source daotao_ai --metric gold_course_activity_summary"
+      /opt/project/apps/spark/run_gold_dashboard_stream.py"
     ports:
       - "${GOLD_SPARK_UI_PORT:-4042}:4042"
     restart: unless-stopped
-    mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
+    mem_limit: ${GOLD_STREAM_MEM_LIMIT:-1536m}
 
   gold-alert-stream:
     build: *spark-build
@@ -674,17 +677,46 @@ services:
       <<: *spark-env
       GOLD_ALERTING_APP_NAME: ${GOLD_ALERTING_APP_NAME:-gold_alerting}
       SPARK_UI_PORT: ${GOLD_ALERTING_SPARK_UI_PORT:-4043}
+      SPARK_DRIVER_MEMORY: ${GOLD_ALERTING_SPARK_DRIVER_MEMORY:-1024m}
     command: >
       bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
       --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
       --name \"$${GOLD_ALERTING_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
       --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
       --conf spark.cores.max=1
-      /opt/project/apps/spark/run_task.py --source daotao_ai --plan"
+      /opt/project/apps/spark/run_gold_alerting.py"
     ports:
       - "${GOLD_ALERTING_SPARK_UI_PORT:-4043}:4043"
     restart: unless-stopped
-    mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
+    mem_limit: ${GOLD_ALERTING_MEM_LIMIT:-1536m}
+
+  gold-batch:
+    build: *spark-build
+    image: local/spark:dev
+    container_name: lsp-gold-batch
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_healthy
+      silver-stream:
+        condition: service_started
+    environment:
+      <<: *spark-env
+      GOLD_BATCH_APP_NAME: ${GOLD_BATCH_APP_NAME:-gold_dashboard_serving_batch}
+      SPARK_UI_PORT: ${GOLD_BATCH_SPARK_UI_PORT:-4044}
+      SPARK_DRIVER_MEMORY: ${GOLD_BATCH_SPARK_DRIVER_MEMORY:-1024m}
+    command: >
+      bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
+      --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
+      --name \"$${GOLD_BATCH_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
+      --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
+      --conf spark.cores.max=1
+      /opt/project/apps/spark/run_gold_dashboard_batch.py"
+    ports:
+      - "${GOLD_BATCH_SPARK_UI_PORT:-4044}:4044"
+    restart: "no"
+    mem_limit: ${GOLD_BATCH_MEM_LIMIT:-1536m}
 
   tracking-log-replayer:
     build: *spark-build

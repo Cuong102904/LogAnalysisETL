@@ -23,4 +23,3 @@ SELECT
     alert_message,
     alert_time
 FROM delta.mooc.anomaly_alerts
-;
