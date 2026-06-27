@@ -34,6 +34,12 @@ def parse_args() -> argparse.Namespace:
         default=0,
         help="Limit the number of input files to replay. 0 means all files.",
     )
+    parser.add_argument(
+        "--max-records",
+        type=int,
+        default=0,
+        help="Limit the number of decoded records to replay. 0 means all records.",
+    )
     parser.add_argument("--speed", type=float, default=0.0, help="0 means no pacing delay.")
     parser.add_argument(
         "--skip-decode-errors",
@@ -59,6 +65,7 @@ def main() -> int:
     else:
         sink = None
     dry_run_printed = 0
+    replayed_records = 0
     try:
         for record in iter_tracking_log_records(
             input_path,
@@ -89,6 +96,10 @@ def main() -> int:
                 producer.poll(0)
             elif not args.dry_run:
                 print(line)
+
+            replayed_records += 1
+            if args.max_records > 0 and replayed_records >= args.max_records:
+                break
     finally:
         if producer:
             producer.flush()

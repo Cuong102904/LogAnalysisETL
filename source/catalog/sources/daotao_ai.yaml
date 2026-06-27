@@ -3,16 +3,19 @@ source_type: edx_tracking_log
 domain: mooc
 
 input:
-  mode: fixture
+  mode: kafka
   format: json
   path: tests/fixtures/daotao_ai/raw_events.jsonl
+  topic: mooc.raw.events
+  bootstrap_servers: broker1:29092,broker2:29092,broker3:29092
+  starting_offsets: earliest
   event_time_field: time
   event_type_field: event_type
 
 bronze:
   table: bronze_events
-  path: /tmp/learnlake/bronze_events
-  checkpoint: /tmp/learnlake/checkpoints/bronze/daotao_ai
+  path: s3a://lakehouse/learnlake/bronze/bronze_events
+  checkpoint: s3a://platform/learnlake/checkpoints/bronze/daotao_ai
   partition_by:
     - source_id
     - processing_date
@@ -20,8 +23,8 @@ bronze:
 silver:
   event_index:
     table: silver_event_index
-    path: /tmp/learnlake/silver_event_index
-    checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/event_index
+    path: s3a://lakehouse/learnlake/silver/silver_event_index
+    checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/event_index
     mapping: catalog/mappings/daotao_ai_to_learning_event.yaml
     schema: event_index
     partition_by:
@@ -30,58 +33,58 @@ silver:
   targets:
     assessment:
       table: silver_assessment_events
-      path: /tmp/learnlake/silver_assessment_events
-      checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/assessment
+      path: s3a://lakehouse/learnlake/silver/silver_assessment_events
+      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/assessment
       schema: assessment
     video:
       table: silver_video_events
-      path: /tmp/learnlake/silver_video_events
-      checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/video
+      path: s3a://lakehouse/learnlake/silver/silver_video_events
+      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/video
       schema: video
     document:
       table: silver_document_events
-      path: /tmp/learnlake/silver_document_events
-      checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/document
+      path: s3a://lakehouse/learnlake/silver/silver_document_events
+      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/document
       schema: document
     navigation:
       table: silver_navigation_events
-      path: /tmp/learnlake/silver_navigation_events
-      checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/navigation
+      path: s3a://lakehouse/learnlake/silver/silver_navigation_events
+      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/navigation
       schema: navigation
     exam:
       table: silver_exam_events
-      path: /tmp/learnlake/silver_exam_events
-      checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/exam
+      path: s3a://lakehouse/learnlake/silver/silver_exam_events
+      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/exam
       schema: exam
     course_content:
       table: silver_course_content_events
-      path: /tmp/learnlake/silver_course_content_events
-      checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/course_content
+      path: s3a://lakehouse/learnlake/silver/silver_course_content_events
+      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/course_content
       schema: course_content
     authoring:
       table: silver_authoring_events
-      path: /tmp/learnlake/silver_authoring_events
-      checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/authoring
+      path: s3a://lakehouse/learnlake/silver/silver_authoring_events
+      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/authoring
       schema: authoring
     auth:
       table: silver_auth_events
-      path: /tmp/learnlake/silver_auth_events
-      checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/auth
+      path: s3a://lakehouse/learnlake/silver/silver_auth_events
+      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/auth
       schema: auth
     system:
       table: silver_system_events
-      path: /tmp/learnlake/silver_system_events
-      checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/system
+      path: s3a://lakehouse/learnlake/silver/silver_system_events
+      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/system
       schema: system
     unknown:
       table: silver_unknown_events
-      path: /tmp/learnlake/silver_unknown_events
-      checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/unknown
+      path: s3a://lakehouse/learnlake/silver/silver_unknown_events
+      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/unknown
       schema: unknown
   invalid:
     table: silver_invalid_events
-    path: /tmp/learnlake/silver_invalid_events
-    checkpoint: /tmp/learnlake/checkpoints/silver/daotao_ai/invalid
+    path: s3a://lakehouse/learnlake/silver/silver_invalid_events
+    checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/invalid
     schema: invalid
   routing: projects/daotao_ai/routing.yaml
   quality_rules:

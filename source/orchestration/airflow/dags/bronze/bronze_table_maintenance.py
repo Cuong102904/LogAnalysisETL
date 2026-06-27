@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from airflow.providers.standard.operators.empty import EmptyOperator
 from tasks.spark_task import spark_task
+from utils.catalog import bronze_table_path
 
 from airflow import DAG
 
@@ -21,7 +22,7 @@ def _enabled(env_name: str, default: str = "true") -> bool:
 def _maintenance_arguments() -> list[str]:
     arguments = [
         "--table-path",
-        os.getenv("BRONZE_TABLE_PATH", "s3a://lakehouse/mooc/bronze/mooc_events_raw"),
+        bronze_table_path(),
         "--app-name",
         os.getenv("BRONZE_MAINTENANCE_APP_NAME", "bronze_delta_maintenance"),
     ]

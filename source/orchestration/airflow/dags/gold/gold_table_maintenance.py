@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from airflow.providers.standard.operators.empty import EmptyOperator
 from tasks.spark_task import spark_task
+from utils.catalog import GOLD_TABLE_BASE_PATH
 
 from airflow import DAG
 
@@ -29,8 +30,7 @@ def _enabled(env_name: str, default: str = "true") -> bool:
 
 
 def _maintenance_arguments(table_name: str) -> list[str]:
-    base_path = os.getenv("GOLD_TABLE_BASE_PATH", "s3a://lakehouse/mooc/gold")
-    table_path = f"{base_path}/{table_name}"
+    table_path = f"{GOLD_TABLE_BASE_PATH}/{table_name}"
 
     arguments = [
         "--table-path",

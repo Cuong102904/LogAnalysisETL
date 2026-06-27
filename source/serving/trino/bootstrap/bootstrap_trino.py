@@ -277,6 +277,9 @@ def _is_missing_dependency_error(exc: Exception) -> bool:
         "403 forbidden",
         "forbidden",
         "failed to create external path",
+        "name or service not known",
+        "temporary failure in name resolution",
+        "unknownhostexception",
     )
     return any(marker in message for marker in missing_markers)
 

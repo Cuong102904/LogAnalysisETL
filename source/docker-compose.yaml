@@ -1,140 +1,15 @@
 name: log-streaming-platform
-
-x-kafka-build: &kafka-build
-  context: ./platform/local/kafka
-  dockerfile: Dockerfile
-
-x-spark-build: &spark-build
-  context: .
-  dockerfile: platform/local/spark/Dockerfile
-
-x-airflow-build: &airflow-build
-  context: ./orchestration/airflow
-  dockerfile: Dockerfile
-
-x-hive-build: &hive-build
-  context: ./platform/local/hive-metastore
-  dockerfile: Dockerfile
-
-x-trino-build: &trino-build
-  context: ./serving/trino
-  dockerfile: Dockerfile
-
-x-superset-build: &superset-build
-  context: ./serving/superset
-  dockerfile: Dockerfile
-
-x-bootstrap-image: &bootstrap-image
-  python:3.11-slim
-
-x-superset-env: &superset-env
-  PYTHONPATH: /app/pythonpath
-  SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:-change-me-supersecret}
-  SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-superset_admin}
-  SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD:-change-me}
-  SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
-  SUPERSET_TRINO_SQLALCHEMY_URI: ${SUPERSET_TRINO_SQLALCHEMY_URI:-trino://superset@trino:8080/delta/mooc}
-  SUPERSET_PORT: ${SUPERSET_PORT:-8088}
-
-x-spark-env: &spark-env
-  SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
-  SPARK_MASTER_URL: ${LEARNLAKE_SPARK_MASTER_URL:-spark://spark-master:7077}
-  SPARK_APP_PATH: /opt/project
-  SPARK_CONF_DIR: /opt/bitnami/spark/conf
-  PYTHONPATH: /opt/project/src:/opt/project
-  OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
-  OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
-  OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
-  # Generic object-store envs for LearnLake. MinIO is the local S3-compatible provider.
-  AWS_ENDPOINT_URL_S3: ${AWS_ENDPOINT_URL_S3:-http://minio:9000}
-  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-minio}
-  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-minio123456}
-  OBJECT_STORE_ENDPOINT: ${OBJECT_STORE_ENDPOINT:-http://minio:9000}
-  OBJECT_STORE_ACCESS_KEY: ${OBJECT_STORE_ACCESS_KEY:-minio}
-  OBJECT_STORE_SECRET_KEY: ${OBJECT_STORE_SECRET_KEY:-minio123456}
-  OBJECT_STORE_PATH_STYLE_ACCESS: "true"
-  OBJECT_STORE_SSL_ENABLED: "false"
-  MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
-  MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
-  MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
-  MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
-  MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio123456}
-  MINIO_REGION: ${MINIO_REGION:-us-east-1}
-  S3A_PATH_STYLE_ACCESS: "true"
-  S3A_SSL_ENABLED: "false"
-  SPARK_DRIVER_MEMORY: ${SPARK_DRIVER_MEMORY:-512m}
-  SPARK_EXECUTOR_MEMORY: ${SPARK_EXECUTOR_MEMORY:-384m}
-  PYSPARK_PYTHON: /opt/bitnami/python/bin/python
-  PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
-  # LearnLake vertical-slice paths
-  BRONZE_TABLE_PATH: ${LEARNLAKE_BRONZE_TABLE_PATH:-s3a://lakehouse/learnlake/bronze/bronze_events}
-  BRONZE_CHECKPOINT_PATH: ${LEARNLAKE_BRONZE_CHECKPOINT_PATH:-s3a://platform/learnlake/checkpoints/bronze/daotao_ai}
-  SILVER_CHECKPOINT_PATH: ${LEARNLAKE_SILVER_CHECKPOINT_PATH:-s3a://platform/learnlake/checkpoints/silver/daotao_ai}
-  SILVER_EVENT_INDEX_PATH: ${LEARNLAKE_SILVER_EVENT_INDEX_PATH:-s3a://lakehouse/learnlake/silver/silver_event_index}
-  SILVER_LEARNING_PATH: ${LEARNLAKE_SILVER_EVENT_INDEX_PATH:-s3a://lakehouse/learnlake/silver/silver_event_index}
-  SILVER_ASSESSMENT_PATH: ${LEARNLAKE_SILVER_ASSESSMENT_PATH:-s3a://lakehouse/learnlake/silver/silver_assessment_events}
-  SILVER_VIDEO_PATH: ${LEARNLAKE_SILVER_VIDEO_PATH:-s3a://lakehouse/learnlake/silver/silver_video_events}
-  SILVER_DOCUMENT_PATH: ${LEARNLAKE_SILVER_DOCUMENT_PATH:-s3a://lakehouse/learnlake/silver/silver_document_events}
-  SILVER_NAVIGATION_PATH: ${LEARNLAKE_SILVER_NAVIGATION_PATH:-s3a://lakehouse/learnlake/silver/silver_navigation_events}
-  SILVER_EXAM_PATH: ${LEARNLAKE_SILVER_EXAM_PATH:-s3a://lakehouse/learnlake/silver/silver_exam_events}
-  SILVER_COURSE_CONTENT_PATH: ${LEARNLAKE_SILVER_COURSE_CONTENT_PATH:-s3a://lakehouse/learnlake/silver/silver_course_content_events}
-  SILVER_AUTHORING_PATH: ${LEARNLAKE_SILVER_AUTHORING_PATH:-s3a://lakehouse/learnlake/silver/silver_authoring_events}
-  SILVER_AUTH_PATH: ${LEARNLAKE_SILVER_AUTH_PATH:-s3a://lakehouse/learnlake/silver/silver_auth_events}
-  SILVER_SYSTEM_PATH: ${LEARNLAKE_SILVER_SYSTEM_PATH:-s3a://lakehouse/learnlake/silver/silver_system_events}
-  SILVER_UNKNOWN_PATH: ${LEARNLAKE_SILVER_UNKNOWN_PATH:-s3a://lakehouse/learnlake/silver/silver_unknown_events}
-  SILVER_INVALID_PATH: ${LEARNLAKE_SILVER_INVALID_PATH:-s3a://lakehouse/learnlake/silver/silver_invalid_events}
-
-x-airflow-env: &airflow-env
-  AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR:-LocalExecutor}
-  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: ${AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:-True}
-  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD:-airflow}@airflow-db:5432/${AIRFLOW_DB_NAME:-airflow}
-  AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
-  AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW__API_AUTH__JWT_SECRET:-airflow_jwt_secret}
-  AIRFLOW__API_AUTH__JWT_ISSUER: ${AIRFLOW__API_AUTH__JWT_ISSUER:-airflow}
-  AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
-  AIRFLOW__SCHEDULER__STANDALONE_DAG_PROCESSOR: "true"
-  AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-webserver:8080/execution/
-  SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
-  SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://100.120.19.23:7077}
-  SPARK_APP_PATH: /opt/project
-  SPARK_CONF_DIR: /opt/project/platform/local/spark/conf
-  KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
-  KAFKA_TOPIC_RAW: ${KAFKA_TOPIC_RAW:-mooc.raw.events}
-  MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
-  MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
-  MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
-  MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
-  MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio123456}
-  MINIO_REGION: ${MINIO_REGION:-us-east-1}
-  BRONZE_TABLE_PATH: ${BRONZE_TABLE_PATH:-s3a://lakehouse/mooc/bronze/mooc_events_raw}
-  BRONZE_TABLE_BUCKET: ${MINIO_BUCKET_DATA:-lakehouse}
-  BRONZE_TABLE_PREFIX: ${BRONZE_TABLE_PREFIX:-mooc/bronze/mooc_events_raw/}
-  CHECKPOINT_BUCKET: ${MINIO_BUCKET_PLATFORM:-platform}
-  CHECKPOINT_PREFIX: ${BRONZE_CHECKPOINT_PREFIX:-mooc/bronze_ingestor/offsets/}
-  BRONZE_VACUUM_RETENTION_HOURS: ${BRONZE_VACUUM_RETENTION_HOURS:-168}
-  BRONZE_OPTIMIZE_ENABLED: ${BRONZE_OPTIMIZE_ENABLED:-true}
-  BRONZE_VACUUM_ENABLED: ${BRONZE_VACUUM_ENABLED:-false}
-  PYTHONPATH: /opt/airflow:/opt/project:/opt/project/src
-  _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
-  _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-admin}
-  AIRFLOW_CONN_SPARK_DEFAULT: ${AIRFLOW_CONN_SPARK_DEFAULT:-spark://100.120.19.23:7077}
-
-x-marquez-env: &marquez-env
-  MARQUEZ_TAG: ${MARQUEZ_TAG:-0.49.0}
-  MARQUEZ_API_PORT: ${MARQUEZ_API_PORT:-5000}
-  MARQUEZ_ADMIN_PORT: ${MARQUEZ_ADMIN_PORT:-5001}
-  MARQUEZ_WEB_PORT: ${MARQUEZ_WEB_PORT:-3000}
-  MARQUEZ_DB_PORT: ${MARQUEZ_DB_PORT:-5432}
-  MARQUEZ_SEARCH_ENABLED: ${MARQUEZ_SEARCH_ENABLED:-false}
-
 services:
+  # ── Core Infrastructure ──────────────────────────────────────────────
   broker1:
-    build: *kafka-build
+    build:
+      context: ./platform/local/kafka
+      dockerfile: Dockerfile
     image: local/kafka:dev
     hostname: broker1
     container_name: lsp-broker1
     ports:
-      - "9092:9092"
+    - 9092:9092
     environment:
       CLUSTER_ID: ${KAFKA_CLUSTER_ID:-MkU3OEVBNTcwNTJENDM2Qk}
       KAFKA_NODE_ID: 1
@@ -150,24 +25,28 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_HEAP_OPTS: ${KAFKA_HEAP_OPTS:-"-Xms256m -Xmx384m"}
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_HEAP_OPTS: -Xms128m -Xmx256m
     volumes:
-      - broker1-data:/var/lib/kafka/data
-    mem_limit: ${KAFKA_BROKER1_MEM_LIMIT:-650m}
+    - broker1-data:/var/lib/kafka/data
+    mem_limit: 512m
     healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server broker1:29092 >/dev/null 2>&1 || exit 1"]
+      test:
+      - CMD-SHELL
+      - kafka-broker-api-versions --bootstrap-server broker1:29092 >/dev/null 2>&1
+        || exit 1
       interval: 10s
       timeout: 5s
       retries: 30
-
   broker2:
-    build: *kafka-build
+    build:
+      context: ./platform/local/kafka
+      dockerfile: Dockerfile
     image: local/kafka:dev
     hostname: broker2
     container_name: lsp-broker2
     ports:
-      - "9093:9093"
+    - 9093:9093
     environment:
       CLUSTER_ID: ${KAFKA_CLUSTER_ID:-MkU3OEVBNTcwNTJENDM2Qk}
       KAFKA_NODE_ID: 2
@@ -183,24 +62,28 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_HEAP_OPTS: ${KAFKA_HEAP_OPTS:-"-Xms256m -Xmx384m"}
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_HEAP_OPTS: -Xms128m -Xmx256m
     volumes:
-      - broker2-data:/var/lib/kafka/data
-    mem_limit: ${KAFKA_BROKER_MEM_LIMIT:-650m}
+    - broker2-data:/var/lib/kafka/data
+    mem_limit: 512m
     healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server broker2:29092 >/dev/null 2>&1 || exit 1"]
+      test:
+      - CMD-SHELL
+      - kafka-broker-api-versions --bootstrap-server broker2:29092 >/dev/null 2>&1
+        || exit 1
       interval: 10s
       timeout: 5s
       retries: 30
-
   broker3:
-    build: *kafka-build
+    build:
+      context: ./platform/local/kafka
+      dockerfile: Dockerfile
     image: local/kafka:dev
     hostname: broker3
     container_name: lsp-broker3
     ports:
-      - "9094:9094"
+    - 9094:9094
     environment:
       CLUSTER_ID: ${KAFKA_CLUSTER_ID:-MkU3OEVBNTcwNTJENDM2Qk}
       KAFKA_NODE_ID: 3
@@ -216,37 +99,194 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_HEAP_OPTS: ${KAFKA_HEAP_OPTS:-"-Xms256m -Xmx384m"}
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_HEAP_OPTS: -Xms128m -Xmx256m
     volumes:
-      - broker3-data:/var/lib/kafka/data
-    mem_limit: ${KAFKA_BROKER_MEM_LIMIT:-650m}
+    - broker3-data:/var/lib/kafka/data
+    mem_limit: 512m
     healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server broker3:29092 >/dev/null 2>&1 || exit 1"]
+      test:
+      - CMD-SHELL
+      - kafka-broker-api-versions --bootstrap-server broker3:29092 >/dev/null 2>&1
+        || exit 1
       interval: 10s
       timeout: 5s
       retries: 30
-
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: lsp-kafka-ui
-    depends_on:
-      broker1:
-        condition: service_healthy
-      broker2:
-        condition: service_healthy
-      broker3:
-        condition: service_healthy
+  minio:
+    build:
+      context: ./platform/local/minio
+      dockerfile: Dockerfile
+    image: local/minio:dev
+    container_name: lsp-minio
+    command: server --console-address ":9001" /data
     ports:
-      - "8085:8080"
+    - 9000:9000
+    - 9001:9001
     environment:
-      KAFKA_CLUSTERS_0_NAME: local-kraft
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker1:29092,broker2:29092,broker3:29092
-      DYNAMIC_CONFIG_ENABLED: "true"
-    mem_limit: ${KAFKA_UI_MEM_LIMIT:-300m}
-
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION_NAME: ${MINIO_REGION:-us-east-1}
+    volumes:
+    - minio-data:/data
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl -fsS http://minio:9000/minio/health/ready >/dev/null || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 30
+  airflow-db:
+    image: postgres:16-alpine
+    container_name: lsp-airflow-db
+    environment:
+      POSTGRES_USER: ${AIRFLOW_DB_USER:-airflow}
+      POSTGRES_PASSWORD: ${AIRFLOW_DB_PASSWORD}
+      POSTGRES_DB: ${AIRFLOW_DB_NAME:-airflow}
+    volumes:
+    - airflow-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U ${AIRFLOW_DB_USER:-airflow} -d ${AIRFLOW_DB_NAME:-airflow}
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    mem_limit: 256m
+  hive-metastore:
+    build:
+      context: ./platform/local/hive-metastore
+      dockerfile: Dockerfile
+    image: local/hive-metastore:dev
+    container_name: lsp-hive-metastore
+    environment:
+      SERVICE_NAME: metastore
+    ports:
+    - 9083:9083
+    volumes:
+    - hive-metastore-data:/opt/hive/data
+    restart: 'no'
+    mem_limit: 512m
+  spark-master:
+    build:
+      context: .
+      dockerfile: platform/local/spark/Dockerfile
+    image: local/spark:dev
+    container_name: lsp-spark-master
+    environment:
+      SPARK_MASTER_HOST: ${SPARK_MASTER_BIND_HOST:-spark-master}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/bitnami/spark/conf
+      PYTHONPATH: /opt/project/src:/opt/project
+      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      S3A_PATH_STYLE_ACCESS: 'true'
+      S3A_SSL_ENABLED: 'false'
+      SPARK_DRIVER_MEMORY: 768m
+      SPARK_EXECUTOR_MEMORY: 1g
+      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
+      SPARK_MODE: master
+      SPARK_PUBLIC_DNS: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
+    ports:
+    - 7077:7077
+    - 8081:8080
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl -fsS http://spark-master:8080 >/dev/null || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 30
+  spark-worker-1:
+    build:
+      context: .
+      dockerfile: platform/local/spark/Dockerfile
+    image: local/spark:dev
+    container_name: lsp-spark-worker-1
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    environment:
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/bitnami/spark/conf
+      PYTHONPATH: /opt/project/src:/opt/project
+      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      S3A_PATH_STYLE_ACCESS: 'true'
+      S3A_SSL_ENABLED: 'false'
+      SPARK_DRIVER_MEMORY: 768m
+      SPARK_EXECUTOR_MEMORY: 1g
+      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
+      SPARK_MODE: worker
+      SPARK_WORKER_MEMORY: 4g
+      SPARK_WORKER_CORES: 4
+    ports:
+    - 8082:8081
+    mem_limit: 4096m
+  spark-worker-2:
+    build:
+      context: .
+      dockerfile: platform/local/spark/Dockerfile
+    image: local/spark:dev
+    container_name: lsp-spark-worker-2
+    profiles:
+    - local-workers
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    environment:
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/bitnami/spark/conf
+      PYTHONPATH: /opt/project/src:/opt/project
+      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      S3A_PATH_STYLE_ACCESS: 'true'
+      S3A_SSL_ENABLED: 'false'
+      SPARK_DRIVER_MEMORY: 768m
+      SPARK_EXECUTOR_MEMORY: 1g
+      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
+      SPARK_MODE: worker
+      SPARK_WORKER_MEMORY: 4g
+      SPARK_WORKER_CORES: 4
+    ports:
+    - 8083:8081
+    mem_limit: 4096m
+  # ── Kafka Topic Bootstrap (run-once) ───────────────────────────────
   kafka-init:
-    build: *kafka-build
+    build:
+      context: ./platform/local/kafka
+      dockerfile: Dockerfile
     image: local/kafka:dev
     container_name: lsp-kafka-init
     depends_on:
@@ -258,39 +298,15 @@ services:
         condition: service_healthy
     environment:
       BOOTSTRAP_SERVER: broker1:29092
-      LEARNLAKE_RAW_TOPIC: ${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw}
-      LEARNLAKE_ANONYMOUS_TOPIC: ${LEARNLAKE_ANONYMOUS_TOPIC:-learnlake.daotao.raw.anonymous}
-      LEARNLAKE_DLQ_TOPIC: ${LEARNLAKE_DLQ_TOPIC:-learnlake.daotao.dlq}
     volumes:
-      - ./platform/local/kafka/scripts:/scripts:ro
-    entrypoint: ["/bin/bash", "-lc"]
-    command: "/scripts/create_topics.sh"
-    restart: "no"
-    mem_limit: ${KAFKA_INIT_MEM_LIMIT:-256m}
-
-  minio:
-    build:
-      context: ./platform/local/minio
-      dockerfile: Dockerfile
-    image: local/minio:dev
-    container_name: lsp-minio
-    command: server --console-address ":9001" /data
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
-      MINIO_REGION_NAME: ${MINIO_REGION:-us-east-1}
-    volumes:
-      - minio-data:/data
-    mem_limit: ${MINIO_MEM_LIMIT:-512m}
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://minio:9000/minio/health/ready >/dev/null || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-
+    - ./platform/local/kafka/scripts:/scripts:ro
+    entrypoint:
+    - /bin/bash
+    - -lc
+    command: /scripts/create_topics.sh
+    restart: 'no'
+    mem_limit: 256m
+  # ── MinIO Bucket Bootstrap (run-once) ──────────────────────────────
   minio-init:
     image: minio/mc:latest
     container_name: lsp-minio-init
@@ -298,281 +314,34 @@ services:
       minio:
         condition: service_healthy
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET_DATA: ${MINIO_BUCKET_DATA:-lakehouse}
       MINIO_BUCKET_PLATFORM: ${MINIO_BUCKET_PLATFORM:-platform}
     entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        set -e
-        mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
-        mc mb --ignore-existing "local/$${MINIO_BUCKET_DATA}"
-        mc mb --ignore-existing "local/$${MINIO_BUCKET_PLATFORM}"
-        touch /tmp/spark-events-log-keep
-        mc cp /tmp/spark-events-log-keep "local/$${MINIO_BUCKET_PLATFORM}/spark-events/logs/.keep"
-        mc anonymous set download "local/$${MINIO_BUCKET_DATA}" || true
-    mem_limit: ${MINIO_INIT_MEM_LIMIT:-192m}
+    - /bin/sh
+    - -c
+    - 'set -e
 
-  hive-metastore:
-    build: *hive-build
-    image: local/hive-metastore:dev
-    container_name: lsp-hive-metastore
-    environment:
-      SERVICE_NAME: metastore
-    ports:
-      - "9083:9083"
-    volumes:
-      - hive-metastore-data:/opt/hive/data
-    restart: "no"
-    mem_limit: ${HIVE_METASTORE_MEM_LIMIT:-512m}
+      mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
 
-  trino:
-    build: *trino-build
-    image: local/trino:dev
-    container_name: lsp-trino
-    depends_on:
-      hive-metastore:
-        condition: service_started
-      minio-init:
-        condition: service_completed_successfully
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123456}
-    ports:
-      - "8080:8080"
-    volumes:
-      - trino-data:/data/trino
-    restart: unless-stopped
-    mem_limit: ${TRINO_MEM_LIMIT:-1536m}
+      mc mb --ignore-existing "local/$${MINIO_BUCKET_DATA}"
 
-  trino-bootstrap:
-    image: *bootstrap-image
-    container_name: lsp-trino-bootstrap
-    depends_on:
-      trino:
-        condition: service_started
-      minio-init:
-        condition: service_completed_successfully
-    volumes:
-      - ./serving/trino/bootstrap:/bootstrap:ro
-      - ./serving/trino/views:/views:ro
-    command: ["python", "/bootstrap/bootstrap_trino.py"]
-    restart: "no"
-    mem_limit: ${TRINO_BOOTSTRAP_MEM_LIMIT:-256m}
+      mc mb --ignore-existing "local/$${MINIO_BUCKET_PLATFORM}"
 
-  superset-init:
-    build: *superset-build
-    image: local/superset:dev
-    container_name: lsp-superset-init
-    depends_on:
-      trino:
-        condition: service_started
-    environment:
-      <<: *superset-env
-    volumes:
-      - superset-home:/app/superset_home
-    entrypoint: ["/bin/sh", "-c"]
-    command: >
-      superset db upgrade &&
-      (superset fab create-admin
-      --username "$${SUPERSET_ADMIN_USERNAME}"
-      --firstname Superset
-      --lastname Admin
-      --email "$${SUPERSET_ADMIN_EMAIL}"
-      --password "$${SUPERSET_ADMIN_PASSWORD}" || true) &&
-      superset init
-    restart: "no"
-    mem_limit: ${SUPERSET_INIT_MEM_LIMIT:-512m}
+      touch /tmp/spark-events-log-keep
 
-  superset:
-    build: *superset-build
-    image: local/superset:dev
-    container_name: lsp-superset
-    depends_on:
-      superset-init:
-        condition: service_completed_successfully
-      trino:
-        condition: service_started
-    environment:
-      <<: *superset-env
-    volumes:
-      - superset-home:/app/superset_home
-    ports:
-      - "8088:8088"
-    command: ["sh", "-c", "superset run -h 0.0.0.0 -p 8088"]
-    restart: unless-stopped
-    mem_limit: ${SUPERSET_MEM_LIMIT:-768m}
+      mc cp /tmp/spark-events-log-keep "local/$${MINIO_BUCKET_PLATFORM}/spark-events/logs/.keep"
 
-  superset-bootstrap:
-    image: *bootstrap-image
-    container_name: lsp-superset-bootstrap
-    depends_on:
-      superset:
-        condition: service_started
-      trino:
-        condition: service_healthy
-    environment:
-      <<: *superset-env
-    volumes:
-      - ./serving/superset/bootstrap:/bootstrap:ro
-    command: ["python", "/bootstrap/bootstrap_superset.py"]
-    restart: "no"
-    mem_limit: ${SUPERSET_BOOTSTRAP_MEM_LIMIT:-256m}
+      mc anonymous set download "local/$${MINIO_BUCKET_DATA}" || true
 
-  marquez-db:
-    image: postgres:14
-    container_name: lsp-marquez-db
-    hostname: postgres
-    profiles:
-      - lineage
-    environment:
-      POSTGRES_DB: ${MARQUEZ_DB:-marquez}
-      POSTGRES_USER: ${MARQUEZ_POSTGRES_USER:-marquez}
-      POSTGRES_PASSWORD: ${MARQUEZ_POSTGRES_PASSWORD:-marquez}
-      MARQUEZ_DB: ${MARQUEZ_DB:-marquez}
-      MARQUEZ_USER: ${MARQUEZ_USER:-marquez}
-      MARQUEZ_PASSWORD: ${MARQUEZ_PASSWORD:-marquez}
-    ports:
-      - "${MARQUEZ_DB_HOST_PORT:-15432}:5432"
-    volumes:
-      - marquez-db-data:/var/lib/postgresql/data
-    networks:
-      default:
-        aliases:
-          - postgres
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${MARQUEZ_POSTGRES_USER:-postgres} -d ${MARQUEZ_DB:-marquez}"]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-    restart: unless-stopped
-    mem_limit: ${MARQUEZ_DB_MEM_LIMIT:-512m}
-
-  marquez-api:
-    image: "marquezproject/marquez:${MARQUEZ_TAG:-0.49.0}"
-    container_name: lsp-marquez-api
-    profiles:
-      - lineage
-    depends_on:
-      marquez-db:
-        condition: service_healthy
-    environment:
-      MARQUEZ_PORT: ${MARQUEZ_API_PORT:-5000}
-      MARQUEZ_ADMIN_PORT: ${MARQUEZ_ADMIN_PORT:-5001}
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: ${MARQUEZ_DB_PORT:-5432}
-      SEARCH_ENABLED: ${MARQUEZ_SEARCH_ENABLED:-false}
-    ports:
-      - "${MARQUEZ_API_PORT:-5000}:5000"
-      - "${MARQUEZ_ADMIN_PORT:-5001}:5001"
-    volumes:
-      - marquez-api-data:/opt/marquez
-    entrypoint:
-      - /bin/bash
-      - -lc
-      - |
-        until (echo >/dev/tcp/postgres/${MARQUEZ_DB_PORT:-5432}) >/dev/null 2>&1; do
-          sleep 1
-        done
-        exec ./entrypoint.sh
-    restart: unless-stopped
-    mem_limit: ${MARQUEZ_API_MEM_LIMIT:-768m}
-
-  marquez-web:
-    image: "marquezproject/marquez-web:${MARQUEZ_TAG:-0.49.0}"
-    container_name: lsp-marquez-web
-    profiles:
-      - lineage
-    depends_on:
-      marquez-api:
-        condition: service_started
-    environment:
-      MARQUEZ_HOST: marquez-api
-      MARQUEZ_PORT: ${MARQUEZ_API_PORT:-5000}
-      WEB_PORT: ${MARQUEZ_WEB_PORT:-3000}
-      REACT_APP_ADVANCED_SEARCH: ${MARQUEZ_SEARCH_ENABLED:-false}
-    ports:
-      - "${MARQUEZ_WEB_PORT:-3000}:3000"
-    restart: unless-stopped
-    mem_limit: ${MARQUEZ_WEB_MEM_LIMIT:-384m}
-
-  spark-master:
-    build: *spark-build
-    image: local/spark:dev
-    container_name: lsp-spark-master
-    environment:
-      <<: *spark-env
-      SPARK_MODE: master
-      SPARK_PUBLIC_DNS: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
-      SPARK_MASTER_HOST: ${SPARK_MASTER_BIND_HOST:-spark-master}
-    ports:
-      - "7077:7077"
-      - "8081:8080"
-    mem_limit: ${SPARK_MASTER_MEM_LIMIT:-512m}
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://spark-master:8080 >/dev/null || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-
-  spark-worker-1:
-    build: *spark-build
-    image: local/spark:dev
-    container_name: lsp-spark-worker-1
-    depends_on:
-      spark-master:
-        condition: service_healthy
-    environment:
-      <<: *spark-env
-      SPARK_MODE: worker
-      SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-2g}
-      SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-2}
-    ports:
-      - "8082:8081"
-    mem_limit: ${SPARK_WORKER_MEM_LIMIT:-2304m}
-
-  spark-worker-2:
-    build: *spark-build
-    image: local/spark:dev
-    container_name: lsp-spark-worker-2
-    profiles:
-      - local-workers
-    depends_on:
-      spark-master:
-        condition: service_healthy
-    environment:
-      <<: *spark-env
-      SPARK_MODE: worker
-      SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-2g}
-      SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-2}
-    ports:
-      - "8083:8081"
-    mem_limit: ${SPARK_WORKER_MEM_LIMIT:-2304m}
-
-  spark-history-server:
-    build: *spark-build
-    image: local/spark:dev
-    container_name: lsp-spark-history-server
-    depends_on:
-      minio-init:
-        condition: service_completed_successfully
-    environment:
-      <<: *spark-env
-    command: >
-      bash -lc "/opt/bitnami/spark/bin/spark-class org.apache.spark.deploy.history.HistoryServer"
-    ports:
-      - "18080:18080"
-    mem_limit: ${SPARK_HISTORY_MEM_LIMIT:-512m}
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://spark-history-server:18080 >/dev/null || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-
+      '
+    mem_limit: 192m
+  # ── Streaming Pipelines ─────────────────────────────────────────────
   bronze-stream:
-    build: *spark-build
+    build:
+      context: .
+      dockerfile: platform/local/spark/Dockerfile
     image: local/spark:dev
     container_name: lsp-bronze-stream
     depends_on:
@@ -583,32 +352,42 @@ services:
       spark-master:
         condition: service_healthy
     environment:
-      <<: *spark-env
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/bitnami/spark/conf
+      PYTHONPATH: /opt/project/src:/opt/project
+      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      S3A_PATH_STYLE_ACCESS: 'true'
+      S3A_SSL_ENABLED: 'false'
+      SPARK_DRIVER_MEMORY: 1024m
+      SPARK_EXECUTOR_MEMORY: 1g
+      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
       BRONZE_APP_NAME: ${BRONZE_APP_NAME:-learnlake_bronze_ingestion}
-      SPARK_UI_PORT: ${BRONZE_SPARK_UI_PORT:-4040}
-      SPARK_DRIVER_MEMORY: ${BRONZE_SPARK_DRIVER_MEMORY:-1024m}
+      SPARK_UI_PORT: 4040
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
-      BRONZE_INPUT_TOPIC: ${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw}
-      KAFKA_STARTING_OFFSETS: ${LEARNLAKE_KAFKA_STARTING_OFFSETS:-earliest}
+      KAFKA_STARTING_OFFSETS: ${KAFKA_STARTING_OFFSETS:-earliest}
       KAFKA_MAX_OFFSETS_PER_TRIGGER: ${BRONZE_MAX_OFFSETS_PER_TRIGGER:-1000}
       KAFKA_TRIGGER_PROCESSING_TIME: ${BRONZE_TRIGGER_PROCESSING_TIME:-1 second}
-      BRONZE_TABLE_PATH: ${LEARNLAKE_BRONZE_TABLE_PATH:-s3a://lakehouse/learnlake/bronze/bronze_events}
-      BRONZE_CHECKPOINT_PATH: ${LEARNLAKE_BRONZE_CHECKPOINT_PATH:-s3a://platform/learnlake/checkpoints/bronze/daotao_ai}
-      BRONZE_QUERY_NAME: ${BRONZE_QUERY_NAME:-bronze_ingestor_raw}
-    command: >
-      bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
-      --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
-      --name \"$${BRONZE_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
-      --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
-      --conf spark.cores.max=1
-      /opt/project/apps/spark/run_bronze.py --source daotao_ai --stream"
+    command:
+    - /opt/project/platform/local/spark/scripts/run_bronze_stream.sh
     ports:
-      - "${BRONZE_SPARK_UI_PORT:-4040}:4040"
+    - 4040:4040
     restart: unless-stopped
-    mem_limit: ${BRONZE_SPARK_STREAM_DRIVER_MEM_LIMIT:-1536m}
-
+    mem_limit: 1536m
   silver-stream:
-    build: *spark-build
+    build:
+      context: .
+      dockerfile: platform/local/spark/Dockerfile
     image: local/spark:dev
     container_name: lsp-silver-stream
     depends_on:
@@ -619,23 +398,38 @@ services:
       bronze-stream:
         condition: service_started
     environment:
-      <<: *spark-env
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/bitnami/spark/conf
+      PYTHONPATH: /opt/project/src:/opt/project
+      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      S3A_PATH_STYLE_ACCESS: 'true'
+      S3A_SSL_ENABLED: 'false'
+      SPARK_DRIVER_MEMORY: 768m
+      SPARK_EXECUTOR_MEMORY: 1g
+      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
       SILVER_APP_NAME: ${SILVER_APP_NAME:-learnlake_silver_normalization}
-      SPARK_UI_PORT: ${SILVER_SPARK_UI_PORT:-4041}
-    command: >
-      bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
-      --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
-      --name \"$${SILVER_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
-      --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
-      --conf spark.cores.max=1
-      /opt/project/apps/spark/run_silver.py --source daotao_ai --stream"
+      SPARK_UI_PORT: 4041
+    command:
+    - /opt/project/platform/local/spark/scripts/run_silver_stream.sh
     ports:
-      - "${SILVER_SPARK_UI_PORT:-4041}:4041"
+    - 4041:4041
     restart: unless-stopped
-    mem_limit: ${SPARK_STREAM_DRIVER_MEM_LIMIT:-768m}
-
+    mem_limit: 768m
   gold-stream:
-    build: *spark-build
+    build:
+      context: .
+      dockerfile: platform/local/spark/Dockerfile
     image: local/spark:dev
     container_name: lsp-gold-stream
     depends_on:
@@ -646,24 +440,38 @@ services:
       silver-stream:
         condition: service_started
     environment:
-      <<: *spark-env
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/bitnami/spark/conf
+      PYTHONPATH: /opt/project/src:/opt/project
+      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      S3A_PATH_STYLE_ACCESS: 'true'
+      S3A_SSL_ENABLED: 'false'
+      SPARK_DRIVER_MEMORY: 1024m
+      SPARK_EXECUTOR_MEMORY: 1g
+      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
       GOLD_APP_NAME: ${GOLD_APP_NAME:-gold_aggregator}
-      SPARK_UI_PORT: ${GOLD_SPARK_UI_PORT:-4042}
-      SPARK_DRIVER_MEMORY: ${GOLD_STREAM_SPARK_DRIVER_MEMORY:-1024m}
-    command: >
-      bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
-      --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
-      --name \"$${GOLD_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
-      --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
-      --conf spark.cores.max=1
-      /opt/project/apps/spark/run_gold_dashboard_stream.py"
+      SPARK_UI_PORT: 4042
+    command:
+    - /opt/project/platform/local/spark/scripts/run_gold_stream.sh
     ports:
-      - "${GOLD_SPARK_UI_PORT:-4042}:4042"
+    - 4042:4042
     restart: unless-stopped
-    mem_limit: ${GOLD_STREAM_MEM_LIMIT:-1536m}
-
+    mem_limit: 1536m
   gold-alert-stream:
-    build: *spark-build
+    build:
+      context: .
+      dockerfile: platform/local/spark/Dockerfile
     image: local/spark:dev
     container_name: lsp-gold-alert-stream
     depends_on:
@@ -674,24 +482,39 @@ services:
       gold-stream:
         condition: service_started
     environment:
-      <<: *spark-env
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/bitnami/spark/conf
+      PYTHONPATH: /opt/project/src:/opt/project
+      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      S3A_PATH_STYLE_ACCESS: 'true'
+      S3A_SSL_ENABLED: 'false'
+      SPARK_DRIVER_MEMORY: 1024m
+      SPARK_EXECUTOR_MEMORY: 1g
+      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
       GOLD_ALERTING_APP_NAME: ${GOLD_ALERTING_APP_NAME:-gold_alerting}
-      SPARK_UI_PORT: ${GOLD_ALERTING_SPARK_UI_PORT:-4043}
-      SPARK_DRIVER_MEMORY: ${GOLD_ALERTING_SPARK_DRIVER_MEMORY:-1024m}
-    command: >
-      bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
-      --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
-      --name \"$${GOLD_ALERTING_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
-      --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
-      --conf spark.cores.max=1
-      /opt/project/apps/spark/run_gold_alerting.py"
+      SPARK_UI_PORT: 4043
+    command:
+    - /opt/project/platform/local/spark/scripts/run_gold_alert_stream.sh
     ports:
-      - "${GOLD_ALERTING_SPARK_UI_PORT:-4043}:4043"
+    - 4043:4043
     restart: unless-stopped
-    mem_limit: ${GOLD_ALERTING_MEM_LIMIT:-1536m}
-
+    mem_limit: 1536m
+  # ── Batch / Replay Utilities (run-once) ────────────────────────────
   gold-batch:
-    build: *spark-build
+    build:
+      context: .
+      dockerfile: platform/local/spark/Dockerfile
     image: local/spark:dev
     container_name: lsp-gold-batch
     depends_on:
@@ -702,159 +525,294 @@ services:
       silver-stream:
         condition: service_started
     environment:
-      <<: *spark-env
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/bitnami/spark/conf
+      PYTHONPATH: /opt/project/src:/opt/project
+      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      S3A_PATH_STYLE_ACCESS: 'true'
+      S3A_SSL_ENABLED: 'false'
+      SPARK_DRIVER_MEMORY: 1024m
+      SPARK_EXECUTOR_MEMORY: 1g
+      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
       GOLD_BATCH_APP_NAME: ${GOLD_BATCH_APP_NAME:-gold_dashboard_serving_batch}
-      SPARK_UI_PORT: ${GOLD_BATCH_SPARK_UI_PORT:-4044}
-      SPARK_DRIVER_MEMORY: ${GOLD_BATCH_SPARK_DRIVER_MEMORY:-1024m}
-    command: >
-      bash -lc "/opt/bitnami/spark/bin/spark-submit --master \"$${SPARK_MASTER_URL}\" --deploy-mode client
-      --driver-memory \"$${SPARK_DRIVER_MEMORY}\" --executor-memory \"$${SPARK_EXECUTOR_MEMORY}\"
-      --name \"$${GOLD_BATCH_APP_NAME}\" --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project
-      --conf spark.ui.port=\"$${SPARK_UI_PORT}\"
-      --conf spark.cores.max=1
-      /opt/project/apps/spark/run_gold_dashboard_batch.py"
+      SPARK_UI_PORT: 4044
+    command:
+    - /opt/project/platform/local/spark/scripts/run_gold_batch.sh
     ports:
-      - "${GOLD_BATCH_SPARK_UI_PORT:-4044}:4044"
-    restart: "no"
-    mem_limit: ${GOLD_BATCH_MEM_LIMIT:-1536m}
-
+    - 4044:4044
+    restart: 'no'
+    mem_limit: 1536m
+  # ── Replay Smoke Test (run-once) ───────────────────────────────────
   tracking-log-replayer:
-    build: *spark-build
+    build:
+      context: .
+      dockerfile: platform/local/spark/Dockerfile
     image: local/spark:dev
     profiles:
-      - replay
+    - replay
     depends_on:
       kafka-init:
         condition: service_completed_successfully
       bronze-stream:
         condition: service_started
     environment:
-      <<: *spark-env
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/bitnami/spark/conf
+      PYTHONPATH: /opt/project/src:/opt/project
+      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      S3A_PATH_STYLE_ACCESS: 'true'
+      S3A_SSL_ENABLED: 'false'
+      SPARK_DRIVER_MEMORY: 768m
+      SPARK_EXECUTOR_MEMORY: 1g
+      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
     command:
-      - /opt/bitnami/python/bin/python
-      - -m
-      - apps.replay.replay_to_kafka
-      - --source
-      - daotao_ai
-      - --brokers
-      - broker1:29092,broker2:29092,broker3:29092
-      - --topic
-      - ${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw}
-      - --speed
-      - "100"
-    restart: "no"
+    - /opt/bitnami/python/bin/python
+    - -m
+    - apps.replay.replay_to_kafka
+    - --source
+    - daotao_ai
+    - --brokers
+    - broker1:29092,broker2:29092,broker3:29092
+    - --speed
+    - '0'
+    restart: 'no'
     mem_limit: 512m
-
-  airflow-db:
-    image: postgres:16-alpine
-    container_name: lsp-airflow-db
-    environment:
-      POSTGRES_USER: ${AIRFLOW_DB_USER:-airflow}
-      POSTGRES_PASSWORD: ${AIRFLOW_DB_PASSWORD:-airflow}
-      POSTGRES_DB: ${AIRFLOW_DB_NAME:-airflow}
-    volumes:
-      - airflow-db-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${AIRFLOW_DB_USER:-airflow} -d ${AIRFLOW_DB_NAME:-airflow}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    mem_limit: ${AIRFLOW_DB_MEM_LIMIT:-256m}
-
-  airflow-webserver:
-    build: *airflow-build
-    image: local/airflow:dev
-    container_name: lsp-airflow-webserver
-    user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
-    environment:
-      <<: *airflow-env
-    volumes:
-      - airflow-logs:/opt/airflow/logs
-      - ./orchestration/airflow/dags:/opt/airflow/dags
-      - ./orchestration/airflow/tasks:/opt/airflow/tasks
-      - ./orchestration/airflow/config:/opt/airflow/config
-      - ./orchestration/airflow/utils:/opt/airflow/utils
-      - ./:/opt/project:ro
-    ports:
-      - "8089:8080"
+    container_name: lsp-tracking-log-replayer
+  spark-history-server:
+    build:
+      context: .
+      dockerfile: platform/local/spark/Dockerfile
+    image: local/spark:dev
+    container_name: lsp-spark-history-server
     depends_on:
-      airflow-init:
-        condition: service_completed_successfully
-    command: "airflow api-server"
-    restart: unless-stopped
-    mem_limit: ${AIRFLOW_WEBSERVER_MEM_LIMIT:-512m}
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/monitor/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  airflow-dag-reserialize:
-    build: *airflow-build
-    image: local/airflow:dev
-    container_name: lsp-airflow-dag-reserialize
-    user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
-    depends_on:
-      airflow-init:
-        condition: service_completed_successfully
-    environment:
-      <<: *airflow-env
-    volumes:
-      - airflow-logs:/opt/airflow/logs
-      - ./orchestration/airflow/dags:/opt/airflow/dags
-      - ./orchestration/airflow/tasks:/opt/airflow/tasks
-      - ./orchestration/airflow/config:/opt/airflow/config
-      - ./orchestration/airflow/utils:/opt/airflow/utils
-      - ./:/opt/project:ro
-    command: "airflow dags reserialize -v"
-    restart: "no"
-
-  airflow-scheduler:
-    build: *airflow-build
-    image: local/airflow:dev
-    container_name: lsp-airflow-scheduler
-    user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
-    environment:
-      <<: *airflow-env
-    volumes:
-      - airflow-logs:/opt/airflow/logs
-      - ./orchestration/airflow/dags:/opt/airflow/dags
-      - ./orchestration/airflow/tasks:/opt/airflow/tasks
-      - ./orchestration/airflow/config:/opt/airflow/config
-      - ./orchestration/airflow/utils:/opt/airflow/utils
-      - ./:/opt/project:ro
-    depends_on:
-      airflow-init:
-        condition: service_completed_successfully
-      kafka-init:
-        condition: service_completed_successfully
       minio-init:
         condition: service_completed_successfully
-      spark-master:
-        condition: service_healthy
-    command: "airflow scheduler"
-    restart: unless-stopped
-    mem_limit: ${AIRFLOW_SCHEDULER_MEM_LIMIT:-2g}
+    environment:
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/bitnami/spark/conf
+      PYTHONPATH: /opt/project/src:/opt/project
+      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      S3A_PATH_STYLE_ACCESS: 'true'
+      S3A_SSL_ENABLED: 'false'
+      SPARK_DRIVER_MEMORY: 768m
+      SPARK_EXECUTOR_MEMORY: 1g
+      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
+    command: 'bash -lc "/opt/bitnami/spark/bin/spark-class org.apache.spark.deploy.history.HistoryServer"
 
+      '
+    ports:
+    - 18080:18080
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl -fsS http://spark-history-server:18080 >/dev/null || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 30
+  # ── Query / BI Layer ────────────────────────────────────────────────
+  trino:
+    build:
+      context: ./serving/trino
+      dockerfile: Dockerfile
+    image: local/trino:dev
+    container_name: lsp-trino
+    depends_on:
+      hive-metastore:
+        condition: service_started
+      minio-init:
+        condition: service_completed_successfully
+    ports:
+    - 8080:8080
+    volumes:
+    - trino-data:/data/trino
+    restart: unless-stopped
+    mem_limit: 1536m
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl -fsS http://trino:8080/v1/info >/dev/null || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 30
+  # ── Trino Semantic Bootstrap (run-once) ────────────────────────────
+  trino-bootstrap:
+    image: python:3.11-slim
+    container_name: lsp-trino-bootstrap
+    depends_on:
+      trino:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    volumes:
+    - ./serving/trino/bootstrap:/bootstrap:ro
+    - ./serving/trino/views:/views:ro
+    command:
+    - python
+    - /bootstrap/bootstrap_trino.py
+    restart: 'no'
+    mem_limit: 256m
+  # ── Superset Initialization (run-once) ─────────────────────────────
+  superset-init:
+    build:
+      context: ./serving/superset
+      dockerfile: Dockerfile
+    image: local/superset:dev
+    container_name: lsp-superset-init
+    depends_on:
+      trino:
+        condition: service_started
+    environment:
+      PYTHONPATH: /app/pythonpath
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-superset_admin}
+      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
+      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
+      SUPERSET_TRINO_SQLALCHEMY_URI: ${SUPERSET_TRINO_SQLALCHEMY_URI:-trino://superset@trino:8080/delta/mooc}
+    volumes:
+    - superset-home:/app/superset_home
+    entrypoint:
+    - /bin/sh
+    - -c
+    command: 'superset db upgrade && (superset fab create-admin --username "$${SUPERSET_ADMIN_USERNAME}"
+      --firstname Superset --lastname Admin --email "$${SUPERSET_ADMIN_EMAIL}" --password
+      "$${SUPERSET_ADMIN_PASSWORD}" || true) && superset init
+
+      '
+    restart: 'no'
+    mem_limit: 512m
+  superset:
+    build:
+      context: ./serving/superset
+      dockerfile: Dockerfile
+    image: local/superset:dev
+    container_name: lsp-superset
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+      trino:
+        condition: service_started
+    environment:
+      PYTHONPATH: /app/pythonpath
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-superset_admin}
+      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
+      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
+      SUPERSET_TRINO_SQLALCHEMY_URI: ${SUPERSET_TRINO_SQLALCHEMY_URI:-trino://superset@trino:8080/delta/mooc}
+    volumes:
+    - superset-home:/app/superset_home
+    ports:
+    - 8088:8088
+    command:
+    - sh
+    - -c
+    - superset run -h 0.0.0.0 -p 8088
+    restart: unless-stopped
+    mem_limit: 768m
+  # ── Superset Bootstrap (run-once) ──────────────────────────────────
+  superset-bootstrap:
+    image: python:3.11-slim
+    container_name: lsp-superset-bootstrap
+    depends_on:
+      superset:
+        condition: service_started
+      trino:
+        condition: service_healthy
+    environment:
+      PYTHONPATH: /app/pythonpath
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-superset_admin}
+      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
+      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
+      SUPERSET_TRINO_SQLALCHEMY_URI: ${SUPERSET_TRINO_SQLALCHEMY_URI:-trino://superset@trino:8080/delta/mooc}
+    volumes:
+    - ./serving/superset/bootstrap:/bootstrap:ro
+    command:
+    - python
+    - /bootstrap/bootstrap_superset.py
+    restart: 'no'
+    mem_limit: 256m
+  # ── Airflow Runtime ─────────────────────────────────────────────────
+  # ── DB Migrations (run-once) ─────────────────────────────────────────
   airflow-init:
-    build: *airflow-build
+    build:
+      context: ./orchestration/airflow
+      dockerfile: Dockerfile
     image: local/airflow:dev
     container_name: lsp-airflow-init
-    user: "${AIRFLOW_UID:-50000}:0"
+    user: ${AIRFLOW_UID:-50000}:0
     environment:
-      <<: *airflow-env
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR:-LocalExecutor}
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: ${AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:-True}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD}@airflow-db:5432/${AIRFLOW_DB_NAME:-airflow}
+      AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+      AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW__API_AUTH__JWT_SECRET}
+      AIRFLOW__API_AUTH__JWT_ISSUER: ${AIRFLOW__API_AUTH__JWT_ISSUER:-airflow}
+      AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+      AIRFLOW__SCHEDULER__STANDALONE_DAG_PROCESSOR: 'true'
+      AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-webserver:8080/execution/
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://100.120.19.23:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/project/platform/local/spark/conf
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      BRONZE_VACUUM_RETENTION_HOURS: ${BRONZE_VACUUM_RETENTION_HOURS:-168}
+      BRONZE_OPTIMIZE_ENABLED: ${BRONZE_OPTIMIZE_ENABLED:-true}
+      BRONZE_VACUUM_ENABLED: ${BRONZE_VACUUM_ENABLED:-false}
+      PYTHONPATH: /opt/airflow:/opt/project:/opt/project/src
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD}
+      AIRFLOW_CONN_SPARK_DEFAULT: ${AIRFLOW_CONN_SPARK_DEFAULT}
     volumes:
-      - airflow-logs:/opt/airflow/logs
-    command: >
-      bash -lc "set -e;
-      mkdir -p /opt/airflow/logs;
-      chmod -R g+rwX /opt/airflow/logs;
-      airflow db migrate;
-      airflow users create --username \"${_AIRFLOW_WWW_USER_USERNAME:-admin}\" --password \"${_AIRFLOW_WWW_USER_PASSWORD:-admin}\" --firstname Admin --lastname User --role Admin --email admin@example.com || true;
-      airflow pools set bronze_pool 1 'Pool for Bronze Delta tasks' || true;
-      airflow pools set silver_pool 1 'Pool for Silver Delta tasks' || true;
-      airflow pools set gold_pool 1 'Pool for Gold Delta tasks' || true"
+    - airflow-logs:/opt/airflow/logs
+    command: 'bash -lc "set -e; mkdir -p /opt/airflow/logs; chmod -R g+rwX /opt/airflow/logs;
+      airflow db migrate; airflow users create --username \"${_AIRFLOW_WWW_USER_USERNAME:-admin}\"
+      --password \"${_AIRFLOW_WWW_USER_PASSWORD:-admin}\" --firstname Admin --lastname
+      User --role Admin --email admin@example.com || true; airflow pools set bronze_pool
+      1 ''Pool for Bronze Delta tasks'' || true; airflow pools set silver_pool 1 ''Pool
+      for Silver Delta tasks'' || true; airflow pools set gold_pool 1 ''Pool for Gold
+      Delta tasks'' || true"
+
+      '
     depends_on:
       airflow-db:
         condition: service_healthy
@@ -862,17 +820,269 @@ services:
         condition: service_completed_successfully
       spark-master:
         condition: service_healthy
-    mem_limit: ${AIRFLOW_INIT_MEM_LIMIT:-256m}
-
+    mem_limit: 256m
+  # ── DAG Reserialize (run-once) ─────────────────────────────────────
+  airflow-dag-reserialize:
+    build:
+      context: ./orchestration/airflow
+      dockerfile: Dockerfile
+    image: local/airflow:dev
+    container_name: lsp-airflow-dag-reserialize
+    user: ${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    environment:
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR:-LocalExecutor}
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: ${AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:-True}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD}@airflow-db:5432/${AIRFLOW_DB_NAME:-airflow}
+      AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+      AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW__API_AUTH__JWT_SECRET}
+      AIRFLOW__API_AUTH__JWT_ISSUER: ${AIRFLOW__API_AUTH__JWT_ISSUER:-airflow}
+      AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+      AIRFLOW__SCHEDULER__STANDALONE_DAG_PROCESSOR: 'true'
+      AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-webserver:8080/execution/
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://100.120.19.23:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/project/platform/local/spark/conf
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      BRONZE_VACUUM_RETENTION_HOURS: ${BRONZE_VACUUM_RETENTION_HOURS:-168}
+      BRONZE_OPTIMIZE_ENABLED: ${BRONZE_OPTIMIZE_ENABLED:-true}
+      BRONZE_VACUUM_ENABLED: ${BRONZE_VACUUM_ENABLED:-false}
+      PYTHONPATH: /opt/airflow:/opt/project:/opt/project/src
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD}
+      AIRFLOW_CONN_SPARK_DEFAULT: ${AIRFLOW_CONN_SPARK_DEFAULT}
+    volumes:
+    - airflow-logs:/opt/airflow/logs
+    - ./orchestration/airflow/dags:/opt/airflow/dags
+    - ./orchestration/airflow/tasks:/opt/airflow/tasks
+    - ./orchestration/airflow/config:/opt/airflow/config
+    - ./orchestration/airflow/utils:/opt/airflow/utils
+    - ./:/opt/project:ro
+    command: airflow dags reserialize -v
+    restart: 'no'
+  # ── Long-running Airflow Services ───────────────────────────────────
+  airflow-webserver:
+    build:
+      context: ./orchestration/airflow
+      dockerfile: Dockerfile
+    image: local/airflow:dev
+    container_name: lsp-airflow-webserver
+    user: ${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}
+    environment:
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR:-LocalExecutor}
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: ${AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:-True}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD}@airflow-db:5432/${AIRFLOW_DB_NAME:-airflow}
+      AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+      AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW__API_AUTH__JWT_SECRET}
+      AIRFLOW__API_AUTH__JWT_ISSUER: ${AIRFLOW__API_AUTH__JWT_ISSUER:-airflow}
+      AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+      AIRFLOW__SCHEDULER__STANDALONE_DAG_PROCESSOR: 'true'
+      AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-webserver:8080/execution/
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://100.120.19.23:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/project/platform/local/spark/conf
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      BRONZE_VACUUM_RETENTION_HOURS: ${BRONZE_VACUUM_RETENTION_HOURS:-168}
+      BRONZE_OPTIMIZE_ENABLED: ${BRONZE_OPTIMIZE_ENABLED:-true}
+      BRONZE_VACUUM_ENABLED: ${BRONZE_VACUUM_ENABLED:-false}
+      PYTHONPATH: /opt/airflow:/opt/project:/opt/project/src
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD}
+      AIRFLOW_CONN_SPARK_DEFAULT: ${AIRFLOW_CONN_SPARK_DEFAULT}
+    volumes:
+    - airflow-logs:/opt/airflow/logs
+    - ./orchestration/airflow/dags:/opt/airflow/dags
+    - ./orchestration/airflow/tasks:/opt/airflow/tasks
+    - ./orchestration/airflow/config:/opt/airflow/config
+    - ./orchestration/airflow/utils:/opt/airflow/utils
+    - ./:/opt/project:ro
+    ports:
+    - 8089:8080
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    command: airflow api-server
+    restart: unless-stopped
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - curl
+      - --fail
+      - http://localhost:8080/api/v2/monitor/health
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  airflow-scheduler:
+    build:
+      context: ./orchestration/airflow
+      dockerfile: Dockerfile
+    image: local/airflow:dev
+    container_name: lsp-airflow-scheduler
+    user: ${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}
+    environment:
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR:-LocalExecutor}
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: ${AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:-True}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD}@airflow-db:5432/${AIRFLOW_DB_NAME:-airflow}
+      AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+      AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW__API_AUTH__JWT_SECRET}
+      AIRFLOW__API_AUTH__JWT_ISSUER: ${AIRFLOW__API_AUTH__JWT_ISSUER:-airflow}
+      AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+      AIRFLOW__SCHEDULER__STANDALONE_DAG_PROCESSOR: 'true'
+      AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-webserver:8080/execution/
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://100.120.19.23:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/project/platform/local/spark/conf
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      BRONZE_VACUUM_RETENTION_HOURS: ${BRONZE_VACUUM_RETENTION_HOURS:-168}
+      BRONZE_OPTIMIZE_ENABLED: ${BRONZE_OPTIMIZE_ENABLED:-true}
+      BRONZE_VACUUM_ENABLED: ${BRONZE_VACUUM_ENABLED:-false}
+      PYTHONPATH: /opt/airflow:/opt/project:/opt/project/src
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD}
+      AIRFLOW_CONN_SPARK_DEFAULT: ${AIRFLOW_CONN_SPARK_DEFAULT}
+    volumes:
+    - airflow-logs:/opt/airflow/logs
+    - ./orchestration/airflow/dags:/opt/airflow/dags
+    - ./orchestration/airflow/tasks:/opt/airflow/tasks
+    - ./orchestration/airflow/config:/opt/airflow/config
+    - ./orchestration/airflow/utils:/opt/airflow/utils
+    - ./:/opt/project:ro
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+      kafka-init:
+        condition: service_completed_successfully
+      minio-init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_healthy
+    command: airflow scheduler
+    restart: unless-stopped
+    mem_limit: 2g
+  # ── Optional Tooling / Observability ────────────────────────────────
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: lsp-kafka-ui
+    depends_on:
+      broker1:
+        condition: service_healthy
+      broker2:
+        condition: service_healthy
+      broker3:
+        condition: service_healthy
+    ports:
+    - 8085:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local-kraft
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker1:29092,broker2:29092,broker3:29092
+      DYNAMIC_CONFIG_ENABLED: 'true'
+    mem_limit: 300m
+  marquez-db:
+    image: postgres:14
+    container_name: lsp-marquez-db
+    hostname: postgres
+    profiles:
+    - lineage
+    environment:
+      POSTGRES_DB: ${MARQUEZ_DB:-marquez}
+      POSTGRES_USER: ${MARQUEZ_POSTGRES_USER:-marquez}
+      POSTGRES_PASSWORD: ${MARQUEZ_POSTGRES_PASSWORD}
+      MARQUEZ_DB: ${MARQUEZ_DB:-marquez}
+      MARQUEZ_USER: ${MARQUEZ_USER:-marquez}
+      MARQUEZ_PASSWORD: ${MARQUEZ_PASSWORD}
+    ports:
+    - ${MARQUEZ_DB_HOST_PORT:-15432}:5432
+    volumes:
+    - marquez-db-data:/var/lib/postgresql/data
+    networks:
+      default:
+        aliases:
+        - postgres
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U ${MARQUEZ_POSTGRES_USER:-postgres} -d ${MARQUEZ_DB:-marquez}
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    mem_limit: 512m
+  marquez-api:
+    image: marquezproject/marquez:${MARQUEZ_TAG:-0.49.0}
+    container_name: lsp-marquez-api
+    profiles:
+    - lineage
+    depends_on:
+      marquez-db:
+        condition: service_healthy
+    environment:
+      MARQUEZ_PORT: ${MARQUEZ_API_PORT:-5000}
+      MARQUEZ_ADMIN_PORT: ${MARQUEZ_ADMIN_PORT:-5001}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: ${MARQUEZ_DB_PORT:-5432}
+      SEARCH_ENABLED: ${MARQUEZ_SEARCH_ENABLED:-false}
+    ports:
+    - ${MARQUEZ_API_PORT:-5000}:5000
+    - ${MARQUEZ_ADMIN_PORT:-5001}:5001
+    volumes:
+    - marquez-api-data:/opt/marquez
+    entrypoint:
+    - /bin/bash
+    - -lc
+    - "until (echo >/dev/tcp/postgres/${MARQUEZ_DB_PORT:-5432}) >/dev/null 2>&1; do\n\
+      \  sleep 1\ndone\nexec ./entrypoint.sh\n"
+    restart: unless-stopped
+    mem_limit: 768m
+  marquez-web:
+    image: marquezproject/marquez-web:${MARQUEZ_TAG:-0.49.0}
+    container_name: lsp-marquez-web
+    profiles:
+    - lineage
+    depends_on:
+      marquez-api:
+        condition: service_started
+    environment:
+      MARQUEZ_HOST: marquez-api
+      MARQUEZ_PORT: ${MARQUEZ_API_PORT:-5000}
+      WEB_PORT: ${MARQUEZ_WEB_PORT:-3000}
+      REACT_APP_ADVANCED_SEARCH: ${MARQUEZ_SEARCH_ENABLED:-false}
+    ports:
+    - ${MARQUEZ_WEB_PORT:-3000}:3000
+    restart: unless-stopped
+    mem_limit: 384m
 volumes:
-  broker1-data:
-  broker2-data:
-  broker3-data:
-  minio-data:
-  hive-metastore-data:
-  trino-data:
-  superset-home:
-  airflow-db-data:
-  airflow-logs:
-  marquez-db-data:
-  marquez-api-data:
+  broker1-data: null
+  broker2-data: null
+  broker3-data: null
+  minio-data: null
+  hive-metastore-data: null
+  trino-data: null
+  superset-home: null
+  airflow-db-data: null
+  airflow-logs: null
+  marquez-db-data: null
+  marquez-api-data: null

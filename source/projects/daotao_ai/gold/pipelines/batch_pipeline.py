@@ -18,11 +18,14 @@ from projects.daotao_ai.gold.serving_registry import GoldServingRegistry
 
 
 def _build_batch_outputs(inputs: dict[str, object]) -> dict[str, object]:
-    return {
-        "pdf_engagement_features": build_pdf_behavior_features(inputs["pdf"]),
-        "quiz_attempt_metrics": build_quiz_performance_features(inputs["performance"]),
-        "user_learning_profile_daily": build_learning_journey_features(inputs["learning"]),
-    }
+    outputs: dict[str, object] = {}
+    if "pdf" in inputs:
+        outputs["pdf_engagement_features"] = build_pdf_behavior_features(inputs["pdf"])
+    if "performance" in inputs:
+        outputs["quiz_attempt_metrics"] = build_quiz_performance_features(inputs["performance"])
+    if "learning" in inputs:
+        outputs["user_learning_profile_daily"] = build_learning_journey_features(inputs["learning"])
+    return outputs
 
 
 def run(config: GoldConfig) -> None:
@@ -34,5 +37,8 @@ def run(config: GoldConfig) -> None:
     outputs = _build_batch_outputs(inputs)
 
     for spec in batch_specs:
-        df = outputs[spec.name]
+        df = outputs.get(spec.name)
+        if df is None:
+            print(f"skipping batch output {spec.name}: required silver inputs are not ready")
+            continue
         write_batch_output(df, resolve_output_path(config, spec.name), spec.partition_by)

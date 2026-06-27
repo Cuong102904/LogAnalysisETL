@@ -117,8 +117,19 @@ def load_batch_inputs(
 ) -> dict[str, Any]:
     inputs: dict[str, Any] = {}
     for key in input_keys:
-        inputs[key] = spark.read.format("delta").load(resolve_input_path(config, key))
+        path = resolve_input_path(config, key)
+        if not _path_exists(spark, path):
+            print(f"skipping batch input {key}: {path} is not materialized yet")
+            continue
+        inputs[key] = spark.read.format("delta").load(path)
     return inputs
+
+
+def _path_exists(spark: Any, path: str) -> bool:
+    jvm = spark._jvm
+    hadoop_conf = spark._jsc.hadoopConfiguration()
+    fs = jvm.org.apache.hadoop.fs.FileSystem.get(jvm.java.net.URI(path), hadoop_conf)
+    return bool(fs.exists(jvm.org.apache.hadoop.fs.Path(path)))
 
 
 def write_stream_output(

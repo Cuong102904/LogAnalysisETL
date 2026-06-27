@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from airflow.providers.standard.operators.empty import EmptyOperator
 from tasks.spark_task import spark_task
+from utils.catalog import silver_table_path
 
 from airflow import DAG
 
@@ -19,12 +20,9 @@ def _enabled(env_name: str, default: str = "true") -> bool:
 
 
 def _maintenance_arguments() -> list[str]:
-    base_path = os.getenv("SILVER_TABLE_BASE_PATH", "s3a://lakehouse/mooc/silver")
-    table_path = f"{base_path}/navigation_events"
-
     arguments = [
         "--table-path",
-        table_path,
+        silver_table_path("navigation"),
         "--app-name",
         "silver_navigation_events_maintenance",
     ]
