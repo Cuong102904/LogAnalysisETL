@@ -22,6 +22,7 @@ def test_daotao_fixture_bronze_silver_gold_vertical_slice() -> None:
     )
 
     assert {record["source_id"] for record in bronze} == {"daotao_ai"}
+    assert all(isinstance(record["raw_payload"], str) for record in bronze)
     assert all(record["raw_payload"] for record in bronze)
     assert [record["event_time"].isoformat() for record in bronze[:2]] == [
         "2026-01-01T10:00:30+00:00",

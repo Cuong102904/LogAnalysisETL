@@ -3,13 +3,13 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from learnlake.contracts import (
-    BronzeEnvelope,
     EventIndex,
     MappingSpec,
     MetricDefinition,
     QualityRuleSet,
     SourceProfile,
 )
+from learnlake.ingestion.bronze_transform import build_bronze_schema
 from learnlake.runtime import (
     load_mapping_spec,
     load_metric_definition,
@@ -17,20 +17,28 @@ from learnlake.runtime import (
     load_source_profile,
 )
 from learnlake.runtime.config import resolve_path
+from pyspark.sql.types import StringType
 
 
-def test_bronze_envelope_contract_accepts_required_fields() -> None:
-    envelope = BronzeEnvelope(
-        event_id="b1",
-        source_id="source",
-        source_type="format",
-        ingestion_time=datetime.now(timezone.utc),
-        raw_payload={"event_type": "x"},
-        processing_date=datetime.now(timezone.utc).date(),
-    )
+def test_bronze_schema_uses_raw_string_payload() -> None:
+    schema = build_bronze_schema()
 
-    assert envelope.event_id == "b1"
-    assert envelope.schema_version == "bronze-envelope-v1"
+    assert [field.name for field in schema.fields] == [
+        "event_id",
+        "source_id",
+        "source_type",
+        "source_event_type",
+        "event_time_raw",
+        "event_time",
+        "ingestion_time",
+        "raw_payload",
+        "kafka_topic",
+        "kafka_partition",
+        "kafka_offset",
+        "schema_version",
+        "processing_date",
+    ]
+    assert schema["raw_payload"].dataType == StringType()
 
 
 def test_event_index_contract_accepts_required_fields() -> None:

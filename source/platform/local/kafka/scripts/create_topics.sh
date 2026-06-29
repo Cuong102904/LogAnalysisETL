@@ -47,19 +47,11 @@ create_topic() {
 }
 
 create_topic "mooc.raw.events" 12 1209600000
-create_topic "mooc.raw.anonymous.events" 12 1209600000
 create_topic "mooc.dlq.events" 6 1209600000
-create_topic "${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw}" 12 1209600000
-create_topic "${LEARNLAKE_ANONYMOUS_TOPIC:-learnlake.daotao.raw.anonymous}" 12 1209600000
-create_topic "${LEARNLAKE_DLQ_TOPIC:-learnlake.daotao.dlq}" 6 1209600000
 
 for topic in \
   "mooc.raw.events" \
-  "mooc.raw.anonymous.events" \
-  "mooc.dlq.events" \
-  "${LEARNLAKE_RAW_TOPIC:-learnlake.daotao.raw}" \
-  "${LEARNLAKE_ANONYMOUS_TOPIC:-learnlake.daotao.raw.anonymous}" \
-  "${LEARNLAKE_DLQ_TOPIC:-learnlake.daotao.dlq}"
+  "mooc.dlq.events"
 do
   run_kafka_topics \
     --describe \

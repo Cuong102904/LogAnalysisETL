@@ -374,10 +374,10 @@ services:
       PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
       BRONZE_APP_NAME: ${BRONZE_APP_NAME:-learnlake_bronze_ingestion}
       SPARK_UI_PORT: 4040
-      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
-      KAFKA_STARTING_OFFSETS: ${KAFKA_STARTING_OFFSETS:-earliest}
-      KAFKA_MAX_OFFSETS_PER_TRIGGER: ${BRONZE_MAX_OFFSETS_PER_TRIGGER:-1000}
-      KAFKA_TRIGGER_PROCESSING_TIME: ${BRONZE_TRIGGER_PROCESSING_TIME:-1 second}
+      BRONZE_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
+      BRONZE_STARTING_OFFSETS: ${BRONZE_STARTING_OFFSETS:-earliest}
+      BRONZE_MAX_OFFSETS_PER_TRIGGER: ${BRONZE_MAX_OFFSETS_PER_TRIGGER:-1000}
+      BRONZE_TRIGGER_PROCESSING_TIME: ${BRONZE_TRIGGER_PROCESSING_TIME:-5 seconds}
     command:
     - /opt/project/platform/local/spark/scripts/run_bronze_stream.sh
     ports:
@@ -593,10 +593,15 @@ services:
     - apps.replay.replay_to_kafka
     - --source
     - daotao_ai
+    - --input
+    - /data/activity_logs
     - --brokers
     - broker1:29092,broker2:29092,broker3:29092
     - --speed
-    - '0'
+    - '1'
+    - --skip-decode-errors
+    volumes:
+    - /home/cuong/Desktop/DATN/BK_activity_logs_unzipped:/data/activity_logs:ro
     restart: 'no'
     mem_limit: 512m
     container_name: lsp-tracking-log-replayer

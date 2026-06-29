@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from datetime import datetime, timezone
+import json
 from typing import Any
 
 from pydantic import ValidationError
@@ -26,10 +27,11 @@ def _record_for_mapping(
     *,
     route: dict[str, Any] | None = None,
     parsed_payload: dict[str, Any] | None = None,
+    raw_payload: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
         "bronze": bronze,
-        "raw_payload": bronze.get("raw_payload") or {},
+        "raw_payload": raw_payload or {},
         "route": route or {},
         "parsed_payload": parsed_payload or {},
     }
@@ -45,6 +47,8 @@ def normalize_bronze_record(
 ) -> NormalizationResult:
     observed_processing_time = processing_time or datetime.now(timezone.utc)
     raw_payload = bronze.get("raw_payload") or {}
+    if isinstance(raw_payload, str):
+        raw_payload = json.loads(raw_payload)
     parsed_payload = parse_event_payload(raw_payload.get("event"))
     route_matcher = RouteMatcher(route_set)
     route = route_matcher.match(
@@ -87,6 +91,7 @@ def normalize_bronze_record(
             bronze,
             route=route_data,
             parsed_payload={"kind": parsed_payload.kind, "data": parsed_payload.data},
+            raw_payload=raw_payload,
         )
     )
     if "processing_time" not in mapped or mapped["processing_time"] is None:

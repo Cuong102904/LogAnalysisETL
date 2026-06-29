@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import json
+import time
 from pathlib import Path
 
 from confluent_kafka import Producer
@@ -8,6 +10,36 @@ from confluent_kafka import Producer
 from learnlake.replay import iter_tracking_log_records, sleep_by_event_delta
 from learnlake.runtime import load_source_profile
 from learnlake.runtime.config import resolve_path
+
+DEFAULT_DLQ_TOPIC = "mooc.dlq.events"
+
+
+def _produce_with_backpressure(producer: Producer, topic: str, value: bytes) -> None:
+    while True:
+        try:
+            producer.produce(topic, value=value)
+            producer.poll(0)
+            return
+        except BufferError:
+            producer.poll(0.1)
+            time.sleep(0.1)
+
+
+def _publish_dlq_record(
+    producer: Producer,
+    topic: str,
+    *,
+    record_path: Path,
+    raw_line: str,
+    decode_error: str,
+) -> None:
+    payload = {
+        "error_type": "decode_failed",
+        "error_message": decode_error,
+        "raw_line": raw_line,
+        "source_path": str(record_path),
+    }
+    _produce_with_backpressure(producer, topic, json.dumps(payload, ensure_ascii=False).encode("utf-8"))
 
 
 def parse_args() -> argparse.Namespace:
@@ -17,6 +49,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", help="Optional JSONL sink used when Kafka publishing is not requested.")
     parser.add_argument("--brokers", help="Kafka bootstrap servers used when publishing to Kafka.")
     parser.add_argument("--topic", help="Kafka topic used when publishing to Kafka.")
+    parser.add_argument(
+        "--dlq-topic",
+        default=DEFAULT_DLQ_TOPIC,
+        help="Kafka topic used for parser/decode failures. Set empty to disable DLQ publishing.",
+    )
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -55,8 +92,9 @@ def main() -> int:
     input_path = resolve_path(args.input or profile.input.path or "")
     output_path = Path(args.output).expanduser() if args.output else None
     topic = args.topic or profile.input.topic
+    dlq_topic = (args.dlq_topic or "").strip() or None
     producer = None
-    if not args.dry_run and args.brokers and topic:
+    if not args.dry_run and args.brokers and (topic or dlq_topic):
         producer = Producer({"bootstrap.servers": args.brokers})
     previous_event_time = None
     if output_path and not args.dry_run:
@@ -73,10 +111,22 @@ def main() -> int:
             max_files=args.max_files,
             skip_decode_errors=args.skip_decode_errors,
         ):
-            if record.decode_error is not None and not args.skip_decode_errors:
-                raise ValueError(
-                    f"failed to decode replay record from {record.source_path}: {record.decode_error}"
-                )
+            if record.decode_error is not None:
+                if producer and dlq_topic and not args.dry_run:
+                    _publish_dlq_record(
+                        producer,
+                        dlq_topic,
+                        record_path=record.source_path,
+                        raw_line=record.raw_line,
+                        decode_error=record.decode_error,
+                    )
+                    continue
+
+                if not args.skip_decode_errors:
+                    raise ValueError(
+                        f"failed to decode replay record from {record.source_path}: {record.decode_error}"
+                    )
+                continue
 
             observed = record.event_time
             sleep_by_event_delta(previous_event_time, observed, args.speed)
@@ -91,9 +141,8 @@ def main() -> int:
                     break
             elif sink:
                 sink.write(line + "\n")
-            if producer:
-                producer.produce(topic, value=line.encode("utf-8"))
-                producer.poll(0)
+            if producer and topic:
+                _produce_with_backpressure(producer, topic, line.encode("utf-8"))
             elif not args.dry_run:
                 print(line)
 

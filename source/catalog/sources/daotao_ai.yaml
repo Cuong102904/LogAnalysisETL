@@ -4,8 +4,8 @@ domain: mooc
 
 input:
   mode: kafka
-  format: json
-  path: tests/fixtures/daotao_ai/raw_events.jsonl
+  format: jsonl
+  path: /home/cuong/Desktop/DATN/BK_activity_logs_unzipped
   topic: mooc.raw.events
   bootstrap_servers: broker1:29092,broker2:29092,broker3:29092
   starting_offsets: earliest

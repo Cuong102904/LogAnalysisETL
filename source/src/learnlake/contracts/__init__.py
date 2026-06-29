@@ -1,4 +1,3 @@
-from learnlake.contracts.bronze import BronzeEnvelope
 from learnlake.contracts.event_index import EventIndex
 from learnlake.contracts.facts import FACT_MODEL_BY_TARGET
 from learnlake.contracts.mapping import FieldMapping, MappingSpec
@@ -11,7 +10,6 @@ from learnlake.contracts.workflow import WorkflowDefinition, WorkflowTaskSpec
 
 __all__ = [
     "BatchNormalizationResult",
-    "BronzeEnvelope",
     "EventIndex",
     "FACT_MODEL_BY_TARGET",
     "FieldMapping",
