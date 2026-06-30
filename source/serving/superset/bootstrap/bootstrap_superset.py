@@ -599,24 +599,31 @@ def slugify(value: str) -> str:
 def get_or_create_database(access_token: str) -> int:
     headers = authed_headers(access_token)
     _, payload = _json_request("GET", _endpoint("/api/v1/database/"), headers=headers)
-    for item in (payload or {}).get("result", []):
-        if item.get("database_name") == "trino_delta":
-            return int(item["id"])
-
-    create_payload = {
+    database_payload = {
         "database_name": "trino_delta",
         "sqlalchemy_uri": SUPERSET_TRINO_SQLALCHEMY_URI,
         "expose_in_sqllab": True,
         "allow_ctas": False,
         "allow_cvas": False,
-        "allow_dml": False,
+        "allow_dml": True,
         "allow_file_upload": False,
         "impersonate_user": False,
         "configuration_method": "sqlalchemy_form",
         "extra": json.dumps({"allow_multi_catalog": True, "disable_data_preview": True}),
     }
+    for item in (payload or {}).get("result", []):
+        if item.get("database_name") == "trino_delta":
+            database_id = int(item["id"])
+            _json_request(
+                "PUT",
+                _endpoint(f"/api/v1/database/{database_id}"),
+                payload=database_payload,
+                headers=headers,
+            )
+            return int(item["id"])
+
     status, created = _json_request(
-        "POST", _endpoint("/api/v1/database/"), payload=create_payload, headers=headers
+        "POST", _endpoint("/api/v1/database/"), payload=database_payload, headers=headers
     )
     if status not in (200, 201):
         raise RuntimeError(f"Failed to create Superset database: {created}")

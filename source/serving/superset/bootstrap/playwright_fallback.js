@@ -33,24 +33,26 @@ async page => {
 
       async function getOrCreateDatabase() {
         const payload = await jsonRequest("GET", "/api/v1/database/");
-        for (const item of payload.result || []) {
-          if (item.database_name === registry.database.name) {
-            return item.id;
-          }
-        }
-
-        const created = await jsonRequest("POST", "/api/v1/database/", {
+        const databasePayload = {
           database_name: registry.database.name,
           sqlalchemy_uri: registry.database.sqlalchemy_uri,
           expose_in_sqllab: true,
           allow_ctas: false,
           allow_cvas: false,
-          allow_dml: false,
+          allow_dml: true,
           allow_file_upload: false,
           impersonate_user: false,
           configuration_method: "sqlalchemy_form",
           extra: JSON.stringify({ allow_multi_catalog: true, disable_data_preview: true }),
-        });
+        };
+        for (const item of payload.result || []) {
+          if (item.database_name === registry.database.name) {
+            await jsonRequest("PUT", `/api/v1/database/${item.id}`, databasePayload);
+            return item.id;
+          }
+        }
+
+        const created = await jsonRequest("POST", "/api/v1/database/", databasePayload);
         if (created && created.id) {
           return created.id;
         }

@@ -218,7 +218,7 @@ def wait_for_trino() -> None:
                 payload = json.loads(body.decode("utf-8"))
                 if payload.get("starting") is False:
                     try:
-                        execute_sql("SELECT 1")
+                        execute_sql("SHOW SCHEMAS FROM delta")
                         return
                     except (urllib.error.HTTPError, RuntimeError) as exc:
                         if "SERVER_STARTING_UP" not in str(exc):
@@ -289,6 +289,36 @@ def _is_already_exists_error(exc: Exception) -> bool:
     return "already exists" in message or '"name": "already_exists"' in message
 
 
+def register_tables(schema_name: str, register_statements: list[tuple[str, str]]) -> None:
+    execute_sql(f"CREATE SCHEMA IF NOT EXISTS {TRINO_CATALOG}.{schema_name}")
+
+    deadline = time.time() + BOOTSTRAP_TIMEOUT_SECONDS
+    for table_name, table_location in register_statements:
+        sql = (
+            "CALL delta.system.register_table("
+            f"schema_name => '{schema_name}', "
+            f"table_name => '{table_name}', "
+            f"table_location => '{table_location}')"
+        )
+        while True:
+            try:
+                execute_sql(sql)
+                break
+            except (urllib.error.HTTPError, RuntimeError) as exc:
+                if _is_already_exists_error(exc):
+                    print(f"skipping table registration for {schema_name}.{table_name}: already registered")
+                    break
+                if not _is_missing_dependency_error(exc):
+                    raise RuntimeError(f"Failed to register {schema_name}.{table_name}") from exc
+                if time.time() >= deadline:
+                    print(
+                        f"skipping table registration for {schema_name}.{table_name}: "
+                        f"{table_location} is not materialized yet"
+                    )
+                    break
+                time.sleep(5)
+
+
 def validate_semantic_views() -> None:
     for sql_file_name, contract in SEMANTIC_VIEW_CONTRACTS.items():
         sql_file = VIEWS_DIR / sql_file_name
@@ -309,8 +339,32 @@ def validate_semantic_views() -> None:
                 raise RuntimeError(f"{sql_file_name} is missing column contract {column_name}")
 
 
+def register_direct_tables() -> None:
+    direct_tables = [
+        ("bronze_events", "s3://lakehouse/learnlake/bronze/bronze_events"),
+        ("silver_event_index", "s3://lakehouse/learnlake/silver/silver_event_index"),
+        ("silver_assessment_events", "s3://lakehouse/learnlake/silver/silver_assessment_events"),
+        ("silver_auth_events", "s3://lakehouse/learnlake/silver/silver_auth_events"),
+        ("silver_authoring_events", "s3://lakehouse/learnlake/silver/silver_authoring_events"),
+        (
+            "silver_course_content_events",
+            "s3://lakehouse/learnlake/silver/silver_course_content_events",
+        ),
+        ("silver_document_events", "s3://lakehouse/learnlake/silver/silver_document_events"),
+        ("silver_exam_events", "s3://lakehouse/learnlake/silver/silver_exam_events"),
+        ("silver_invalid_events", "s3://lakehouse/learnlake/silver/silver_invalid_events"),
+        (
+            "silver_navigation_events",
+            "s3://lakehouse/learnlake/silver/silver_navigation_events",
+        ),
+        ("silver_video_events", "s3://lakehouse/learnlake/silver/silver_video_events"),
+        ("silver_system_events", "s3://lakehouse/learnlake/silver/silver_system_events"),
+        ("silver_unknown_events", "s3://lakehouse/learnlake/silver/silver_unknown_events"),
+    ]
+    register_tables(TRINO_SCHEMA, direct_tables)
+
+
 def register_gold_tables() -> None:
-    execute_sql("CREATE SCHEMA IF NOT EXISTS delta.mooc")
     register_statements = [
         (
             "video_friction_signals",
@@ -338,32 +392,7 @@ def register_gold_tables() -> None:
         ),
         ("anomaly_alerts", "s3://lakehouse/learnlake/gold/anomaly_alerts"),
     ]
-
-    deadline = time.time() + BOOTSTRAP_TIMEOUT_SECONDS
-    for table_name, table_location in register_statements:
-        sql = (
-            "CALL delta.system.register_table("
-            f"schema_name => '{TRINO_SCHEMA}', "
-            f"table_name => '{table_name}', "
-            f"table_location => '{table_location}')"
-        )
-        while True:
-            try:
-                execute_sql(sql)
-                break
-            except (urllib.error.HTTPError, RuntimeError) as exc:
-                if _is_already_exists_error(exc):
-                    print(f"skipping table registration for {table_name}: already registered")
-                    break
-                if not _is_missing_dependency_error(exc):
-                    raise RuntimeError(f"Failed to register {table_name}") from exc
-                if time.time() >= deadline:
-                    print(
-                        f"skipping table registration for {table_name}: "
-                        f"{table_location} is not materialized yet"
-                    )
-                    break
-                time.sleep(5)
+    register_tables(TRINO_SCHEMA, register_statements)
 
 
 def apply_views() -> None:
@@ -384,6 +413,7 @@ def apply_views() -> None:
 
 def main() -> None:
     wait_for_trino()
+    register_direct_tables()
     register_gold_tables()
     apply_views()
 

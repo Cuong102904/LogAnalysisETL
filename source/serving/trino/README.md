@@ -7,8 +7,9 @@ Trino is the SQL query layer for the lakehouse semantic layer.
 - Compose has a `trino` service and a `trino-bootstrap` service.
 - Trino image and config live under `serving/trino/`.
 - Hive Metastore is self-hosted in the compose stack.
+- Direct Bronze/Silver Delta tables and Gold tables are registered into `delta.mooc`.
 - Semantic views live in `views/`.
-- Bootstrap service `trino-bootstrap` waits for Trino, registers Delta tables, and applies semantic views.
+- Bootstrap service `trino-bootstrap` waits for Trino, registers direct tables, and applies semantic views.
 
 ## Semantic Layer
 
@@ -25,5 +26,5 @@ Trino is the SQL query layer for the lakehouse semantic layer.
 
 - Trino uses Hive Metastore plus MinIO-backed S3 storage for the Delta catalog.
 - Trino 455 uses the native S3 file system, enabled with `fs.native-s3.enabled=true`.
-- The bootstrap registers the Gold Delta tables needed by the semantic layer under `s3://lakehouse/learnlake/gold/...`.
+- The bootstrap registers the Bronze/Silver/Gold Delta tables needed by the stack under `s3://lakehouse/learnlake/...`.
 - Views are stored as SQL files so they can be bootstrapped from CLI or consumed by Superset SQL Lab.
