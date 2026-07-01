@@ -1,0 +1,1555 @@
+{
+    "name": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@80c4e176229c439c8271d45a49213688/handler/xmodule_handler/problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@80c4e176229c439c8271d45a49213688/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "{\"GET\": {}, \"POST\": {\"input_80c4e176229c439c8271d45a49213688_2_1\": [\"choice_1\"]}}",
+    "time": "2026-01-17T23:26:24.138689+00:00",
+    "event_type": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@80c4e176229c439c8271d45a49213688/handler/xmodule_handler/problem_check",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "input_80c4e176229c439c8271d45a49213688_2_1=choice_1",
+    "time": "2026-01-17T23:26:24.152326+00:00",
+    "event_type": "problem_check",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "edx.grades.problem.submitted",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@80c4e176229c439c8271d45a49213688/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@80c4e176229c439c8271d45a49213688"
+        }
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "user_id": "12439",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@80c4e176229c439c8271d45a49213688",
+        "event_transaction_id": "29922577-7710-481b-9720-85176651f972",
+        "event_transaction_type": "edx.grades.problem.submitted",
+        "weighted_earned": 1,
+        "weighted_possible": 1
+    },
+    "time": "2026-01-17T23:26:24.384630+00:00",
+    "event_type": "edx.grades.problem.submitted",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@80c4e176229c439c8271d45a49213688/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@80c4e176229c439c8271d45a49213688"
+        },
+        "asides": {}
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "state": {
+            "seed": 1,
+            "student_answers": {},
+            "has_saved_answers": false,
+            "correct_map": {},
+            "input_state": {
+                "80c4e176229c439c8271d45a49213688_2_1": {}
+            },
+            "done": false,
+            "mask_display_name": "",
+            "selected_answer_index": null
+        },
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@80c4e176229c439c8271d45a49213688",
+        "answers": {
+            "80c4e176229c439c8271d45a49213688_2_1": "choice_1"
+        },
+        "grade": 1,
+        "max_grade": 1,
+        "correct_map": {
+            "80c4e176229c439c8271d45a49213688_2_1": {
+                "correctness": "correct",
+                "npoints": null,
+                "msg": "",
+                "hint": "",
+                "hintmode": null,
+                "queuestate": null,
+                "answervariable": null
+            }
+        },
+        "success": "correct",
+        "attempts": 1,
+        "submission": {
+            "80c4e176229c439c8271d45a49213688_2_1": {
+                "question": "",
+                "answer": "B. Inter Symbol Interference.",
+                "response_type": "multiplechoiceresponse",
+                "input_type": "choicegroup",
+                "correct": true,
+                "variant": "",
+                "group_label": ""
+            }
+        }
+    },
+    "time": "2026-01-17T23:26:24.434722+00:00",
+    "event_type": "problem_check",
+    "event_source": "server",
+    "page": "x_module"
+}
+{
+    "name": "problem_graded",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": [
+        "input_80c4e176229c439c8271d45a49213688_2_1=choice_1",
+        "\n\n\n\n<h3 class=\"hd hd-3 problem-header\" id=\"80c4e176229c439c8271d45a49213688-problem-title\" aria-describedby=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@80c4e176229c439c8271d45a49213688-problem-progress\" tabindex=\"-1\">\n  Multiple Choice\n</h3>\n\n<div class=\"problem-progress\" id=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@80c4e176229c439c8271d45a49213688-problem-progress\"></div>\n\n<div class=\"problem\">\n  <div>\n<div class=\"wrapper-problem-response\" tabindex=\"-1\" aria-label=\"Question 1\" role=\"group\"><p>C&#226;u 1: Kh&#225;i ni&#7879;m ISI l&#224; g&#236;?</p>\n<div class=\"choicegroup capa_inputtype\" id=\"inputtype_80c4e176229c439c8271d45a49213688_2_1\">\n    <fieldset aria-describedby=\"status_80c4e176229c439c8271d45a49213688_2_1\">\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_80c4e176229c439c8271d45a49213688_2_1\" id=\"input_80c4e176229c439c8271d45a49213688_2_1_choice_0\" class=\"field-input input-radio\" value=\"choice_0\"/><label id=\"80c4e176229c439c8271d45a49213688_2_1-choice_0-label\" for=\"input_80c4e176229c439c8271d45a49213688_2_1_choice_0\" class=\"response-label field-label label-inline\" aria-describedby=\"status_80c4e176229c439c8271d45a49213688_2_1\"> A. Inter Signaling Interference.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_80c4e176229c439c8271d45a49213688_2_1\" id=\"input_80c4e176229c439c8271d45a49213688_2_1_choice_1\" class=\"field-input input-radio submitted\" value=\"choice_1\" checked=\"true\"/><label id=\"80c4e176229c439c8271d45a49213688_2_1-choice_1-label\" for=\"input_80c4e176229c439c8271d45a49213688_2_1_choice_1\" class=\"response-label field-label label-inline choicegroup_submitted\" aria-describedby=\"status_80c4e176229c439c8271d45a49213688_2_1\"> B. Inter Symbol Interference.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_80c4e176229c439c8271d45a49213688_2_1\" id=\"input_80c4e176229c439c8271d45a49213688_2_1_choice_2\" class=\"field-input input-radio\" value=\"choice_2\"/><label id=\"80c4e176229c439c8271d45a49213688_2_1-choice_2-label\" for=\"input_80c4e176229c439c8271d45a49213688_2_1_choice_2\" class=\"response-label field-label label-inline\" aria-describedby=\"status_80c4e176229c439c8271d45a49213688_2_1\"> C. Inter Signal Interference.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_80c4e176229c439c8271d45a49213688_2_1\" id=\"input_80c4e176229c439c8271d45a49213688_2_1_choice_3\" class=\"field-input input-radio\" value=\"choice_3\"/><label id=\"80c4e176229c439c8271d45a49213688_2_1-choice_3-label\" for=\"input_80c4e176229c439c8271d45a49213688_2_1_choice_3\" class=\"response-label field-label label-inline\" aria-describedby=\"status_80c4e176229c439c8271d45a49213688_2_1\"> D. Inter System Interference.\n            </label>\n          </div>\n        <span id=\"answer_80c4e176229c439c8271d45a49213688_2_1\"/>\n    </fieldset>\n    <div class=\"indicator-container\">\n          \n\n<span class=\"status submitted\" id=\"status_80c4e176229c439c8271d45a49213688_2_1\" data-tooltip=\"\">\n  <span class=\"sr\">&#272;&#227; tr&#7843; l&#7901;i</span><span class=\"status-icon\" aria-hidden=\"true\"/>\n</span>\n\n    </div>\n</div></div>\n</div>\n  <div class=\"action\">\n    <input type=\"hidden\" name=\"problem_id\" value=\"Multiple Choice\" />\n\n    <div class=\"problem-action-buttons-wrapper\">\n    </div>\n    <div class=\"submit-attempt-container\">\n      <button type=\"button\" class=\"submit btn-brand\" data-submitting=\"\u0110ang g\u1eedi\" data-value=\"G\u1eedi\" data-should-enable-submit-button=\"True\" aria-describedby=\"submission_feedback_80c4e176229c439c8271d45a49213688\" >\n          <span class=\"submit-label\">G\u1eedi</span>\n      </button>\n\n      <div class=\"submission-feedback\" id=\"submission_feedback_80c4e176229c439c8271d45a49213688\">\n        <span class=\"sr\">M\u1ed9t s\u1ed1 c\u00e2u h\u1ecfi c\u00f3 c\u00e1c t\u00f9y ch\u1ecdn nh\u01b0 l\u01b0u, \u0111\u1eb7t l\u1ea1i, g\u1ee3i \u00fd ho\u1eb7c hi\u1ec3n th\u1ecb c\u00e2u tr\u1ea3 l\u1eddi. C\u00e1c t\u00f9y ch\u1ecdn n\u00e0y n\u1eb1m sau n\u00fat G\u1eedi.</span>\n      </div>\n    </div>\n  </div>\n    \n\n\n<div class=\"notification warning notification-gentle-alert\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-exclamation-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"80c4e176229c439c8271d45a49213688-problem-title\">\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n            \n\n\n<div class=\"notification general notification-submit\n      \"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"80c4e176229c439c8271d45a49213688-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u00e3 \u0111\u01b0\u1ee3c g\u1eedi.\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n\n\n<div class=\"notification warning notification-save\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-save\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"80c4e176229c439c8271d45a49213688-problem-title\">None\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n    \n\n\n<div class=\"notification general notification-show-answer\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"80c4e176229c439c8271d45a49213688-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u01b0\u1ee3c \u0111\u00e1nh d\u1ea5u trong c\u00e1c c\u00e2u h\u1ecfi\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n</div>\n\n<script>\n    function emit_event(message) {\n        parent.postMessage(message, '*');\n    }\n</script>\n"
+    ],
+    "time": "2026-01-17T23:26:24.574175+00:00",
+    "event_type": "problem_graded",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@c1c20e68c63040179bd5f5f9517284bd/handler/xmodule_handler/problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@c1c20e68c63040179bd5f5f9517284bd/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "{\"GET\": {}, \"POST\": {\"input_c1c20e68c63040179bd5f5f9517284bd_2_1\": [\"choice_2\"]}}",
+    "time": "2026-01-17T23:30:53.638089+00:00",
+    "event_type": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@c1c20e68c63040179bd5f5f9517284bd/handler/xmodule_handler/problem_check",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "input_c1c20e68c63040179bd5f5f9517284bd_2_1=choice_2",
+    "time": "2026-01-17T23:30:53.651636+00:00",
+    "event_type": "problem_check",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "edx.grades.problem.submitted",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@c1c20e68c63040179bd5f5f9517284bd/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@c1c20e68c63040179bd5f5f9517284bd"
+        }
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "user_id": "12439",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@c1c20e68c63040179bd5f5f9517284bd",
+        "event_transaction_id": "ea8645cb-65bf-4639-bb41-f5a1f20f432a",
+        "event_transaction_type": "edx.grades.problem.submitted",
+        "weighted_earned": 1,
+        "weighted_possible": 1
+    },
+    "time": "2026-01-17T23:30:54.062313+00:00",
+    "event_type": "edx.grades.problem.submitted",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@c1c20e68c63040179bd5f5f9517284bd/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@c1c20e68c63040179bd5f5f9517284bd"
+        },
+        "asides": {}
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "state": {
+            "seed": 1,
+            "student_answers": {},
+            "has_saved_answers": false,
+            "correct_map": {},
+            "input_state": {
+                "c1c20e68c63040179bd5f5f9517284bd_2_1": {}
+            },
+            "done": false,
+            "mask_display_name": "",
+            "selected_answer_index": null
+        },
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@c1c20e68c63040179bd5f5f9517284bd",
+        "answers": {
+            "c1c20e68c63040179bd5f5f9517284bd_2_1": "choice_2"
+        },
+        "grade": 1,
+        "max_grade": 1,
+        "correct_map": {
+            "c1c20e68c63040179bd5f5f9517284bd_2_1": {
+                "correctness": "correct",
+                "npoints": null,
+                "msg": "",
+                "hint": "",
+                "hintmode": null,
+                "queuestate": null,
+                "answervariable": null
+            }
+        },
+        "success": "correct",
+        "attempts": 1,
+        "submission": {
+            "c1c20e68c63040179bd5f5f9517284bd_2_1": {
+                "question": "",
+                "answer": "C. Do t\u1ed1c \u0111\u1ed9 truy\u1ec1n d\u1eef li\u1ec7u qu\u00e1 nhanh.",
+                "response_type": "multiplechoiceresponse",
+                "input_type": "choicegroup",
+                "correct": true,
+                "variant": "",
+                "group_label": ""
+            }
+        }
+    },
+    "time": "2026-01-17T23:30:54.199490+00:00",
+    "event_type": "problem_check",
+    "event_source": "server",
+    "page": "x_module"
+}
+{
+    "name": "problem_graded",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": [
+        "input_c1c20e68c63040179bd5f5f9517284bd_2_1=choice_2",
+        "\n\n\n\n<h3 class=\"hd hd-3 problem-header\" id=\"c1c20e68c63040179bd5f5f9517284bd-problem-title\" aria-describedby=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@c1c20e68c63040179bd5f5f9517284bd-problem-progress\" tabindex=\"-1\">\n  Multiple Choice\n</h3>\n\n<div class=\"problem-progress\" id=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@c1c20e68c63040179bd5f5f9517284bd-problem-progress\"></div>\n\n<div class=\"problem\">\n  <div>\n<div class=\"wrapper-problem-response\" tabindex=\"-1\" aria-label=\"Question 1\" role=\"group\"><p>C&#226;u 2: Trong c&#225;c ph&#225;t bi&#7875;u d&#432;&#7899;i &#273;&#226;y, &#273;&#226;u c&#243; th&#7875; l&#224; nguy&#234;n nh&#226;n khi&#7871;n x&#7843;y ra hi&#7879;n t&#432;&#7907;ng nhi&#7877;u li&#234;n k&#253; hi&#7879;u (ISI)?</p>\n<div class=\"choicegroup capa_inputtype\" id=\"inputtype_c1c20e68c63040179bd5f5f9517284bd_2_1\">\n    <fieldset aria-describedby=\"status_c1c20e68c63040179bd5f5f9517284bd_2_1\">\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1\" id=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1_choice_0\" class=\"field-input input-radio\" value=\"choice_0\"/><label id=\"c1c20e68c63040179bd5f5f9517284bd_2_1-choice_0-label\" for=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1_choice_0\" class=\"response-label field-label label-inline\" aria-describedby=\"status_c1c20e68c63040179bd5f5f9517284bd_2_1\"> A. Do l&#7885;c t&#237;n hi&#7879;u ph&#249; h&#7907;p k&#234;nh truy&#7873;n.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1\" id=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1_choice_1\" class=\"field-input input-radio\" value=\"choice_1\"/><label id=\"c1c20e68c63040179bd5f5f9517284bd_2_1-choice_1-label\" for=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1_choice_1\" class=\"response-label field-label label-inline\" aria-describedby=\"status_c1c20e68c63040179bd5f5f9517284bd_2_1\"> B. Do t&#7847;n s&#7889; qu&#225; cao.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1\" id=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1_choice_2\" class=\"field-input input-radio submitted\" value=\"choice_2\" checked=\"true\"/><label id=\"c1c20e68c63040179bd5f5f9517284bd_2_1-choice_2-label\" for=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1_choice_2\" class=\"response-label field-label label-inline choicegroup_submitted\" aria-describedby=\"status_c1c20e68c63040179bd5f5f9517284bd_2_1\"> C. Do t&#7889;c &#273;&#7897; truy&#7873;n d&#7919; li&#7879;u qu&#225; nhanh.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1\" id=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1_choice_3\" class=\"field-input input-radio\" value=\"choice_3\"/><label id=\"c1c20e68c63040179bd5f5f9517284bd_2_1-choice_3-label\" for=\"input_c1c20e68c63040179bd5f5f9517284bd_2_1_choice_3\" class=\"response-label field-label label-inline\" aria-describedby=\"status_c1c20e68c63040179bd5f5f9517284bd_2_1\"> D. Do bi&#234;n &#273;&#7897; t&#237;n hi&#7879;u truy&#7873;n &#273;i qu&#225; l&#7899;n.\n            </label>\n          </div>\n        <span id=\"answer_c1c20e68c63040179bd5f5f9517284bd_2_1\"/>\n    </fieldset>\n    <div class=\"indicator-container\">\n          \n\n<span class=\"status submitted\" id=\"status_c1c20e68c63040179bd5f5f9517284bd_2_1\" data-tooltip=\"\">\n  <span class=\"sr\">&#272;&#227; tr&#7843; l&#7901;i</span><span class=\"status-icon\" aria-hidden=\"true\"/>\n</span>\n\n    </div>\n</div></div>\n</div>\n  <div class=\"action\">\n    <input type=\"hidden\" name=\"problem_id\" value=\"Multiple Choice\" />\n\n    <div class=\"problem-action-buttons-wrapper\">\n    </div>\n    <div class=\"submit-attempt-container\">\n      <button type=\"button\" class=\"submit btn-brand\" data-submitting=\"\u0110ang g\u1eedi\" data-value=\"G\u1eedi\" data-should-enable-submit-button=\"True\" aria-describedby=\"submission_feedback_c1c20e68c63040179bd5f5f9517284bd\" >\n          <span class=\"submit-label\">G\u1eedi</span>\n      </button>\n\n      <div class=\"submission-feedback\" id=\"submission_feedback_c1c20e68c63040179bd5f5f9517284bd\">\n        <span class=\"sr\">M\u1ed9t s\u1ed1 c\u00e2u h\u1ecfi c\u00f3 c\u00e1c t\u00f9y ch\u1ecdn nh\u01b0 l\u01b0u, \u0111\u1eb7t l\u1ea1i, g\u1ee3i \u00fd ho\u1eb7c hi\u1ec3n th\u1ecb c\u00e2u tr\u1ea3 l\u1eddi. C\u00e1c t\u00f9y ch\u1ecdn n\u00e0y n\u1eb1m sau n\u00fat G\u1eedi.</span>\n      </div>\n    </div>\n  </div>\n    \n\n\n<div class=\"notification warning notification-gentle-alert\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-exclamation-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"c1c20e68c63040179bd5f5f9517284bd-problem-title\">\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n            \n\n\n<div class=\"notification general notification-submit\n      \"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"c1c20e68c63040179bd5f5f9517284bd-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u00e3 \u0111\u01b0\u1ee3c g\u1eedi.\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n\n\n<div class=\"notification warning notification-save\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-save\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"c1c20e68c63040179bd5f5f9517284bd-problem-title\">None\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n    \n\n\n<div class=\"notification general notification-show-answer\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"c1c20e68c63040179bd5f5f9517284bd-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u01b0\u1ee3c \u0111\u00e1nh d\u1ea5u trong c\u00e1c c\u00e2u h\u1ecfi\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n</div>\n\n<script>\n    function emit_event(message) {\n        parent.postMessage(message, '*');\n    }\n</script>\n"
+    ],
+    "time": "2026-01-17T23:30:54.326803+00:00",
+    "event_type": "problem_graded",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e/handler/xmodule_handler/problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "{\"GET\": {}, \"POST\": {\"input_de629cd827f94ae9a42fa326e7236c3e_2_1\": [\"choice_0\"]}}",
+    "time": "2026-01-17T23:33:45.082581+00:00",
+    "event_type": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e/handler/xmodule_handler/problem_check",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "input_de629cd827f94ae9a42fa326e7236c3e_2_1=choice_0",
+    "time": "2026-01-17T23:33:45.086242+00:00",
+    "event_type": "problem_check",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "edx.grades.problem.submitted",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e"
+        }
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "user_id": "12439",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e",
+        "event_transaction_id": "93901748-8688-47ff-8bf8-d5571b26e876",
+        "event_transaction_type": "edx.grades.problem.submitted",
+        "weighted_earned": 1,
+        "weighted_possible": 1
+    },
+    "time": "2026-01-17T23:33:45.266726+00:00",
+    "event_type": "edx.grades.problem.submitted",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e"
+        },
+        "asides": {}
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "state": {
+            "seed": 1,
+            "student_answers": {},
+            "has_saved_answers": false,
+            "correct_map": {},
+            "input_state": {
+                "de629cd827f94ae9a42fa326e7236c3e_2_1": {}
+            },
+            "done": false,
+            "mask_display_name": "",
+            "selected_answer_index": null
+        },
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e",
+        "answers": {
+            "de629cd827f94ae9a42fa326e7236c3e_2_1": "choice_0"
+        },
+        "grade": 1,
+        "max_grade": 1,
+        "correct_map": {
+            "de629cd827f94ae9a42fa326e7236c3e_2_1": {
+                "correctness": "correct",
+                "npoints": null,
+                "msg": "",
+                "hint": "",
+                "hintmode": null,
+                "queuestate": null,
+                "answervariable": null
+            }
+        },
+        "success": "correct",
+        "attempts": 1,
+        "submission": {
+            "de629cd827f94ae9a42fa326e7236c3e_2_1": {
+                "question": "",
+                "answer": "A. \\( h(t) =\\frac{4\\alpha}{\\pi\\sqrt{T}}\\,\\frac{\\cos\\!\\big((1+\\alpha)\\pi \\tfrac{t}{T}\\big)+ \\frac{T}{4\\alpha t}\\sin\\!\\big((1-\\alpha)\\pi \\tfrac{t}{T}\\big)}{1 - \\big(4\\alpha \\tfrac{t}{T}\\big)^2} \\)",
+                "response_type": "multiplechoiceresponse",
+                "input_type": "choicegroup",
+                "correct": true,
+                "variant": "",
+                "group_label": ""
+            }
+        }
+    },
+    "time": "2026-01-17T23:33:45.297071+00:00",
+    "event_type": "problem_check",
+    "event_source": "server",
+    "page": "x_module"
+}
+{
+    "name": "problem_graded",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": [
+        "input_de629cd827f94ae9a42fa326e7236c3e_2_1=choice_0",
+        "\n\n\n\n<h3 class=\"hd hd-3 problem-header\" id=\"de629cd827f94ae9a42fa326e7236c3e-problem-title\" aria-describedby=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e-problem-progress\" tabindex=\"-1\">\n  Multiple Choice\n</h3>\n\n<div class=\"problem-progress\" id=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e-problem-progress\"></div>\n\n<div class=\"problem\">\n  <div>\n<div class=\"wrapper-problem-response\" tabindex=\"-1\" aria-label=\"Question 1\" role=\"group\"><p>C&#226;u 3: &#272;&#226;u l&#224; h&#224;m &#273;&#225;p &#7913;ng xung c&#7911;a b&#7897; l&#7885;c root raised cosine v&#7899;i h&#7879; s&#7889; roll-off l&#224; \\( \\alpha \\)?</p>\n<div class=\"choicegroup capa_inputtype\" id=\"inputtype_de629cd827f94ae9a42fa326e7236c3e_2_1\">\n    <fieldset aria-describedby=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\">\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1\" id=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_0\" class=\"field-input input-radio submitted\" value=\"choice_0\" checked=\"true\"/><label id=\"de629cd827f94ae9a42fa326e7236c3e_2_1-choice_0-label\" for=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_0\" class=\"response-label field-label label-inline choicegroup_submitted\" aria-describedby=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\"> A. \\( h(t) =\\frac{4\\alpha}{\\pi\\sqrt{T}}\\,\\frac{\\cos\\!\\big((1+\\alpha)\\pi \\tfrac{t}{T}\\big)+ \\frac{T}{4\\alpha t}\\sin\\!\\big((1-\\alpha)\\pi \\tfrac{t}{T}\\big)}{1 - \\big(4\\alpha \\tfrac{t}{T}\\big)^2} \\)\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1\" id=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_1\" class=\"field-input input-radio\" value=\"choice_1\"/><label id=\"de629cd827f94ae9a42fa326e7236c3e_2_1-choice_1-label\" for=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_1\" class=\"response-label field-label label-inline\" aria-describedby=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\"> B. \\( h(t) = \\frac{\\sin\\!\\big(\\pi \\tfrac{t}{T}\\big)}{\\pi \\tfrac{t}{T}}\\cdot \\frac{\\cos\\!\\big(\\alpha\\pi \\tfrac{t}{T}\\big)}{1 - \\big(2\\alpha \\tfrac{t}{T}\\big)^2} \\)\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1\" id=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_2\" class=\"field-input input-radio\" value=\"choice_2\"/><label id=\"de629cd827f94ae9a42fa326e7236c3e_2_1-choice_2-label\" for=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_2\" class=\"response-label field-label label-inline\" aria-describedby=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\"> C. \\( h(t) = \\frac{\\sin\\!\\big((1-\\alpha)\\pi \\tfrac{t}{T}\\big) + 2\\alpha \\tfrac{t}{T}\\cos\\!\\big((1+\\alpha)\\pi \\tfrac{t}{T}\\big)}{\\pi \\tfrac{t}{T}\\big[1 - (2\\alpha \\tfrac{t}{T})^2\\big]} \\)\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1\" id=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_3\" class=\"field-input input-radio\" value=\"choice_3\"/><label id=\"de629cd827f94ae9a42fa326e7236c3e_2_1-choice_3-label\" for=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_3\" class=\"response-label field-label label-inline\" aria-describedby=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\"> D. \\( h(t) =\\frac{\\sin\\!\\big((1+\\alpha)\\pi \\tfrac{t}{T}\\big)} {\\pi \\tfrac{t}{T}} \\)\n            </label>\n          </div>\n        <span id=\"answer_de629cd827f94ae9a42fa326e7236c3e_2_1\"/>\n    </fieldset>\n    <div class=\"indicator-container\">\n          \n\n<span class=\"status submitted\" id=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\" data-tooltip=\"\">\n  <span class=\"sr\">&#272;&#227; tr&#7843; l&#7901;i</span><span class=\"status-icon\" aria-hidden=\"true\"/>\n</span>\n\n    </div>\n</div></div>\n</div>\n  <div class=\"action\">\n    <input type=\"hidden\" name=\"problem_id\" value=\"Multiple Choice\" />\n\n    <div class=\"problem-action-buttons-wrapper\">\n    </div>\n    <div class=\"submit-attempt-container\">\n      <button type=\"button\" class=\"submit btn-brand\" data-submitting=\"\u0110ang g\u1eedi\" data-value=\"G\u1eedi\" data-should-enable-submit-button=\"True\" aria-describedby=\"submission_feedback_de629cd827f94ae9a42fa326e7236c3e\" >\n          <span class=\"submit-label\">G\u1eedi</span>\n      </button>\n\n      <div class=\"submission-feedback\" id=\"submission_feedback_de629cd827f94ae9a42fa326e7236c3e\">\n        <span class=\"sr\">M\u1ed9t s\u1ed1 c\u00e2u h\u1ecfi c\u00f3 c\u00e1c t\u00f9y ch\u1ecdn nh\u01b0 l\u01b0u, \u0111\u1eb7t l\u1ea1i, g\u1ee3i \u00fd ho\u1eb7c hi\u1ec3n th\u1ecb c\u00e2u tr\u1ea3 l\u1eddi. C\u00e1c t\u00f9y ch\u1ecdn n\u00e0y n\u1eb1m sau n\u00fat G\u1eedi.</span>\n      </div>\n    </div>\n  </div>\n    \n\n\n<div class=\"notification warning notification-gentle-alert\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-exclamation-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"de629cd827f94ae9a42fa326e7236c3e-problem-title\">\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n            \n\n\n<div class=\"notification general notification-submit\n      \"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"de629cd827f94ae9a42fa326e7236c3e-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u00e3 \u0111\u01b0\u1ee3c g\u1eedi.\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n\n\n<div class=\"notification warning notification-save\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-save\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"de629cd827f94ae9a42fa326e7236c3e-problem-title\">None\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n    \n\n\n<div class=\"notification general notification-show-answer\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"de629cd827f94ae9a42fa326e7236c3e-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u01b0\u1ee3c \u0111\u00e1nh d\u1ea5u trong c\u00e1c c\u00e2u h\u1ecfi\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n</div>\n\n<script>\n    function emit_event(message) {\n        parent.postMessage(message, '*');\n    }\n</script>\n"
+    ],
+    "time": "2026-01-17T23:33:45.577847+00:00",
+    "event_type": "problem_graded",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e/handler/xmodule_handler/problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "{\"GET\": {}, \"POST\": {\"input_de629cd827f94ae9a42fa326e7236c3e_2_1\": [\"choice_0\"]}}",
+    "time": "2026-01-18T00:41:28.846268+00:00",
+    "event_type": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e/handler/xmodule_handler/problem_check",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "input_de629cd827f94ae9a42fa326e7236c3e_2_1=choice_0",
+    "time": "2026-01-18T00:41:28.854826+00:00",
+    "event_type": "problem_check",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "edx.grades.problem.submitted",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e"
+        }
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "user_id": "12439",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e",
+        "event_transaction_id": "5c78e5a3-a96a-46fc-8ab7-c48bedf396fb",
+        "event_transaction_type": "edx.grades.problem.submitted",
+        "weighted_earned": 1,
+        "weighted_possible": 1
+    },
+    "time": "2026-01-18T00:41:29.138928+00:00",
+    "event_type": "edx.grades.problem.submitted",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e"
+        },
+        "asides": {}
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "state": {
+            "seed": 1,
+            "student_answers": {
+                "de629cd827f94ae9a42fa326e7236c3e_2_1": "choice_0"
+            },
+            "has_saved_answers": false,
+            "correct_map": {
+                "de629cd827f94ae9a42fa326e7236c3e_2_1": {
+                    "correctness": "correct",
+                    "npoints": null,
+                    "msg": "",
+                    "hint": "",
+                    "hintmode": null,
+                    "queuestate": null,
+                    "answervariable": null
+                }
+            },
+            "input_state": {
+                "de629cd827f94ae9a42fa326e7236c3e_2_1": {}
+            },
+            "done": true,
+            "mask_display_name": "",
+            "selected_answer_index": null
+        },
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e",
+        "answers": {
+            "de629cd827f94ae9a42fa326e7236c3e_2_1": "choice_0"
+        },
+        "grade": 1,
+        "max_grade": 1,
+        "correct_map": {
+            "de629cd827f94ae9a42fa326e7236c3e_2_1": {
+                "correctness": "correct",
+                "npoints": null,
+                "msg": "",
+                "hint": "",
+                "hintmode": null,
+                "queuestate": null,
+                "answervariable": null
+            }
+        },
+        "success": "correct",
+        "attempts": 2,
+        "submission": {
+            "de629cd827f94ae9a42fa326e7236c3e_2_1": {
+                "question": "",
+                "answer": "A. \\( h(t) =\\frac{4\\alpha}{\\pi\\sqrt{T}}\\,\\frac{\\cos\\!\\big((1+\\alpha)\\pi \\tfrac{t}{T}\\big)+ \\frac{T}{4\\alpha t}\\sin\\!\\big((1-\\alpha)\\pi \\tfrac{t}{T}\\big)}{1 - \\big(4\\alpha \\tfrac{t}{T}\\big)^2} \\)",
+                "response_type": "multiplechoiceresponse",
+                "input_type": "choicegroup",
+                "correct": true,
+                "variant": "",
+                "group_label": ""
+            }
+        }
+    },
+    "time": "2026-01-18T00:41:29.174016+00:00",
+    "event_type": "problem_check",
+    "event_source": "server",
+    "page": "x_module"
+}
+{
+    "name": "problem_graded",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": [
+        "input_de629cd827f94ae9a42fa326e7236c3e_2_1=choice_0",
+        "\n\n\n\n<h3 class=\"hd hd-3 problem-header\" id=\"de629cd827f94ae9a42fa326e7236c3e-problem-title\" aria-describedby=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e-problem-progress\" tabindex=\"-1\">\n  Multiple Choice\n</h3>\n\n<div class=\"problem-progress\" id=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@de629cd827f94ae9a42fa326e7236c3e-problem-progress\"></div>\n\n<div class=\"problem\">\n  <div>\n<div class=\"wrapper-problem-response\" tabindex=\"-1\" aria-label=\"Question 1\" role=\"group\"><p>C&#226;u 3: &#272;&#226;u l&#224; h&#224;m &#273;&#225;p &#7913;ng xung c&#7911;a b&#7897; l&#7885;c root raised cosine v&#7899;i h&#7879; s&#7889; roll-off l&#224; \\( \\alpha \\)?</p>\n<div class=\"choicegroup capa_inputtype\" id=\"inputtype_de629cd827f94ae9a42fa326e7236c3e_2_1\">\n    <fieldset aria-describedby=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\">\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1\" id=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_0\" class=\"field-input input-radio submitted\" value=\"choice_0\" checked=\"true\"/><label id=\"de629cd827f94ae9a42fa326e7236c3e_2_1-choice_0-label\" for=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_0\" class=\"response-label field-label label-inline choicegroup_submitted\" aria-describedby=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\"> A. \\( h(t) =\\frac{4\\alpha}{\\pi\\sqrt{T}}\\,\\frac{\\cos\\!\\big((1+\\alpha)\\pi \\tfrac{t}{T}\\big)+ \\frac{T}{4\\alpha t}\\sin\\!\\big((1-\\alpha)\\pi \\tfrac{t}{T}\\big)}{1 - \\big(4\\alpha \\tfrac{t}{T}\\big)^2} \\)\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1\" id=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_1\" class=\"field-input input-radio\" value=\"choice_1\"/><label id=\"de629cd827f94ae9a42fa326e7236c3e_2_1-choice_1-label\" for=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_1\" class=\"response-label field-label label-inline\" aria-describedby=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\"> B. \\( h(t) = \\frac{\\sin\\!\\big(\\pi \\tfrac{t}{T}\\big)}{\\pi \\tfrac{t}{T}}\\cdot \\frac{\\cos\\!\\big(\\alpha\\pi \\tfrac{t}{T}\\big)}{1 - \\big(2\\alpha \\tfrac{t}{T}\\big)^2} \\)\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1\" id=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_2\" class=\"field-input input-radio\" value=\"choice_2\"/><label id=\"de629cd827f94ae9a42fa326e7236c3e_2_1-choice_2-label\" for=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_2\" class=\"response-label field-label label-inline\" aria-describedby=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\"> C. \\( h(t) = \\frac{\\sin\\!\\big((1-\\alpha)\\pi \\tfrac{t}{T}\\big) + 2\\alpha \\tfrac{t}{T}\\cos\\!\\big((1+\\alpha)\\pi \\tfrac{t}{T}\\big)}{\\pi \\tfrac{t}{T}\\big[1 - (2\\alpha \\tfrac{t}{T})^2\\big]} \\)\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1\" id=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_3\" class=\"field-input input-radio\" value=\"choice_3\"/><label id=\"de629cd827f94ae9a42fa326e7236c3e_2_1-choice_3-label\" for=\"input_de629cd827f94ae9a42fa326e7236c3e_2_1_choice_3\" class=\"response-label field-label label-inline\" aria-describedby=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\"> D. \\( h(t) =\\frac{\\sin\\!\\big((1+\\alpha)\\pi \\tfrac{t}{T}\\big)} {\\pi \\tfrac{t}{T}} \\)\n            </label>\n          </div>\n        <span id=\"answer_de629cd827f94ae9a42fa326e7236c3e_2_1\"/>\n    </fieldset>\n    <div class=\"indicator-container\">\n          \n\n<span class=\"status submitted\" id=\"status_de629cd827f94ae9a42fa326e7236c3e_2_1\" data-tooltip=\"\">\n  <span class=\"sr\">&#272;&#227; tr&#7843; l&#7901;i</span><span class=\"status-icon\" aria-hidden=\"true\"/>\n</span>\n\n    </div>\n</div></div>\n</div>\n  <div class=\"action\">\n    <input type=\"hidden\" name=\"problem_id\" value=\"Multiple Choice\" />\n\n    <div class=\"problem-action-buttons-wrapper\">\n    </div>\n    <div class=\"submit-attempt-container\">\n      <button type=\"button\" class=\"submit btn-brand\" data-submitting=\"\u0110ang g\u1eedi\" data-value=\"G\u1eedi\" data-should-enable-submit-button=\"True\" aria-describedby=\"submission_feedback_de629cd827f94ae9a42fa326e7236c3e\" >\n          <span class=\"submit-label\">G\u1eedi</span>\n      </button>\n\n      <div class=\"submission-feedback\" id=\"submission_feedback_de629cd827f94ae9a42fa326e7236c3e\">\n        <span class=\"sr\">M\u1ed9t s\u1ed1 c\u00e2u h\u1ecfi c\u00f3 c\u00e1c t\u00f9y ch\u1ecdn nh\u01b0 l\u01b0u, \u0111\u1eb7t l\u1ea1i, g\u1ee3i \u00fd ho\u1eb7c hi\u1ec3n th\u1ecb c\u00e2u tr\u1ea3 l\u1eddi. C\u00e1c t\u00f9y ch\u1ecdn n\u00e0y n\u1eb1m sau n\u00fat G\u1eedi.</span>\n      </div>\n    </div>\n  </div>\n    \n\n\n<div class=\"notification warning notification-gentle-alert\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-exclamation-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"de629cd827f94ae9a42fa326e7236c3e-problem-title\">\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n            \n\n\n<div class=\"notification general notification-submit\n      \"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"de629cd827f94ae9a42fa326e7236c3e-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u00e3 \u0111\u01b0\u1ee3c g\u1eedi.\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n\n\n<div class=\"notification warning notification-save\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-save\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"de629cd827f94ae9a42fa326e7236c3e-problem-title\">None\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n    \n\n\n<div class=\"notification general notification-show-answer\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"de629cd827f94ae9a42fa326e7236c3e-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u01b0\u1ee3c \u0111\u00e1nh d\u1ea5u trong c\u00e1c c\u00e2u h\u1ecfi\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n</div>\n\n<script>\n    function emit_event(message) {\n        parent.postMessage(message, '*');\n    }\n</script>\n"
+    ],
+    "time": "2026-01-18T00:41:29.396990+00:00",
+    "event_type": "problem_graded",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@d9e4bd70f8154890a8832bfbbe9d1901/handler/xmodule_handler/problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@d9e4bd70f8154890a8832bfbbe9d1901/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "{\"GET\": {}, \"POST\": {\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1\": [\"choice_1\"]}}",
+    "time": "2026-01-18T02:08:41.807977+00:00",
+    "event_type": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@d9e4bd70f8154890a8832bfbbe9d1901/handler/xmodule_handler/problem_check",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "input_d9e4bd70f8154890a8832bfbbe9d1901_2_1=choice_1",
+    "time": "2026-01-18T02:08:41.818523+00:00",
+    "event_type": "problem_check",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "edx.grades.problem.submitted",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@d9e4bd70f8154890a8832bfbbe9d1901/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@d9e4bd70f8154890a8832bfbbe9d1901"
+        }
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "user_id": "12439",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@d9e4bd70f8154890a8832bfbbe9d1901",
+        "event_transaction_id": "0a67b592-d6ff-4348-be29-60114f62f86c",
+        "event_transaction_type": "edx.grades.problem.submitted",
+        "weighted_earned": 1,
+        "weighted_possible": 1
+    },
+    "time": "2026-01-18T02:08:41.963525+00:00",
+    "event_type": "edx.grades.problem.submitted",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@d9e4bd70f8154890a8832bfbbe9d1901/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@d9e4bd70f8154890a8832bfbbe9d1901"
+        },
+        "asides": {}
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "state": {
+            "seed": 1,
+            "student_answers": {},
+            "has_saved_answers": false,
+            "correct_map": {},
+            "input_state": {
+                "d9e4bd70f8154890a8832bfbbe9d1901_2_1": {}
+            },
+            "done": false,
+            "mask_display_name": "",
+            "selected_answer_index": null
+        },
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@d9e4bd70f8154890a8832bfbbe9d1901",
+        "answers": {
+            "d9e4bd70f8154890a8832bfbbe9d1901_2_1": "choice_1"
+        },
+        "grade": 1,
+        "max_grade": 1,
+        "correct_map": {
+            "d9e4bd70f8154890a8832bfbbe9d1901_2_1": {
+                "correctness": "correct",
+                "npoints": null,
+                "msg": "",
+                "hint": "",
+                "hintmode": null,
+                "queuestate": null,
+                "answervariable": null
+            }
+        },
+        "success": "correct",
+        "attempts": 1,
+        "submission": {
+            "d9e4bd70f8154890a8832bfbbe9d1901_2_1": {
+                "question": "",
+                "answer": "B. T\u00edn hi\u1ec7u sau khi qua b\u1ed9 l\u1ecdc ph\u1ea3i c\u00f3 \u0111\u00e1p \u1ee9ng xung sao cho t\u1ea1i c\u00e1c th\u1eddi \u0111i\u1ec3m l\u1ea5y m\u1eabu, gi\u00e1 tr\u1ecb b\u1eb1ng 0 v\u1edbi m\u1ecdi k\u00fd hi\u1ec7u kh\u00e1c ngo\u1ea1i tr\u1eeb t\u1ea1i th\u1eddi \u0111i\u1ec3m trung t\u00e2m.",
+                "response_type": "multiplechoiceresponse",
+                "input_type": "choicegroup",
+                "correct": true,
+                "variant": "",
+                "group_label": ""
+            }
+        }
+    },
+    "time": "2026-01-18T02:08:41.991689+00:00",
+    "event_type": "problem_check",
+    "event_source": "server",
+    "page": "x_module"
+}
+{
+    "name": "problem_graded",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": [
+        "input_d9e4bd70f8154890a8832bfbbe9d1901_2_1=choice_1",
+        "\n\n\n\n<h3 class=\"hd hd-3 problem-header\" id=\"d9e4bd70f8154890a8832bfbbe9d1901-problem-title\" aria-describedby=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@d9e4bd70f8154890a8832bfbbe9d1901-problem-progress\" tabindex=\"-1\">\n  Multiple Choice\n</h3>\n\n<div class=\"problem-progress\" id=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@d9e4bd70f8154890a8832bfbbe9d1901-problem-progress\"></div>\n\n<div class=\"problem\">\n  <div>\n<div class=\"wrapper-problem-response\" tabindex=\"-1\" aria-label=\"Question 1\" role=\"group\"><p>C&#226;u 4: Ti&#234;u chu&#7849;n Nyquist trong mi&#7873;n th&#7901;i gian l&#224; g&#236;?</p>\n<div class=\"choicegroup capa_inputtype\" id=\"inputtype_d9e4bd70f8154890a8832bfbbe9d1901_2_1\">\n    <fieldset aria-describedby=\"status_d9e4bd70f8154890a8832bfbbe9d1901_2_1\">\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1\" id=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1_choice_0\" class=\"field-input input-radio\" value=\"choice_0\"/><label id=\"d9e4bd70f8154890a8832bfbbe9d1901_2_1-choice_0-label\" for=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1_choice_0\" class=\"response-label field-label label-inline\" aria-describedby=\"status_d9e4bd70f8154890a8832bfbbe9d1901_2_1\"> A. Ph&#7893; c&#7911;a t&#237;n hi&#7879;u ph&#7843;i b&#7883; gi&#7899;i h&#7841;n ho&#224;n to&#224;n trong b&#259;ng t&#7847;n h&#7919;u h&#7841;n &#273;&#7875; tr&#225;nh hi&#7879;n t&#432;&#7907;ng ch&#7891;ng ph&#7893;.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1\" id=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1_choice_1\" class=\"field-input input-radio submitted\" value=\"choice_1\" checked=\"true\"/><label id=\"d9e4bd70f8154890a8832bfbbe9d1901_2_1-choice_1-label\" for=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1_choice_1\" class=\"response-label field-label label-inline choicegroup_submitted\" aria-describedby=\"status_d9e4bd70f8154890a8832bfbbe9d1901_2_1\"> B. T&#237;n hi&#7879;u sau khi qua b&#7897; l&#7885;c ph&#7843;i c&#243; &#273;&#225;p &#7913;ng xung sao cho t&#7841;i c&#225;c th&#7901;i &#273;i&#7875;m l&#7845;y m&#7851;u, gi&#225; tr&#7883; b&#7857;ng 0 v&#7899;i m&#7885;i k&#253; hi&#7879;u kh&#225;c ngo&#7841;i tr&#7915; t&#7841;i th&#7901;i &#273;i&#7875;m trung t&#226;m.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1\" id=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1_choice_2\" class=\"field-input input-radio\" value=\"choice_2\"/><label id=\"d9e4bd70f8154890a8832bfbbe9d1901_2_1-choice_2-label\" for=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1_choice_2\" class=\"response-label field-label label-inline\" aria-describedby=\"status_d9e4bd70f8154890a8832bfbbe9d1901_2_1\"> C. Chu k&#7923; l&#7845;y m&#7851;u ph&#7843;i l&#7899;n h&#417;n hai l&#7847;n t&#7847;n s&#7889; cao nh&#7845;t c&#7911;a t&#237;n hi&#7879;u.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1\" id=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1_choice_3\" class=\"field-input input-radio\" value=\"choice_3\"/><label id=\"d9e4bd70f8154890a8832bfbbe9d1901_2_1-choice_3-label\" for=\"input_d9e4bd70f8154890a8832bfbbe9d1901_2_1_choice_3\" class=\"response-label field-label label-inline\" aria-describedby=\"status_d9e4bd70f8154890a8832bfbbe9d1901_2_1\"> D. &#272;&#225;p &#7913;ng bi&#234;n &#273;&#7897; c&#7911;a b&#7897; l&#7885;c ph&#7843;i b&#7857;ng ph&#7859;ng ho&#224;n to&#224;n trong d&#7843;i th&#244;ng.\n            </label>\n          </div>\n        <span id=\"answer_d9e4bd70f8154890a8832bfbbe9d1901_2_1\"/>\n    </fieldset>\n    <div class=\"indicator-container\">\n          \n\n<span class=\"status submitted\" id=\"status_d9e4bd70f8154890a8832bfbbe9d1901_2_1\" data-tooltip=\"\">\n  <span class=\"sr\">&#272;&#227; tr&#7843; l&#7901;i</span><span class=\"status-icon\" aria-hidden=\"true\"/>\n</span>\n\n    </div>\n</div></div>\n</div>\n  <div class=\"action\">\n    <input type=\"hidden\" name=\"problem_id\" value=\"Multiple Choice\" />\n\n    <div class=\"problem-action-buttons-wrapper\">\n    </div>\n    <div class=\"submit-attempt-container\">\n      <button type=\"button\" class=\"submit btn-brand\" data-submitting=\"\u0110ang g\u1eedi\" data-value=\"G\u1eedi\" data-should-enable-submit-button=\"True\" aria-describedby=\"submission_feedback_d9e4bd70f8154890a8832bfbbe9d1901\" >\n          <span class=\"submit-label\">G\u1eedi</span>\n      </button>\n\n      <div class=\"submission-feedback\" id=\"submission_feedback_d9e4bd70f8154890a8832bfbbe9d1901\">\n        <span class=\"sr\">M\u1ed9t s\u1ed1 c\u00e2u h\u1ecfi c\u00f3 c\u00e1c t\u00f9y ch\u1ecdn nh\u01b0 l\u01b0u, \u0111\u1eb7t l\u1ea1i, g\u1ee3i \u00fd ho\u1eb7c hi\u1ec3n th\u1ecb c\u00e2u tr\u1ea3 l\u1eddi. C\u00e1c t\u00f9y ch\u1ecdn n\u00e0y n\u1eb1m sau n\u00fat G\u1eedi.</span>\n      </div>\n    </div>\n  </div>\n    \n\n\n<div class=\"notification warning notification-gentle-alert\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-exclamation-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"d9e4bd70f8154890a8832bfbbe9d1901-problem-title\">\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n            \n\n\n<div class=\"notification general notification-submit\n      \"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"d9e4bd70f8154890a8832bfbbe9d1901-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u00e3 \u0111\u01b0\u1ee3c g\u1eedi.\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n\n\n<div class=\"notification warning notification-save\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-save\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"d9e4bd70f8154890a8832bfbbe9d1901-problem-title\">None\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n    \n\n\n<div class=\"notification general notification-show-answer\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"d9e4bd70f8154890a8832bfbbe9d1901-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u01b0\u1ee3c \u0111\u00e1nh d\u1ea5u trong c\u00e1c c\u00e2u h\u1ecfi\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n</div>\n\n<script>\n    function emit_event(message) {\n        parent.postMessage(message, '*');\n    }\n</script>\n"
+    ],
+    "time": "2026-01-18T02:08:42.085954+00:00",
+    "event_type": "problem_graded",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "problem_check",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "input_2094529705584b56a5105330042e8435_2_1=choice_2",
+    "time": "2026-01-18T02:10:11.846037+00:00",
+    "event_type": "problem_check",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@2094529705584b56a5105330042e8435/handler/xmodule_handler/problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@2094529705584b56a5105330042e8435/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "{\"GET\": {}, \"POST\": {\"input_2094529705584b56a5105330042e8435_2_1\": [\"choice_2\"]}}",
+    "time": "2026-01-18T02:10:11.848472+00:00",
+    "event_type": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@2094529705584b56a5105330042e8435/handler/xmodule_handler/problem_check",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "edx.grades.problem.submitted",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@2094529705584b56a5105330042e8435/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@2094529705584b56a5105330042e8435"
+        }
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "user_id": "12439",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@2094529705584b56a5105330042e8435",
+        "event_transaction_id": "cba07b6a-6d52-4ab3-a8f8-04771c55d9dc",
+        "event_transaction_type": "edx.grades.problem.submitted",
+        "weighted_earned": 1,
+        "weighted_possible": 1
+    },
+    "time": "2026-01-18T02:10:12.109247+00:00",
+    "event_type": "edx.grades.problem.submitted",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@2094529705584b56a5105330042e8435/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@2094529705584b56a5105330042e8435"
+        },
+        "asides": {}
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "state": {
+            "seed": 1,
+            "student_answers": {},
+            "has_saved_answers": false,
+            "correct_map": {},
+            "input_state": {
+                "2094529705584b56a5105330042e8435_2_1": {}
+            },
+            "done": false,
+            "mask_display_name": "",
+            "selected_answer_index": null
+        },
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@2094529705584b56a5105330042e8435",
+        "answers": {
+            "2094529705584b56a5105330042e8435_2_1": "choice_2"
+        },
+        "grade": 1,
+        "max_grade": 1,
+        "correct_map": {
+            "2094529705584b56a5105330042e8435_2_1": {
+                "correctness": "correct",
+                "npoints": null,
+                "msg": "",
+                "hint": "",
+                "hintmode": null,
+                "queuestate": null,
+                "answervariable": null
+            }
+        },
+        "success": "correct",
+        "attempts": 1,
+        "submission": {
+            "2094529705584b56a5105330042e8435_2_1": {
+                "question": "",
+                "answer": "C. \\(h(t) =\\) \\( 2f_0 \\), \\(t = 0;\\) v\u00e0 \\(h(t) =\\) \\( \\frac{\\sin(2\\pi f_0 t)}{\\pi t} \\), \\(t \\ne 0\\)",
+                "response_type": "multiplechoiceresponse",
+                "input_type": "choicegroup",
+                "correct": true,
+                "variant": "",
+                "group_label": ""
+            }
+        }
+    },
+    "time": "2026-01-18T02:10:12.281499+00:00",
+    "event_type": "problem_check",
+    "event_source": "server",
+    "page": "x_module"
+}
+{
+    "name": "problem_graded",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": [
+        "input_2094529705584b56a5105330042e8435_2_1=choice_2",
+        "\n\n\n\n<h3 class=\"hd hd-3 problem-header\" id=\"2094529705584b56a5105330042e8435-problem-title\" aria-describedby=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@2094529705584b56a5105330042e8435-problem-progress\" tabindex=\"-1\">\n  Multiple Choice\n</h3>\n\n<div class=\"problem-progress\" id=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@2094529705584b56a5105330042e8435-problem-progress\"></div>\n\n<div class=\"problem\">\n  <div>\n<div class=\"wrapper-problem-response\" tabindex=\"-1\" aria-label=\"Question 1\" role=\"group\"><p>C&#226;u 5: Bi&#7875;u di&#7877;n c&#7911;a &#273;&#225;p &#7913;ng xung c&#7911;a b&#7897; l&#7885;c th&#244;ng th&#7845;p l&#253; t&#432;&#7903;ng trong mi&#7873;n th&#7901;i gian l&#224; g&#236;?</p>\n<div class=\"choicegroup capa_inputtype\" id=\"inputtype_2094529705584b56a5105330042e8435_2_1\">\n    <fieldset aria-describedby=\"status_2094529705584b56a5105330042e8435_2_1\">\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_2094529705584b56a5105330042e8435_2_1\" id=\"input_2094529705584b56a5105330042e8435_2_1_choice_0\" class=\"field-input input-radio\" value=\"choice_0\"/><label id=\"2094529705584b56a5105330042e8435_2_1-choice_0-label\" for=\"input_2094529705584b56a5105330042e8435_2_1_choice_0\" class=\"response-label field-label label-inline\" aria-describedby=\"status_2094529705584b56a5105330042e8435_2_1\"> A. \\(h(t) =\\) \\( e^{-j2\\pi f_0 t} \\)\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_2094529705584b56a5105330042e8435_2_1\" id=\"input_2094529705584b56a5105330042e8435_2_1_choice_1\" class=\"field-input input-radio\" value=\"choice_1\"/><label id=\"2094529705584b56a5105330042e8435_2_1-choice_1-label\" for=\"input_2094529705584b56a5105330042e8435_2_1_choice_1\" class=\"response-label field-label label-inline\" aria-describedby=\"status_2094529705584b56a5105330042e8435_2_1\"> B. \\(h(t) =\\) \\( \\frac{\\sin(\\pi t)}{\\pi t} \\)\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_2094529705584b56a5105330042e8435_2_1\" id=\"input_2094529705584b56a5105330042e8435_2_1_choice_2\" class=\"field-input input-radio submitted\" value=\"choice_2\" checked=\"true\"/><label id=\"2094529705584b56a5105330042e8435_2_1-choice_2-label\" for=\"input_2094529705584b56a5105330042e8435_2_1_choice_2\" class=\"response-label field-label label-inline choicegroup_submitted\" aria-describedby=\"status_2094529705584b56a5105330042e8435_2_1\"> C. \\(h(t) =\\) \\( 2f_0 \\), \\(t = 0;\\) v&#224; \\(h(t) =\\) \\( \\frac{\\sin(2\\pi f_0 t)}{\\pi t} \\), \\(t \\ne 0\\)\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_2094529705584b56a5105330042e8435_2_1\" id=\"input_2094529705584b56a5105330042e8435_2_1_choice_3\" class=\"field-input input-radio\" value=\"choice_3\"/><label id=\"2094529705584b56a5105330042e8435_2_1-choice_3-label\" for=\"input_2094529705584b56a5105330042e8435_2_1_choice_3\" class=\"response-label field-label label-inline\" aria-describedby=\"status_2094529705584b56a5105330042e8435_2_1\"> D. \\(h(t) = 1, t = 0\\) v&#224; \\(h(t) = 0, t \\ne 0\\)\n            </label>\n          </div>\n        <span id=\"answer_2094529705584b56a5105330042e8435_2_1\"/>\n    </fieldset>\n    <div class=\"indicator-container\">\n          \n\n<span class=\"status submitted\" id=\"status_2094529705584b56a5105330042e8435_2_1\" data-tooltip=\"\">\n  <span class=\"sr\">&#272;&#227; tr&#7843; l&#7901;i</span><span class=\"status-icon\" aria-hidden=\"true\"/>\n</span>\n\n    </div>\n</div></div>\n</div>\n  <div class=\"action\">\n    <input type=\"hidden\" name=\"problem_id\" value=\"Multiple Choice\" />\n\n    <div class=\"problem-action-buttons-wrapper\">\n    </div>\n    <div class=\"submit-attempt-container\">\n      <button type=\"button\" class=\"submit btn-brand\" data-submitting=\"\u0110ang g\u1eedi\" data-value=\"G\u1eedi\" data-should-enable-submit-button=\"True\" aria-describedby=\"submission_feedback_2094529705584b56a5105330042e8435\" >\n          <span class=\"submit-label\">G\u1eedi</span>\n      </button>\n\n      <div class=\"submission-feedback\" id=\"submission_feedback_2094529705584b56a5105330042e8435\">\n        <span class=\"sr\">M\u1ed9t s\u1ed1 c\u00e2u h\u1ecfi c\u00f3 c\u00e1c t\u00f9y ch\u1ecdn nh\u01b0 l\u01b0u, \u0111\u1eb7t l\u1ea1i, g\u1ee3i \u00fd ho\u1eb7c hi\u1ec3n th\u1ecb c\u00e2u tr\u1ea3 l\u1eddi. C\u00e1c t\u00f9y ch\u1ecdn n\u00e0y n\u1eb1m sau n\u00fat G\u1eedi.</span>\n      </div>\n    </div>\n  </div>\n    \n\n\n<div class=\"notification warning notification-gentle-alert\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-exclamation-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"2094529705584b56a5105330042e8435-problem-title\">\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n            \n\n\n<div class=\"notification general notification-submit\n      \"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"2094529705584b56a5105330042e8435-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u00e3 \u0111\u01b0\u1ee3c g\u1eedi.\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n\n\n<div class=\"notification warning notification-save\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-save\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"2094529705584b56a5105330042e8435-problem-title\">None\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n    \n\n\n<div class=\"notification general notification-show-answer\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"2094529705584b56a5105330042e8435-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u01b0\u1ee3c \u0111\u00e1nh d\u1ea5u trong c\u00e1c c\u00e2u h\u1ecfi\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n</div>\n\n<script>\n    function emit_event(message) {\n        parent.postMessage(message, '*');\n    }\n</script>\n"
+    ],
+    "time": "2026-01-18T02:10:12.515961+00:00",
+    "event_type": "problem_graded",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@7f2999df080347d4844b61d8bbb61323/handler/xmodule_handler/problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@7f2999df080347d4844b61d8bbb61323/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "{\"GET\": {}, \"POST\": {\"input_7f2999df080347d4844b61d8bbb61323_2_1[]\": [\"choice_0\"]}}",
+    "time": "2026-01-18T02:13:25.081817+00:00",
+    "event_type": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@7f2999df080347d4844b61d8bbb61323/handler/xmodule_handler/problem_check",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "input_7f2999df080347d4844b61d8bbb61323_2_1%5B%5D=choice_0",
+    "time": "2026-01-18T02:13:25.102824+00:00",
+    "event_type": "problem_check",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "edx.grades.problem.submitted",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@7f2999df080347d4844b61d8bbb61323/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@7f2999df080347d4844b61d8bbb61323"
+        }
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "user_id": "12439",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@7f2999df080347d4844b61d8bbb61323",
+        "event_transaction_id": "7cde64df-639c-46cf-a1d7-da9467dc84c2",
+        "event_transaction_type": "edx.grades.problem.submitted",
+        "weighted_earned": 0,
+        "weighted_possible": 1
+    },
+    "time": "2026-01-18T02:13:25.243248+00:00",
+    "event_type": "edx.grades.problem.submitted",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@7f2999df080347d4844b61d8bbb61323/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@7f2999df080347d4844b61d8bbb61323"
+        },
+        "asides": {}
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "state": {
+            "seed": 1,
+            "student_answers": {},
+            "has_saved_answers": false,
+            "correct_map": {},
+            "input_state": {
+                "7f2999df080347d4844b61d8bbb61323_2_1": {}
+            },
+            "done": false,
+            "mask_display_name": "",
+            "selected_answer_index": null
+        },
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@7f2999df080347d4844b61d8bbb61323",
+        "answers": {
+            "7f2999df080347d4844b61d8bbb61323_2_1": [
+                "choice_0"
+            ]
+        },
+        "grade": 0,
+        "max_grade": 1,
+        "correct_map": {
+            "7f2999df080347d4844b61d8bbb61323_2_1": {
+                "correctness": "incorrect",
+                "npoints": null,
+                "msg": "",
+                "hint": "",
+                "hintmode": null,
+                "queuestate": null,
+                "answervariable": null
+            }
+        },
+        "success": "incorrect",
+        "attempts": 1,
+        "submission": {
+            "7f2999df080347d4844b61d8bbb61323_2_1": {
+                "question": "",
+                "answer": [
+                    "A. B\u1ed9 l\u1ecdc th\u00f4ng th\u1ea5p l\u00fd t\u01b0\u1edfng c\u00f3 \u0111\u00e1p \u1ee9ng xung k\u00e9o d\u00e0i v\u00f4 h\u1ea1n theo th\u1eddi gian n\u00ean kh\u00f4ng th\u1ec3 th\u1ef1c hi\u1ec7n \u0111\u01b0\u1ee3c v\u1ec1 m\u1eb7t v\u1eadt l\u00fd."
+                ],
+                "response_type": "choiceresponse",
+                "input_type": "checkboxgroup",
+                "correct": false,
+                "variant": "",
+                "group_label": ""
+            }
+        }
+    },
+    "time": "2026-01-18T02:13:25.266736+00:00",
+    "event_type": "problem_check",
+    "event_source": "server",
+    "page": "x_module"
+}
+{
+    "name": "problem_graded",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": [
+        "input_7f2999df080347d4844b61d8bbb61323_2_1%5B%5D=choice_0",
+        "\n\n\n\n<h3 class=\"hd hd-3 problem-header\" id=\"7f2999df080347d4844b61d8bbb61323-problem-title\" aria-describedby=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@7f2999df080347d4844b61d8bbb61323-problem-progress\" tabindex=\"-1\">\n  Multiple Choice\n</h3>\n\n<div class=\"problem-progress\" id=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@7f2999df080347d4844b61d8bbb61323-problem-progress\"></div>\n\n<div class=\"problem\">\n  <div>\n<div class=\"wrapper-problem-response\" tabindex=\"-1\" aria-label=\"Question 1\" role=\"group\"><p>C&#226;u 6: T&#7841;i sao b&#7897; l&#7885;c th&#244;ng th&#7845;p l&#253; t&#432;&#7903;ng kh&#244;ng th&#7875; &#273;&#432;&#7907;c th&#7921;c hi&#7879;n tr&#234;n th&#7921;c t&#7871;?</p>\n<div class=\"choicegroup capa_inputtype\" id=\"inputtype_7f2999df080347d4844b61d8bbb61323_2_1\">\n    <fieldset aria-describedby=\"status_7f2999df080347d4844b61d8bbb61323_2_1\">\n          \n          <div class=\"field\">\n            <input type=\"checkbox\" name=\"input_7f2999df080347d4844b61d8bbb61323_2_1[]\" id=\"input_7f2999df080347d4844b61d8bbb61323_2_1_choice_0\" class=\"field-input input-checkbox submitted\" value=\"choice_0\" checked=\"true\"/><label id=\"7f2999df080347d4844b61d8bbb61323_2_1-choice_0-label\" for=\"input_7f2999df080347d4844b61d8bbb61323_2_1_choice_0\" class=\"response-label field-label label-inline choicegroup_submitted\" aria-describedby=\"status_7f2999df080347d4844b61d8bbb61323_2_1\"> A. B&#7897; l&#7885;c th&#244;ng th&#7845;p l&#253; t&#432;&#7903;ng c&#243; &#273;&#225;p &#7913;ng xung k&#233;o d&#224;i v&#244; h&#7841;n theo th&#7901;i gian n&#234;n kh&#244;ng th&#7875; th&#7921;c hi&#7879;n &#273;&#432;&#7907;c v&#7873; m&#7863;t v&#7853;t l&#253;.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"checkbox\" name=\"input_7f2999df080347d4844b61d8bbb61323_2_1[]\" id=\"input_7f2999df080347d4844b61d8bbb61323_2_1_choice_1\" class=\"field-input input-checkbox\" value=\"choice_1\"/><label id=\"7f2999df080347d4844b61d8bbb61323_2_1-choice_1-label\" for=\"input_7f2999df080347d4844b61d8bbb61323_2_1_choice_1\" class=\"response-label field-label label-inline\" aria-describedby=\"status_7f2999df080347d4844b61d8bbb61323_2_1\"> B. B&#7897; l&#7885;c th&#244;ng th&#7845;p l&#253; t&#432;&#7903;ng l&#224; h&#7879; th&#7889;ng nh&#226;n qu&#7843; n&#234;n c&#243; th&#7875; th&#7921;c hi&#7879;n &#273;&#432;&#7907;c trong th&#7921;c t&#7871;.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"checkbox\" name=\"input_7f2999df080347d4844b61d8bbb61323_2_1[]\" id=\"input_7f2999df080347d4844b61d8bbb61323_2_1_choice_2\" class=\"field-input input-checkbox\" value=\"choice_2\"/><label id=\"7f2999df080347d4844b61d8bbb61323_2_1-choice_2-label\" for=\"input_7f2999df080347d4844b61d8bbb61323_2_1_choice_2\" class=\"response-label field-label label-inline\" aria-describedby=\"status_7f2999df080347d4844b61d8bbb61323_2_1\"> C. B&#7897; l&#7885;c th&#244;ng th&#7845;p l&#253; t&#432;&#7903;ng c&#243; b&#259;ng th&#244;ng qu&#225; h&#7865;p so v&#7899;i t&#237;n hi&#7879;u th&#7921;c t&#7871;.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"checkbox\" name=\"input_7f2999df080347d4844b61d8bbb61323_2_1[]\" id=\"input_7f2999df080347d4844b61d8bbb61323_2_1_choice_3\" class=\"field-input input-checkbox\" value=\"choice_3\"/><label id=\"7f2999df080347d4844b61d8bbb61323_2_1-choice_3-label\" for=\"input_7f2999df080347d4844b61d8bbb61323_2_1_choice_3\" class=\"response-label field-label label-inline\" aria-describedby=\"status_7f2999df080347d4844b61d8bbb61323_2_1\"> D. B&#7897; l&#7885;c th&#244;ng th&#7845;p l&#253; t&#432;&#7903;ng y&#234;u c&#7847;u kh&#7843; n&#259;ng c&#7855;t t&#7847;n s&#7889; tuy&#7879;t &#273;&#7889;i (&#273;&#7897; d&#7889;c v&#244; h&#7841;n), &#273;i&#7873;u n&#224;y kh&#244;ng th&#7875; &#273;&#7841;t &#273;&#432;&#7907;c v&#7899;i linh ki&#7879;n th&#7921;c.\n            </label>\n          </div>\n        <span id=\"answer_7f2999df080347d4844b61d8bbb61323_2_1\"/>\n    </fieldset>\n    <div class=\"indicator-container\">\n          \n\n<span class=\"status submitted\" id=\"status_7f2999df080347d4844b61d8bbb61323_2_1\" data-tooltip=\"\">\n  <span class=\"sr\">&#272;&#227; tr&#7843; l&#7901;i</span><span class=\"status-icon\" aria-hidden=\"true\"/>\n</span>\n\n    </div>\n</div></div>\n</div>\n  <div class=\"action\">\n    <input type=\"hidden\" name=\"problem_id\" value=\"Multiple Choice\" />\n\n    <div class=\"problem-action-buttons-wrapper\">\n    </div>\n    <div class=\"submit-attempt-container\">\n      <button type=\"button\" class=\"submit btn-brand\" data-submitting=\"\u0110ang g\u1eedi\" data-value=\"G\u1eedi\" data-should-enable-submit-button=\"True\" aria-describedby=\"submission_feedback_7f2999df080347d4844b61d8bbb61323\" >\n          <span class=\"submit-label\">G\u1eedi</span>\n      </button>\n\n      <div class=\"submission-feedback\" id=\"submission_feedback_7f2999df080347d4844b61d8bbb61323\">\n        <span class=\"sr\">M\u1ed9t s\u1ed1 c\u00e2u h\u1ecfi c\u00f3 c\u00e1c t\u00f9y ch\u1ecdn nh\u01b0 l\u01b0u, \u0111\u1eb7t l\u1ea1i, g\u1ee3i \u00fd ho\u1eb7c hi\u1ec3n th\u1ecb c\u00e2u tr\u1ea3 l\u1eddi. C\u00e1c t\u00f9y ch\u1ecdn n\u00e0y n\u1eb1m sau n\u00fat G\u1eedi.</span>\n      </div>\n    </div>\n  </div>\n    \n\n\n<div class=\"notification warning notification-gentle-alert\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-exclamation-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"7f2999df080347d4844b61d8bbb61323-problem-title\">\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n            \n\n\n<div class=\"notification general notification-submit\n      \"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"7f2999df080347d4844b61d8bbb61323-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u00e3 \u0111\u01b0\u1ee3c g\u1eedi.\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n\n\n<div class=\"notification warning notification-save\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-save\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"7f2999df080347d4844b61d8bbb61323-problem-title\">None\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n    \n\n\n<div class=\"notification general notification-show-answer\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"7f2999df080347d4844b61d8bbb61323-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u01b0\u1ee3c \u0111\u00e1nh d\u1ea5u trong c\u00e1c c\u00e2u h\u1ecfi\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n</div>\n\n<script>\n    function emit_event(message) {\n        parent.postMessage(message, '*');\n    }\n</script>\n"
+    ],
+    "time": "2026-01-18T02:13:25.374004+00:00",
+    "event_type": "problem_graded",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@b6c8f45c52e84b18be42fc0adbd925ce/handler/xmodule_handler/problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@b6c8f45c52e84b18be42fc0adbd925ce/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "{\"GET\": {}, \"POST\": {\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1\": [\"choice_3\"]}}",
+    "time": "2026-01-18T02:14:29.975945+00:00",
+    "event_type": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@b6c8f45c52e84b18be42fc0adbd925ce/handler/xmodule_handler/problem_check",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "input_b6c8f45c52e84b18be42fc0adbd925ce_2_1=choice_3",
+    "time": "2026-01-18T02:14:30.091327+00:00",
+    "event_type": "problem_check",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "edx.grades.problem.submitted",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@b6c8f45c52e84b18be42fc0adbd925ce/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@b6c8f45c52e84b18be42fc0adbd925ce"
+        }
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "user_id": "12439",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@b6c8f45c52e84b18be42fc0adbd925ce",
+        "event_transaction_id": "3a265bd6-3324-4838-b641-4d1e42721f67",
+        "event_transaction_type": "edx.grades.problem.submitted",
+        "weighted_earned": 1,
+        "weighted_possible": 1
+    },
+    "time": "2026-01-18T02:14:30.490626+00:00",
+    "event_type": "edx.grades.problem.submitted",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@b6c8f45c52e84b18be42fc0adbd925ce/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@b6c8f45c52e84b18be42fc0adbd925ce"
+        },
+        "asides": {}
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "state": {
+            "seed": 1,
+            "student_answers": {},
+            "has_saved_answers": false,
+            "correct_map": {},
+            "input_state": {
+                "b6c8f45c52e84b18be42fc0adbd925ce_2_1": {}
+            },
+            "done": false,
+            "mask_display_name": "",
+            "selected_answer_index": null
+        },
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@b6c8f45c52e84b18be42fc0adbd925ce",
+        "answers": {
+            "b6c8f45c52e84b18be42fc0adbd925ce_2_1": "choice_3"
+        },
+        "grade": 1,
+        "max_grade": 1,
+        "correct_map": {
+            "b6c8f45c52e84b18be42fc0adbd925ce_2_1": {
+                "correctness": "correct",
+                "npoints": null,
+                "msg": "",
+                "hint": "",
+                "hintmode": null,
+                "queuestate": null,
+                "answervariable": null
+            }
+        },
+        "success": "correct",
+        "attempts": 1,
+        "submission": {
+            "b6c8f45c52e84b18be42fc0adbd925ce_2_1": {
+                "question": "",
+                "answer": "D. L\u00e0 t\u1ea7n s\u1ed1 t\u1ea1i \u0111\u00f3 bi\u00ean \u0111\u1ed9 \u0111\u00e1p \u1ee9ng t\u1ea7n s\u1ed1 c\u1ee7a b\u1ed9 l\u1ecdc gi\u1ea3m xu\u1ed1ng c\u00f2n \\( \\frac{1}{\\sqrt{2}} \\) so v\u1edbi gi\u00e1 tr\u1ecb c\u1ef1c \u0111\u1ea1i trong d\u1ea3i th\u00f4ng.",
+                "response_type": "multiplechoiceresponse",
+                "input_type": "choicegroup",
+                "correct": true,
+                "variant": "",
+                "group_label": ""
+            }
+        }
+    },
+    "time": "2026-01-18T02:14:30.626589+00:00",
+    "event_type": "problem_check",
+    "event_source": "server",
+    "page": "x_module"
+}
+{
+    "name": "problem_graded",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": [
+        "input_b6c8f45c52e84b18be42fc0adbd925ce_2_1=choice_3",
+        "\n\n\n\n<h3 class=\"hd hd-3 problem-header\" id=\"b6c8f45c52e84b18be42fc0adbd925ce-problem-title\" aria-describedby=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@b6c8f45c52e84b18be42fc0adbd925ce-problem-progress\" tabindex=\"-1\">\n  Multiple Choice\n</h3>\n\n<div class=\"problem-progress\" id=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@b6c8f45c52e84b18be42fc0adbd925ce-problem-progress\"></div>\n\n<div class=\"problem\">\n  <div>\n<div class=\"wrapper-problem-response\" tabindex=\"-1\" aria-label=\"Question 1\" role=\"group\"><p>C&#226;u 7: T&#7847;n s&#7889; c&#7855;t (\\(-3\\,\\mathrm{dB}\\)) c&#7911;a b&#7897; l&#7885;c th&#244;ng th&#7845;p &#273;&#432;&#7907;c &#273;&#7883;nh ngh&#297;a l&#224; g&#236;?</p>\n<div class=\"choicegroup capa_inputtype\" id=\"inputtype_b6c8f45c52e84b18be42fc0adbd925ce_2_1\">\n    <fieldset aria-describedby=\"status_b6c8f45c52e84b18be42fc0adbd925ce_2_1\">\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1\" id=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1_choice_0\" class=\"field-input input-radio\" value=\"choice_0\"/><label id=\"b6c8f45c52e84b18be42fc0adbd925ce_2_1-choice_0-label\" for=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1_choice_0\" class=\"response-label field-label label-inline\" aria-describedby=\"status_b6c8f45c52e84b18be42fc0adbd925ce_2_1\"> A. L&#224; t&#7847;n s&#7889; t&#7841;i &#273;&#243; &#273;&#225;p &#7913;ng t&#7847;n s&#7889; c&#7911;a b&#7897; l&#7885;c b&#7857;ng 0.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1\" id=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1_choice_1\" class=\"field-input input-radio\" value=\"choice_1\"/><label id=\"b6c8f45c52e84b18be42fc0adbd925ce_2_1-choice_1-label\" for=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1_choice_1\" class=\"response-label field-label label-inline\" aria-describedby=\"status_b6c8f45c52e84b18be42fc0adbd925ce_2_1\"> B. L&#224; t&#7847;n s&#7889; cao nh&#7845;t c&#7911;a t&#237;n hi&#7879;u &#273;&#7847;u v&#224;o.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1\" id=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1_choice_2\" class=\"field-input input-radio\" value=\"choice_2\"/><label id=\"b6c8f45c52e84b18be42fc0adbd925ce_2_1-choice_2-label\" for=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1_choice_2\" class=\"response-label field-label label-inline\" aria-describedby=\"status_b6c8f45c52e84b18be42fc0adbd925ce_2_1\"> C. L&#224; t&#7847;n s&#7889; t&#7841;i &#273;&#243; c&#244;ng su&#7845;t t&#237;n hi&#7879;u &#273;&#7847;u ra b&#7857;ng 0.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1\" id=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1_choice_3\" class=\"field-input input-radio submitted\" value=\"choice_3\" checked=\"true\"/><label id=\"b6c8f45c52e84b18be42fc0adbd925ce_2_1-choice_3-label\" for=\"input_b6c8f45c52e84b18be42fc0adbd925ce_2_1_choice_3\" class=\"response-label field-label label-inline choicegroup_submitted\" aria-describedby=\"status_b6c8f45c52e84b18be42fc0adbd925ce_2_1\"> D. L&#224; t&#7847;n s&#7889; t&#7841;i &#273;&#243; bi&#234;n &#273;&#7897; &#273;&#225;p &#7913;ng t&#7847;n s&#7889; c&#7911;a b&#7897; l&#7885;c gi&#7843;m xu&#7889;ng c&#242;n \\( \\frac{1}{\\sqrt{2}} \\) so v&#7899;i gi&#225; tr&#7883; c&#7921;c &#273;&#7841;i trong d&#7843;i th&#244;ng.\n            </label>\n          </div>\n        <span id=\"answer_b6c8f45c52e84b18be42fc0adbd925ce_2_1\"/>\n    </fieldset>\n    <div class=\"indicator-container\">\n          \n\n<span class=\"status submitted\" id=\"status_b6c8f45c52e84b18be42fc0adbd925ce_2_1\" data-tooltip=\"\">\n  <span class=\"sr\">&#272;&#227; tr&#7843; l&#7901;i</span><span class=\"status-icon\" aria-hidden=\"true\"/>\n</span>\n\n    </div>\n</div></div>\n</div>\n  <div class=\"action\">\n    <input type=\"hidden\" name=\"problem_id\" value=\"Multiple Choice\" />\n\n    <div class=\"problem-action-buttons-wrapper\">\n    </div>\n    <div class=\"submit-attempt-container\">\n      <button type=\"button\" class=\"submit btn-brand\" data-submitting=\"\u0110ang g\u1eedi\" data-value=\"G\u1eedi\" data-should-enable-submit-button=\"True\" aria-describedby=\"submission_feedback_b6c8f45c52e84b18be42fc0adbd925ce\" >\n          <span class=\"submit-label\">G\u1eedi</span>\n      </button>\n\n      <div class=\"submission-feedback\" id=\"submission_feedback_b6c8f45c52e84b18be42fc0adbd925ce\">\n        <span class=\"sr\">M\u1ed9t s\u1ed1 c\u00e2u h\u1ecfi c\u00f3 c\u00e1c t\u00f9y ch\u1ecdn nh\u01b0 l\u01b0u, \u0111\u1eb7t l\u1ea1i, g\u1ee3i \u00fd ho\u1eb7c hi\u1ec3n th\u1ecb c\u00e2u tr\u1ea3 l\u1eddi. C\u00e1c t\u00f9y ch\u1ecdn n\u00e0y n\u1eb1m sau n\u00fat G\u1eedi.</span>\n      </div>\n    </div>\n  </div>\n    \n\n\n<div class=\"notification warning notification-gentle-alert\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-exclamation-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"b6c8f45c52e84b18be42fc0adbd925ce-problem-title\">\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n            \n\n\n<div class=\"notification general notification-submit\n      \"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"b6c8f45c52e84b18be42fc0adbd925ce-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u00e3 \u0111\u01b0\u1ee3c g\u1eedi.\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n\n\n<div class=\"notification warning notification-save\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-save\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"b6c8f45c52e84b18be42fc0adbd925ce-problem-title\">None\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n    \n\n\n<div class=\"notification general notification-show-answer\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"b6c8f45c52e84b18be42fc0adbd925ce-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u01b0\u1ee3c \u0111\u00e1nh d\u1ea5u trong c\u00e1c c\u00e2u h\u1ecfi\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n</div>\n\n<script>\n    function emit_event(message) {\n        parent.postMessage(message, '*');\n    }\n</script>\n"
+    ],
+    "time": "2026-01-18T02:14:30.802899+00:00",
+    "event_type": "problem_graded",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "problem_check",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "input_410c0f55193d4635b06f1c1ed3def7ab_2_1=choice_1",
+    "time": "2026-01-18T02:15:15.007570+00:00",
+    "event_type": "problem_check",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
+{
+    "name": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@410c0f55193d4635b06f1c1ed3def7ab/handler/xmodule_handler/problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@410c0f55193d4635b06f1c1ed3def7ab/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": "{\"GET\": {}, \"POST\": {\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1\": [\"choice_1\"]}}",
+    "time": "2026-01-18T02:15:15.005254+00:00",
+    "event_type": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@410c0f55193d4635b06f1c1ed3def7ab/handler/xmodule_handler/problem_check",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "edx.grades.problem.submitted",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@410c0f55193d4635b06f1c1ed3def7ab/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@410c0f55193d4635b06f1c1ed3def7ab"
+        }
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "user_id": "12439",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@410c0f55193d4635b06f1c1ed3def7ab",
+        "event_transaction_id": "f111cdc8-d3a7-4d3c-8d19-4f89714d5a88",
+        "event_transaction_type": "edx.grades.problem.submitted",
+        "weighted_earned": 1,
+        "weighted_possible": 1
+    },
+    "time": "2026-01-18T02:15:26.220261+00:00",
+    "event_type": "edx.grades.problem.submitted",
+    "event_source": "server",
+    "page": null
+}
+{
+    "name": "problem_check",
+    "context": {
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "course_user_tags": {},
+        "user_id": 12439,
+        "path": "/courses/course-v1:SoICT+IT4593+2023-1-Chien/xblock/block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@410c0f55193d4635b06f1c1ed3def7ab/handler/xmodule_handler/problem_check",
+        "org_id": "SoICT",
+        "module": {
+            "display_name": "Multiple Choice",
+            "usage_key": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@410c0f55193d4635b06f1c1ed3def7ab"
+        },
+        "asides": {}
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": {
+        "state": {
+            "seed": 1,
+            "student_answers": {},
+            "has_saved_answers": false,
+            "correct_map": {},
+            "input_state": {
+                "410c0f55193d4635b06f1c1ed3def7ab_2_1": {}
+            },
+            "done": false,
+            "mask_display_name": "",
+            "selected_answer_index": null
+        },
+        "problem_id": "block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@410c0f55193d4635b06f1c1ed3def7ab",
+        "answers": {
+            "410c0f55193d4635b06f1c1ed3def7ab_2_1": "choice_1"
+        },
+        "grade": 1,
+        "max_grade": 1,
+        "correct_map": {
+            "410c0f55193d4635b06f1c1ed3def7ab_2_1": {
+                "correctness": "correct",
+                "npoints": null,
+                "msg": "",
+                "hint": "",
+                "hintmode": null,
+                "queuestate": null,
+                "answervariable": null
+            }
+        },
+        "success": "correct",
+        "attempts": 1,
+        "submission": {
+            "410c0f55193d4635b06f1c1ed3def7ab_2_1": {
+                "question": "",
+                "answer": "B. Gi\u1ea3m nhi\u1ec5u li\u00ean k\u00fd t\u1ef1 (ISI) trong t\u00edn hi\u1ec7u nh\u1eadn \u0111\u01b0\u1ee3c.",
+                "response_type": "multiplechoiceresponse",
+                "input_type": "choicegroup",
+                "correct": true,
+                "variant": "",
+                "group_label": ""
+            }
+        }
+    },
+    "time": "2026-01-18T02:15:26.255127+00:00",
+    "event_type": "problem_check",
+    "event_source": "server",
+    "page": "x_module"
+}
+{
+    "name": "problem_graded",
+    "context": {
+        "user_id": 12439,
+        "path": "/event",
+        "course_id": "course-v1:SoICT+IT4593+2023-1-Chien",
+        "org_id": "SoICT"
+    },
+    "username": "20210444",
+    "session": "4c9f93d81f966bfc4e33a49f2995540d",
+    "ip": "118.70.178.39",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "host": "soict.daotao.ai",
+    "referer": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea",
+    "accept_language": "vi,en-US;q=0.9,en;q=0.8",
+    "event": [
+        "input_410c0f55193d4635b06f1c1ed3def7ab_2_1=choice_1",
+        "\n\n\n\n<h3 class=\"hd hd-3 problem-header\" id=\"410c0f55193d4635b06f1c1ed3def7ab-problem-title\" aria-describedby=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@410c0f55193d4635b06f1c1ed3def7ab-problem-progress\" tabindex=\"-1\">\n  Multiple Choice\n</h3>\n\n<div class=\"problem-progress\" id=\"block-v1:SoICT+IT4593+2023-1-Chien+type@problem+block@410c0f55193d4635b06f1c1ed3def7ab-problem-progress\"></div>\n\n<div class=\"problem\">\n  <div>\n<div class=\"wrapper-problem-response\" tabindex=\"-1\" aria-label=\"Question 1\" role=\"group\"><p>C&#226;u 8: Trong c&#225;c ph&#225;t bi&#7875;u sau &#273;&#226;y, ph&#225;t bi&#7875;u n&#224;o l&#224; &#273;&#250;ng v&#7873; &#7913;ng d&#7909;ng c&#7911;a b&#7897; l&#7885;c root raised cosine?</p>\n<div class=\"choicegroup capa_inputtype\" id=\"inputtype_410c0f55193d4635b06f1c1ed3def7ab_2_1\">\n    <fieldset aria-describedby=\"status_410c0f55193d4635b06f1c1ed3def7ab_2_1\">\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1\" id=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1_choice_0\" class=\"field-input input-radio\" value=\"choice_0\"/><label id=\"410c0f55193d4635b06f1c1ed3def7ab_2_1-choice_0-label\" for=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1_choice_0\" class=\"response-label field-label label-inline\" aria-describedby=\"status_410c0f55193d4635b06f1c1ed3def7ab_2_1\"> A. Lo&#7841;i b&#7887; c&#225;c th&#224;nh ph&#7847;n t&#7847;n s&#7889; cao trong t&#237;n hi&#7879;u nh&#7853;n &#273;&#432;&#7907;c.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1\" id=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1_choice_1\" class=\"field-input input-radio submitted\" value=\"choice_1\" checked=\"true\"/><label id=\"410c0f55193d4635b06f1c1ed3def7ab_2_1-choice_1-label\" for=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1_choice_1\" class=\"response-label field-label label-inline choicegroup_submitted\" aria-describedby=\"status_410c0f55193d4635b06f1c1ed3def7ab_2_1\"> B. Gi&#7843;m nhi&#7877;u li&#234;n k&#253; t&#7921; (ISI) trong t&#237;n hi&#7879;u nh&#7853;n &#273;&#432;&#7907;c.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1\" id=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1_choice_2\" class=\"field-input input-radio\" value=\"choice_2\"/><label id=\"410c0f55193d4635b06f1c1ed3def7ab_2_1-choice_2-label\" for=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1_choice_2\" class=\"response-label field-label label-inline\" aria-describedby=\"status_410c0f55193d4635b06f1c1ed3def7ab_2_1\"> C. T&#259;ng th&#224;nh ph&#7847;n t&#7847;n s&#7889; th&#7845;p c&#7911;a t&#237;n hi&#7879;u mong mu&#7889;n.\n            </label>\n          </div>\n          \n          <div class=\"field\">\n            <input type=\"radio\" name=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1\" id=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1_choice_3\" class=\"field-input input-radio\" value=\"choice_3\"/><label id=\"410c0f55193d4635b06f1c1ed3def7ab_2_1-choice_3-label\" for=\"input_410c0f55193d4635b06f1c1ed3def7ab_2_1_choice_3\" class=\"response-label field-label label-inline\" aria-describedby=\"status_410c0f55193d4635b06f1c1ed3def7ab_2_1\"> D. Gi&#7843;m thi&#7875;u t&#7845;t c&#7843; nhi&#7877;u t&#7847;n s&#7889; trong t&#237;n hi&#7879;u nh&#7853;n &#273;&#432;&#7907;c.\n            </label>\n          </div>\n        <span id=\"answer_410c0f55193d4635b06f1c1ed3def7ab_2_1\"/>\n    </fieldset>\n    <div class=\"indicator-container\">\n          \n\n<span class=\"status submitted\" id=\"status_410c0f55193d4635b06f1c1ed3def7ab_2_1\" data-tooltip=\"\">\n  <span class=\"sr\">&#272;&#227; tr&#7843; l&#7901;i</span><span class=\"status-icon\" aria-hidden=\"true\"/>\n</span>\n\n    </div>\n</div></div>\n</div>\n  <div class=\"action\">\n    <input type=\"hidden\" name=\"problem_id\" value=\"Multiple Choice\" />\n\n    <div class=\"problem-action-buttons-wrapper\">\n    </div>\n    <div class=\"submit-attempt-container\">\n      <button type=\"button\" class=\"submit btn-brand\" data-submitting=\"\u0110ang g\u1eedi\" data-value=\"G\u1eedi\" data-should-enable-submit-button=\"True\" aria-describedby=\"submission_feedback_410c0f55193d4635b06f1c1ed3def7ab\" >\n          <span class=\"submit-label\">G\u1eedi</span>\n      </button>\n\n      <div class=\"submission-feedback\" id=\"submission_feedback_410c0f55193d4635b06f1c1ed3def7ab\">\n        <span class=\"sr\">M\u1ed9t s\u1ed1 c\u00e2u h\u1ecfi c\u00f3 c\u00e1c t\u00f9y ch\u1ecdn nh\u01b0 l\u01b0u, \u0111\u1eb7t l\u1ea1i, g\u1ee3i \u00fd ho\u1eb7c hi\u1ec3n th\u1ecb c\u00e2u tr\u1ea3 l\u1eddi. C\u00e1c t\u00f9y ch\u1ecdn n\u00e0y n\u1eb1m sau n\u00fat G\u1eedi.</span>\n      </div>\n    </div>\n  </div>\n    \n\n\n<div class=\"notification warning notification-gentle-alert\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-exclamation-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"410c0f55193d4635b06f1c1ed3def7ab-problem-title\">\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n            \n\n\n<div class=\"notification general notification-submit\n      \"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"410c0f55193d4635b06f1c1ed3def7ab-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u00e3 \u0111\u01b0\u1ee3c g\u1eedi.\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n\n\n<div class=\"notification warning notification-save\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-save\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"410c0f55193d4635b06f1c1ed3def7ab-problem-title\">None\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n    \n    \n\n\n<div class=\"notification general notification-show-answer\n      is-hidden\"\n     tabindex=\"-1\">\n    <span class=\"icon fa fa-info-circle\" aria-hidden=\"true\"></span>\n    <span class=\"notification-message\" aria-describedby=\"410c0f55193d4635b06f1c1ed3def7ab-problem-title\">C\u00e2u tr\u1ea3 l\u1eddi \u0111\u01b0\u1ee3c \u0111\u00e1nh d\u1ea5u trong c\u00e1c c\u00e2u h\u1ecfi\n    </span>\n    <div class=\"notification-btn-wrapper\">\n        <button type=\"button\" class=\"btn btn-default btn-small notification-btn review-btn sr\">Xem l\u1ea1i</button>\n    </div>\n</div>\n\n</div>\n\n<script>\n    function emit_event(message) {\n        parent.postMessage(message, '*');\n    }\n</script>\n"
+    ],
+    "time": "2026-01-18T02:15:26.371931+00:00",
+    "event_type": "problem_graded",
+    "event_source": "browser",
+    "page": "https://soict.daotao.ai/courses/course-v1:SoICT+IT4593+2023-1-Chien/courseware/2bcd5034f2214d31a13c85bc5b4f175f/2844f75f35814477868ea45f2a88c5ea/?activate_block_id=block-v1%3ASoICT%2BIT4593%2B2023-1-Chien%2Btype%40sequential%2Bblock%402844f75f35814477868ea45f2a88c5ea"
+}
