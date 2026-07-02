@@ -95,7 +95,13 @@ def main() -> int:
     dlq_topic = (args.dlq_topic or "").strip() or None
     producer = None
     if not args.dry_run and args.brokers and (topic or dlq_topic):
-        producer = Producer({"bootstrap.servers": args.brokers})
+        producer_config = {
+            "bootstrap.servers": args.brokers,
+            "acks": "all",
+            "enable.idempotence": True,
+            "max.in.flight.requests.per.connection": 1,
+        }
+        producer = Producer(producer_config)
     previous_event_time = None
     if output_path and not args.dry_run:
         output_path.parent.mkdir(parents=True, exist_ok=True)
