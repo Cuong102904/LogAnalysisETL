@@ -9,23 +9,23 @@
 
 ## Silver
 
-- Chuẩn hóa một raw source event thành:
-  - `silver_event_index`
+- Chuẩn hóa một raw source event qua Spark DataFrame worker-side flow thành:
+  - `events_canonical`
   - zero hoặc nhiều domain facts theo semantic domain
-    - `silver_assessment_events`
-    - `silver_video_events`
-    - `silver_document_events`
-    - `silver_navigation_events`
-    - `silver_exam_events`
-    - `silver_course_content_events`
-    - `silver_authoring_events`
-    - `silver_auth_events`
-    - `silver_system_events`
+    - `problem_submissions`
+    - `problem_grades`
+    - `exam_attempts`
+    - `video_interactions`
+    - `navigation_events`
+    - `content_access_events`
+    - `system_noise_events`
     - `silver_unknown_events`
-- `silver_event_index` giữ lineage, common dimensions, normalized type, quality status.
-- Domain fact tables chỉ giữ typed analytics-ready fields cho từng domain.
+- `events_canonical` giữ stable event identity, common dimensions, route classification, và canonical behavioral fields.
+- Domain fact tables chỉ giữ typed analytics-ready fields cho từng domain parser family.
 - `silver_invalid_events` giữ record fail contract hoặc quality.
+- `silver_unknown_events` giữ unmatched event để replay thủ công khi mở rộng rule hoặc parser.
 - `time` là event-time canonical dùng cho analytics và watermark/dedup.
+- Silver chỉ có một runtime: Bronze Delta Structured Streaming với `trigger(processingTime='10 seconds')` và `maxFilesPerTrigger=100`.
 - Áp dụng stream/window dedup và business dedup theo rule config.
 
 ## Gold

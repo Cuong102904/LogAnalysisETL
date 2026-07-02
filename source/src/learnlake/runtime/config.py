@@ -10,10 +10,11 @@ from learnlake.contracts import (
     MappingSpec,
     MetricDefinition,
     QualityRuleSet,
-    RouteSet,
     SourceProfile,
     WorkflowDefinition,
 )
+from learnlake.contracts.routing import RouteSet
+from learnlake.silver.schemas import SilverParserConfig, SilverRoutingConfig
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CATALOG_ROOT = Path(os.getenv("LEARNLAKE_CATALOG_ROOT", REPO_ROOT / "catalog"))
@@ -47,6 +48,14 @@ def load_mapping_spec(path: str | Path) -> MappingSpec:
 
 def load_route_set(path: str | Path) -> RouteSet:
     return RouteSet.model_validate(load_yaml(path))
+
+
+def load_silver_routing_config(path: str | Path) -> SilverRoutingConfig:
+    return SilverRoutingConfig.model_validate(load_yaml(path))
+
+
+def load_silver_parser_config(path: str | Path) -> SilverParserConfig:
+    return SilverParserConfig.model_validate(load_yaml(path))
 
 
 def load_quality_rules(paths: list[str | Path]) -> QualityRuleSet:

@@ -22,6 +22,11 @@ Centralized ingest can reorder or delay lines.
 - Do not infer causality or strict sequencing from event position alone.
 - Only treat event A as preceding event B when that ordering is explicitly supported by the `time` field and domain logic.
 
+Decision-making guidance:
+
+- Do not read or rely on `docs/` content to make implementation decisions in this workspace.
+- Treat `docs/` as stale unless the user explicitly asks to update, review, or extract information from it.
+
 Python execution policy:
 
 - Activate the virtual environment before running Python commands.

@@ -6,7 +6,10 @@ USER root
 COPY platform/local/spark/conf /opt/bitnami/spark/conf
 COPY apps /opt/project/apps
 COPY catalog /opt/project/catalog
-COPY orchestration /opt/project/orchestration
+# `orchestration` directory is not present in this workspace (contains Airflow/DAGs).
+# Omit copying it to avoid Docker build errors. Add it back when orchestration
+# assets (e.g. Airflow) are available or needed in the image.
+# COPY orchestration /opt/project/orchestration
 COPY platform /opt/project/platform
 COPY projects /opt/project/projects
 COPY serving /opt/project/serving

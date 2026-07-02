@@ -29,3 +29,14 @@ dist/
 *.env
 .env
 .DS_Store
+
+.codex/*
+EDA/*
+openspec/
+source/.playwright-cli/
+source/.playwright/
+20260320/*
+source/.agents/
+unzip_logs.py
+README.md
+data_mock/

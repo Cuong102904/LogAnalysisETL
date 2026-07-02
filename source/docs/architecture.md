@@ -4,25 +4,27 @@ Pipeline target: replay/file input -> Kafka raw topic -> LearnLake Bronze/Silver
 
 ```mermaid
 flowchart LR
-    dataFiles[BK_activity_logs_unzipped] --> replayer[apps/replay/replay_to_kafka.py]
-    replayer --> kafkaRaw[Kafka learnlake.daotao.raw]
+    dataFiles[BK activity logs] --> replayer[apps/replay/replay_to_kafka.py]
+    replayer --> kafkaRaw[Kafka raw topic]
     kafkaRaw --> bronzeApp[apps/spark/run_bronze.py]
     bronzeApp --> bronzeDelta[Delta bronze_events]
     bronzeDelta --> silverApp[apps/spark/run_silver.py]
-    silverApp --> silverDelta[Delta silver_event_index + fact tables]
+    bronzeDelta --> replayApp[apps/spark/run_silver_replay.py]
+    silverApp --> silverDelta[Delta events_canonical + domain tables + unknown/invalid]
+    replayApp --> silverDelta
     silverDelta --> goldApp[apps/spark/run_gold.py]
 ```
 
-## Responsibility Boundaries
+## Silver Boundary
 
-- `src/learnlake/`: framework core.
-- `catalog/`: source profiles, mappings, metrics, quality rules, and workflow definitions.
-- `apps/`: thin runtime entrypoints.
-- `projects/daotao_ai/`: use-case semantics, transforms, and use-case-specific Gold code.
-- `platform/local/`: Kafka, Spark, MinIO, Hive Metastore, and shared platform assets.
-- `orchestration/airflow/`: scheduling and maintenance DAGs.
-- `serving/`: Trino and Superset assets.
+- Bronze preserves raw payloads.
+- Silver owns semantic parsing, classification, quarantine, and replay.
+- Gold must not reconstruct behavior by reparsing raw Bronze payloads.
 
-## Canonical Layout Rule
+## Silver Runtime
 
-The responsibility-first tree is the source of truth. New code must not restore top-level technology ownership such as `spark/`, `kafka/`, `airflow/`, `trino/`, or `superset/`.
+- One runtime only for Bronze -> Silver normalization:
+  - Structured Streaming
+  - `trigger(processingTime='10 seconds')`
+  - `maxFilesPerTrigger=100`
+- Replay is a separate bounded job for `silver_unknown_events`, not a second normalization runtime.

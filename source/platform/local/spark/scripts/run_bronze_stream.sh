@@ -9,6 +9,7 @@ set -euo pipefail
   --name "${BRONZE_APP_NAME:-learnlake_bronze_ingestion}" \
   --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project \
   --conf "spark.ui.port=${SPARK_UI_PORT:-4040}" \
-  --conf spark.cores.max=2 \
+  --conf spark.cores.max=1 \
+  --conf spark.sql.shuffle.partitions=1 \
   /opt/project/apps/spark/run_bronze.py \
   --source daotao_ai

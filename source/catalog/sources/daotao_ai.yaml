@@ -5,7 +5,7 @@ domain: mooc
 input:
   mode: kafka
   format: jsonl
-  path: /home/cuong/Desktop/DATN/BK_activity_logs_unzipped
+  path: /home/cuong/Desktop/DATN/data_mock
   topic: mooc.raw.events
   bootstrap_servers: broker1:29092,broker2:29092,broker3:29092
   starting_offsets: earliest
@@ -21,72 +21,65 @@ bronze:
     - processing_date
 
 silver:
-  event_index:
-    table: silver_event_index
-    path: s3a://lakehouse/learnlake/silver/silver_event_index
-    checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/event_index
-    mapping: catalog/mappings/daotao_ai_to_learning_event.yaml
-    schema: event_index
+  runtime:
+    checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/runtime
+    trigger_processing_time: 10 seconds
+    max_files_per_trigger: 10
+  canonical:
+    table: events_canonical
+    path: s3a://lakehouse/learnlake/silver/events_canonical
     partition_by:
-      - source_id
+      - event_date
       - course_id
-  targets:
-    assessment:
-      table: silver_assessment_events
-      path: s3a://lakehouse/learnlake/silver/silver_assessment_events
-      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/assessment
-      schema: assessment
-    video:
-      table: silver_video_events
-      path: s3a://lakehouse/learnlake/silver/silver_video_events
-      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/video
-      schema: video
-    document:
-      table: silver_document_events
-      path: s3a://lakehouse/learnlake/silver/silver_document_events
-      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/document
-      schema: document
-    navigation:
-      table: silver_navigation_events
-      path: s3a://lakehouse/learnlake/silver/silver_navigation_events
-      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/navigation
-      schema: navigation
-    exam:
-      table: silver_exam_events
-      path: s3a://lakehouse/learnlake/silver/silver_exam_events
-      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/exam
-      schema: exam
-    course_content:
-      table: silver_course_content_events
-      path: s3a://lakehouse/learnlake/silver/silver_course_content_events
-      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/course_content
-      schema: course_content
-    authoring:
-      table: silver_authoring_events
-      path: s3a://lakehouse/learnlake/silver/silver_authoring_events
-      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/authoring
-      schema: authoring
-    auth:
-      table: silver_auth_events
-      path: s3a://lakehouse/learnlake/silver/silver_auth_events
-      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/auth
-      schema: auth
-    system:
-      table: silver_system_events
-      path: s3a://lakehouse/learnlake/silver/silver_system_events
-      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/system
-      schema: system
-    unknown:
-      table: silver_unknown_events
-      path: s3a://lakehouse/learnlake/silver/silver_unknown_events
-      checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/unknown
-      schema: unknown
+  unknown:
+    table: silver_unknown_events
+    path: s3a://lakehouse/learnlake/silver/silver_unknown_events
+    partition_by:
+      - event_date
+      - replay_status
   invalid:
     table: silver_invalid_events
     path: s3a://lakehouse/learnlake/silver/silver_invalid_events
-    checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/invalid
-    schema: invalid
+    partition_by:
+      - course_id
+  targets:
+    problem_submissions:
+      table: problem_submissions
+      path: s3a://lakehouse/learnlake/silver/problem_submissions
+      partition_by:
+        - course_id
+    problem_grades:
+      table: problem_grades
+      path: s3a://lakehouse/learnlake/silver/problem_grades
+      partition_by:
+        - course_id
+    exam_attempts:
+      table: exam_attempts
+      path: s3a://lakehouse/learnlake/silver/exam_attempts
+      partition_by:
+        - course_id
+    video_interactions:
+      table: video_interactions
+      path: s3a://lakehouse/learnlake/silver/video_interactions
+      partition_by:
+        - course_id
+    navigation_events:
+      table: navigation_events
+      path: s3a://lakehouse/learnlake/silver/navigation_events
+      partition_by:
+        - course_id
+    content_access_events:
+      table: content_access_events
+      path: s3a://lakehouse/learnlake/silver/content_access_events
+      partition_by:
+        - course_id
+    system_noise_events:
+      table: system_noise_events
+      path: s3a://lakehouse/learnlake/silver/system_noise_events
+      partition_by:
+        - event_time_utc
   routing: projects/daotao_ai/routing.yaml
+  parsers: projects/daotao_ai/parsers.yaml
   quality_rules:
     - catalog/quality/common_learning_event_rules.yaml
     - catalog/quality/daotao_ai_rules.yaml

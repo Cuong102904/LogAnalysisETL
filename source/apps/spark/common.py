@@ -1,22 +1,13 @@
 from __future__ import annotations
 
 import os
-from importlib import import_module
 from pathlib import Path
 from typing import Any
 
 from learnlake.connectors import read_json_lines, write_json_lines
-from learnlake.contracts import MappingSpec, RouteSet
-from learnlake.normalization import EventTypeResolver, MappingEvaluator
-from learnlake.plugins import TransformRegistry
-from learnlake.quality import load_rule_set
-from learnlake.runtime import (
-    load_mapping_spec,
-    load_metric_definition,
-    load_route_set,
-    load_source_profile,
-)
+from learnlake.runtime import load_metric_definition, load_source_profile
 from learnlake.runtime.config import resolve_path
+from learnlake.silver.runtime import SilverPlan, load_silver_plan
 
 
 def read_records(path: str | Path) -> list[dict[str, Any]]:
@@ -54,43 +45,6 @@ def load_profile(source_id: str):
     return profile
 
 
-def _load_source_registry(source_id: str) -> TransformRegistry:
-    registry = TransformRegistry()
-    try:
-        module = import_module(f"projects.{source_id}.transforms")
-    except ModuleNotFoundError:
-        return registry
-    register = getattr(module, "register_transforms", None)
-    if callable(register):
-        return register(registry)
-    return registry
-
-
-def build_mapping_evaluator(mapping: MappingSpec, source_id: str | None = None) -> MappingEvaluator:
-    resolvers = {}
-    if mapping.event_type_map:
-        resolver_name = Path(mapping.event_type_map).stem
-        resolvers[resolver_name] = EventTypeResolver.from_yaml(resolve_path(mapping.event_type_map))
-    registry = _load_source_registry(source_id or mapping.source_id)
-    return MappingEvaluator(mapping, resolvers=resolvers, registry=registry)
-
-
-def load_source_mapping(source_id: str) -> tuple[Any, MappingSpec, RouteSet, MappingEvaluator]:
-    profile = load_profile(source_id)
-    mapping = load_mapping_spec(resolve_path(profile.silver.mapping or ""))
-    routes = load_route_set(resolve_path(profile.silver.routing))
-    evaluator = build_mapping_evaluator(mapping, source_id)
-    return profile, mapping, routes, evaluator
-
-
-def load_source_quality_rules(source_id: str):
-    profile = load_profile(source_id)
-    rules = []
-    for rule_path in profile.silver.quality_rules:
-        rules.extend(load_rule_set(resolve_path(rule_path)).rules)
-    return rules
-
-
 def load_source_metric(source_id: str, metric_id: str):
     profile = load_profile(source_id)
     for metric_path in profile.metrics:
@@ -98,3 +52,7 @@ def load_source_metric(source_id: str, metric_id: str):
         if definition.metric_id == metric_id:
             return definition
     raise ValueError(f"Metric {metric_id} is not declared by source {source_id}")
+
+
+def load_source_silver_plan(source_id: str) -> SilverPlan:
+    return load_silver_plan(source_id)

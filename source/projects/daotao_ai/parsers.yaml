@@ -1,0 +1,106 @@
+version: "2026-07-02"
+
+defaults:
+  execution_mode: spark_dataframe
+  canonical_table: events_canonical
+  unknown_table: silver_unknown_events
+  invalid_table: silver_invalid_events
+
+parsers:
+  - name: parse_problem_check_browser
+    parser_family: problem_browser
+    description: Parse browser problem_check payloads into append-only submission facts
+    inputs:
+      required: [event_id, event_time_utc, event_json, course_id, page]
+      optional: [username, user_id, session_id, module_usage_key, module_display_name, referer]
+    outputs:
+      domain_tables: [problem_submissions]
+      canonical_fields:
+        event_group: assessment
+        event_subgroup: problem_submission
+        parser_family: problem_browser
+
+  - name: parse_problem_check_server
+    parser_family: problem_server
+    description: Parse server problem_check payloads into append-only submission facts
+    inputs:
+      required: [event_id, event_time_utc, event_json, course_id]
+      optional: [username, user_id, session_id, module_usage_key, module_display_name]
+    outputs:
+      domain_tables: [problem_submissions]
+      canonical_fields:
+        event_group: assessment
+        event_subgroup: problem_submission
+        parser_family: problem_server
+
+  - name: parse_problem_grade
+    parser_family: grade_server
+    description: Parse server-side problem grading payloads without Silver-side exam correlation
+    inputs:
+      required: [event_id, event_time_utc, event_json, course_id]
+      optional: [username, user_id, session_id, module_usage_key, module_display_name]
+    outputs:
+      domain_tables: [problem_grades]
+
+  - name: parse_special_exam_attempt
+    parser_family: special_exam
+    description: Parse special exam lifecycle payloads as append-only exam attempt events
+    inputs:
+      required: [event_id, event_time_utc, event_type, event_json, course_id]
+      optional: [username, user_id, session_id, event_source]
+    outputs:
+      domain_tables: [exam_attempts]
+
+  - name: parse_video_interaction
+    parser_family: video_browser
+    description: Parse browser-side video interaction payloads
+    inputs:
+      required: [event_id, event_time_utc, event_type, event_json, course_id]
+      optional: [username, user_id, session_id, module_usage_key]
+    outputs:
+      domain_tables: [video_interactions]
+
+  - name: parse_transcript_request
+    parser_family: transcript_request
+    description: Parse transcript request routes
+    inputs:
+      required: [event_id, event_time_utc, context_path]
+      optional: [course_id, user_id, session_id, event_json]
+    outputs:
+      domain_tables: []
+
+  - name: parse_navigation_event
+    parser_family: navigation
+    description: Parse navigation and sequence events
+    inputs:
+      required: [event_time_utc, event_type, course_id]
+      optional: [username, session_id, page, referer, event_json]
+    outputs:
+      domain_tables: [navigation_events]
+
+  - name: parse_content_access_event
+    parser_family: pdf_book
+    description: Parse book and PDF access events
+    inputs:
+      required: [event_time_utc, event_type, course_id]
+      optional: [username, session_id, event_json]
+    outputs:
+      domain_tables: [content_access_events]
+
+  - name: parse_auth_noise_event
+    parser_family: auth
+    description: Parse authentication callback noise events
+    inputs:
+      required: [event_time_utc, context_path]
+      optional: [host, ip, agent, event_type, username]
+    outputs:
+      domain_tables: [system_noise_events]
+
+  - name: parse_system_noise_event
+    parser_family: noise_path
+    description: Parse scanner and bot noise events
+    inputs:
+      required: [event_time_utc, context_path]
+      optional: [host, ip, agent, event_type, username]
+    outputs:
+      domain_tables: [system_noise_events]

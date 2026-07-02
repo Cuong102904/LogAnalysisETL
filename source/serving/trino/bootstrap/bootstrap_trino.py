@@ -342,23 +342,15 @@ def validate_semantic_views() -> None:
 def register_direct_tables() -> None:
     direct_tables = [
         ("bronze_events", "s3://lakehouse/learnlake/bronze/bronze_events"),
-        ("silver_event_index", "s3://lakehouse/learnlake/silver/silver_event_index"),
-        ("silver_assessment_events", "s3://lakehouse/learnlake/silver/silver_assessment_events"),
-        ("silver_auth_events", "s3://lakehouse/learnlake/silver/silver_auth_events"),
-        ("silver_authoring_events", "s3://lakehouse/learnlake/silver/silver_authoring_events"),
-        (
-            "silver_course_content_events",
-            "s3://lakehouse/learnlake/silver/silver_course_content_events",
-        ),
-        ("silver_document_events", "s3://lakehouse/learnlake/silver/silver_document_events"),
-        ("silver_exam_events", "s3://lakehouse/learnlake/silver/silver_exam_events"),
+        ("events_canonical", "s3://lakehouse/learnlake/silver/events_canonical"),
+        ("problem_submissions", "s3://lakehouse/learnlake/silver/problem_submissions"),
+        ("problem_grades", "s3://lakehouse/learnlake/silver/problem_grades"),
+        ("exam_attempts", "s3://lakehouse/learnlake/silver/exam_attempts"),
+        ("content_access_events", "s3://lakehouse/learnlake/silver/content_access_events"),
         ("silver_invalid_events", "s3://lakehouse/learnlake/silver/silver_invalid_events"),
-        (
-            "silver_navigation_events",
-            "s3://lakehouse/learnlake/silver/silver_navigation_events",
-        ),
-        ("silver_video_events", "s3://lakehouse/learnlake/silver/silver_video_events"),
-        ("silver_system_events", "s3://lakehouse/learnlake/silver/silver_system_events"),
+        ("navigation_events", "s3://lakehouse/learnlake/silver/navigation_events"),
+        ("video_interactions", "s3://lakehouse/learnlake/silver/video_interactions"),
+        ("system_noise_events", "s3://lakehouse/learnlake/silver/system_noise_events"),
         ("silver_unknown_events", "s3://lakehouse/learnlake/silver/silver_unknown_events"),
     ]
     register_tables(TRINO_SCHEMA, direct_tables)

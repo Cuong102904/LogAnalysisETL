@@ -1,12 +1,28 @@
 rules:
-  - id: bot_events_are_ignored
-    type: boolean_flag
-    field: is_bot
-    status: ignored
-    message: bot_or_crawler_event
-  - id: unknown_events_warn
-    type: mark_when_equals
-    field: learning_relevance
-    value: unknown
-    status: warning
-    message: unknown_learning_relevance
+  - id: allowed_event_group
+    type: allowed_values
+    field: event_group
+    allowed:
+      - learning
+      - assessment
+      - exam
+      - navigation
+      - video
+      - system
+      - noise
+    status: invalid
+  - id: allowed_parser_family
+    type: allowed_values
+    field: parser_family
+    allowed:
+      - video_browser
+      - problem_browser
+      - problem_server
+      - grade_server
+      - special_exam
+      - transcript_request
+      - navigation
+      - pdf_book
+      - auth
+      - noise_path
+    status: invalid

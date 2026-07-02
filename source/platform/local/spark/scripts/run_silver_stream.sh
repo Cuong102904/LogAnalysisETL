@@ -9,7 +9,7 @@ set -euo pipefail
   --name "${SILVER_APP_NAME:-learnlake_silver_normalization}" \
   --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project \
   --conf "spark.ui.port=${SPARK_UI_PORT:-4041}" \
-  --conf spark.cores.max=1 \
+  --conf spark.cores.max=2 \
+  --conf spark.sql.shuffle.partitions=4 \
   /opt/project/apps/spark/run_silver.py \
-  --source daotao_ai \
-  --stream
+  --source daotao_ai

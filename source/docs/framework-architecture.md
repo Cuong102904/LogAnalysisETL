@@ -191,8 +191,8 @@ flowchart TB
     subgraph OUT["Outputs"]
         direction TB
         O1["Bronze Delta"]
-        O2["silver_event_index"]
-        O3["silver_*_events"]
+        O2["events_canonical"]
+        O3["domain silver tables"]
         O4["Gold metrics / downstream"]
     end
 
@@ -883,23 +883,24 @@ Chúng không chứa business logic phức tạp. Vai trò chính là:
 Các file quan trọng:
 
 - [event_index.py](/home/cuong/Desktop/DATN/source/src/learnlake/contracts/event_index.py)
-  - định nghĩa `EventIndex`
-  - đây là row chuẩn chung cho mọi event sau normalize
-  - chứa lineage, event time, actor, course, route metadata, payload summary
+  - định nghĩa `EventsCanonical`
+  - đây là row chuẩn classified-event chung cho mọi event sau Silver
+  - chứa stable event identity, event time, actor, course, route classification, payload summary
 
 - [facts.py](/home/cuong/Desktop/DATN/source/src/learnlake/contracts/facts.py)
   - định nghĩa fact model theo domain
   - mỗi domain là một typed schema riêng thay vì nhét hết vào một bảng rộng
-  - đây là nền tảng cho kiến trúc `silver_event_index + domain facts`
+  - đây là nền tảng cho kiến trúc `events_canonical + domain facts`
 
 - [source.py](/home/cuong/Desktop/DATN/source/src/learnlake/contracts/source.py)
   - định nghĩa `SourceProfile`
   - một source profile mô tả:
     - input đọc từ đâu
     - Bronze path nào
-    - Silver event index path nào
+    - canonical, unknown, invalid, và domain Silver path nào
     - có những Silver target nào
     - routing file nào
+    - parser file nào
     - quality rules nào
 
 - [routing.py](/home/cuong/Desktop/DATN/source/src/learnlake/contracts/routing.py)
@@ -917,100 +918,85 @@ Nói ngắn gọn:
 
 > `contracts/` là ngôn ngữ chung của framework.
 
-### b. `normalization/` là bộ máy xử lý chính
+### b. `silver/` và `silver_domain/` là bộ máy xử lý chính
 
-Đây là phần quan trọng nhất trong logic của Silver.
+Đây là phần quan trọng nhất trong logic Silver mới.
 
-#### [payloads.py](/home/cuong/Desktop/DATN/source/src/learnlake/normalization/payloads.py)
-
-Nhiệm vụ:
-
-- parse field `event`
-- chuẩn hóa nó thành một payload thống nhất hơn
-
-Lý do cần file này:
-
-- learning logs, đặc biệt Open edX, có field `event` không ổn định
-- có record là `dict`
-- có record là JSON string
-- có record là `list`
-- có record là form-encoded string
-
-Nếu không normalize payload trước, route và extractor phía sau sẽ phải lặp lại logic parse ở nhiều nơi.
-
-#### [router.py](/home/cuong/Desktop/DATN/source/src/learnlake/normalization/router.py)
+#### [runtime.py](/home/cuong/Desktop/DATN/source/src/learnlake/silver/runtime.py)
 
 Nhiệm vụ:
+
+- compile route, parser, quality config trên driver
+- dựng DataFrame plan cho shared transforms và domain parsers
+- tách canonical, unknown, invalid, và domain outputs
+
+Luồng logic của một Bronze batch:
 
 ```text
-record + route set
-  -> evaluate match rules
-  -> sort by priority
-  -> chọn first match
+1. parse base fields từ raw payload
+2. parse context fields
+3. derive event_id và auth flags
+4. attach route classification theo routing.yaml
+5. split thành matched, unknown, invalid
+6. build events_canonical cho matched valid rows
+7. apply parser DataFrame functions cho từng parser family
+8. emit canonical + domain tables + unknown + invalid
 ```
 
 Điểm thiết kế quan trọng:
 
-- router là generic
-- semantics cụ thể không nằm trong router
-- router chỉ hiểu các operator chung
+- driver chỉ compile config và orchestrate Spark plan
+- worker mới thực thi parse, classify, transform
+- không còn per-row Python routing hay mapper hot path
 
-Các operator được support:
-
-- `equals`
-- `in`
-- `starts_with`
-- `contains`
-- `regex`
-- `has_key`
-- `all`
-- `any`
-- `not`
-
-Ý nghĩa:
-
-> `router.py` là engine phân loại generic, còn route YAML mới chứa semantics của source.
-
-#### [mapper.py](/home/cuong/Desktop/DATN/source/src/learnlake/normalization/mapper.py)
+#### [compiler.py](/home/cuong/Desktop/DATN/source/src/learnlake/silver/compiler.py)
 
 Nhiệm vụ:
 
-- đọc mapping spec
-- map dữ liệu từ Bronze/raw payload/parsed payload/route metadata
-- sinh ra draft fields cho `EventIndex`
+- compile `routing.yaml` thành Spark `Column` expressions
+- support deterministic operator set:
+  - `eq`
+  - `in`
+  - `regex`
+  - `contains`
+  - `startswith`
+  - `exists`
+  - `all`
+  - `any`
+  - `not`
 
-Phân biệt rõ:
+Ý nghĩa:
 
-- route quyết định event thuộc loại gì
-- mapper quyết định các field output được lấy từ đâu
+> semantics nằm trong YAML, còn compiler chỉ biến nó thành Spark expressions chạy trên worker.
 
-#### [normalizer.py](/home/cuong/Desktop/DATN/source/src/learnlake/normalization/normalizer.py)
+#### [transforms.py](/home/cuong/Desktop/DATN/source/src/learnlake/silver_domain/transforms.py)
 
-Đây là orchestration center của toàn bộ bước normalize.
+Nhiệm vụ:
 
-Luồng logic của một Bronze record:
+- shared Spark DataFrame functions:
+  - `parse_base_fields`
+  - `parse_context_fields`
+  - `parse_authentication_flags`
+  - `attach_event_identity`
+  - `attach_route_fields`
+  - `build_events_canonical`
+  - `build_unknown_events`
+  - `build_invalid_events`
+- domain parser Spark DataFrame functions:
+  - `parse_problem_check_browser`
+  - `parse_problem_check_server`
+  - `parse_problem_grade`
+  - `parse_special_exam_attempt`
+  - `parse_video_interaction`
+  - `parse_transcript_request`
+  - `parse_navigation_event`
+  - `parse_content_access_event`
+  - `parse_auth_noise_event`
+  - `parse_system_noise_event`
 
-```text
-1. lấy raw_payload
-2. parse field event bằng payload parser
-3. chạy router để tìm route phù hợp
-4. chạy mapper để build event-index draft
-5. validate draft bằng EventIndex contract
-6. chạy quality rules
-7. nếu valid thì gọi extractor đã register
-8. emit:
-   - 1 event_index row
-   - 0..n fact rows
-   - hoặc invalid row
-```
+Ý nghĩa:
 
-Đây là điểm thay đổi kiến trúc quan trọng nhất:
-
-- một Bronze record không còn tạo ra duy nhất 1 row Silver generic
-- nó tạo ra:
-  - 1 `silver_event_index`
-  - cộng thêm 0 hoặc 1 fact row domain
-  - hoặc vào `silver_invalid_events`
+> parser nhận và trả về Spark DataFrame, không materialize Python row object.
 
 ### c. `plugins/` là boundary kiểm soát code mở rộng
 
@@ -1195,10 +1181,12 @@ File này mô tả một source cần gì để framework chạy được:
 
 - input mode là gì
 - Bronze path là gì
-- `silver_event_index` nằm đâu
-- các bảng fact nào được bật
+- `events_canonical` nằm đâu
+- `silver_unknown_events` và `silver_invalid_events` nằm đâu
+- các bảng domain Silver nào được bật
 - mỗi bảng ghi vào path nào
 - routing file nào sẽ được dùng
+- parser file nào sẽ được dùng
 - quality rules nào sẽ được áp dụng
 
 Nói ngắn gọn:
@@ -1221,13 +1209,13 @@ Nó quyết định:
 - priority route phải xử lý các case chồng lấn
 - ví dụ `problem_check` phải thắng generic course route
 
-### c. `transforms.py` là semantic extractor
+### c. `parsers.yaml` + parser functions là semantic extractor surface
 
 Nếu `routing.yaml` trả lời câu hỏi:
 
 > “event này thuộc loại nào?”
 
-thì `transforms.py` trả lời câu hỏi:
+thì parser config và parser functions trả lời câu hỏi:
 
 > “event này cần bóc những field typed nào?”
 
@@ -1272,7 +1260,7 @@ flowchart LR
 
     subgraph RT["apps/spark"]
         RT1["run_bronze.py\nsource -> Bronze Delta"]
-        RT2["run_silver.py\nBronze -> EventIndex + fact tables"]
+        RT2["run_silver.py\nBronze -> canonical/domain/unknown/invalid"]
         RT3["run_gold.py\nSilver -> Gold outputs"]
         RT4["common.py\nprofile loading, env overrides,\nregistry wiring"]
     end
@@ -1296,7 +1284,7 @@ flowchart LR
 ```text
 apps/spark/
 ├── run_bronze.py             # Biến ingest contract thành job chạy thực tế
-├── run_silver.py             # Biến normalize contract thành fan-out job thực tế
+├── run_silver.py             # Biến Silver contract thành single streaming job thực tế
 ├── run_gold.py               # Nối Silver typed data sang lớp aggregate/feature
 ├── common.py                 # Gom wiring runtime để runner không tự biết quá nhiều
 └── __init__.py               # Định danh adapter Spark như một module chạy được
@@ -1321,7 +1309,7 @@ Hiện tại backend là Spark.
 Luồng trong layer này:
 
 1. `run_bronze.py` đọc input và ghi Bronze
-2. `run_silver.py` đọc Bronze và gọi framework core để fan-out Silver
+2. `run_silver.py` đọc Bronze và chạy single Spark-first Silver runtime
 3. `run_gold.py` đọc Silver để tạo metric/aggregate
 
 Điểm cần nhấn mạnh trong slide:
@@ -1370,21 +1358,21 @@ Nó làm:
 
 ### b. `run_silver.py`
 
-Đây là runner quan trọng nhất ở giai đoạn normalize.
+Đây là runner quan trọng nhất ở giai đoạn Silver.
 
 Nó làm:
 
 1. đọc Bronze Delta
-2. load source profile, mapping, routes, quality rules
-3. gọi `normalize_bronze_records`
-4. group output theo target table
-5. ghi ra `silver_event_index` và các fact tables
-6. ghi invalid output nếu có
+2. load source profile, routing, parsers, quality rules
+3. compile config thành Spark plan ở driver
+4. chạy shared transforms và route classification trên worker
+5. build `events_canonical`, domain tables, `silver_unknown_events`, `silver_invalid_events`
+6. ghi output Delta theo từng target
 
 Điểm quan trọng:
 
-- một batch Bronze không ghi vào một bảng Silver duy nhất nữa
-- nó fan-out theo multi-target model
+- Silver không còn có batch mode hoặc legacy stream mode
+- hot path dùng Spark DataFrame expressions chứ không dùng Python row iteration
 
 ### c. `common.py`
 
@@ -1596,21 +1584,20 @@ flowchart TB
     C --> D["run_bronze.py"]
     D --> E["Bronze Delta\nbronze_events"]
     E --> F["run_silver.py"]
-    F --> G["Framework Core\nnormalize_bronze_records"]
-    G --> H["Route by daotao_ai routing.yaml"]
-    H --> I["Extract by daotao_ai transforms.py"]
-    I --> J["silver_event_index"]
-    I --> K["silver_assessment_events"]
-    I --> L["silver_video_events"]
-    I --> M["silver_document_events"]
-    I --> N["silver_navigation_events"]
-    I --> O["silver_exam_events"]
-    I --> P["silver_course_content_events"]
-    I --> Q["silver_authoring_events"]
-    I --> R["silver_auth_events"]
-    I --> S["silver_system_events"]
-    I --> T["silver_unknown_events"]
-    G --> U["silver_invalid_events"]
+    F --> G["Driver control-plane\nload profile + compile routing/parsers"]
+    G --> H["Worker data-plane\nshared Spark DataFrame transforms"]
+    H --> I["Route by daotao_ai routing.yaml"]
+    I --> J["Parser families from parsers.yaml"]
+    J --> K["events_canonical"]
+    J --> L["problem_submissions"]
+    J --> M["problem_grades"]
+    J --> N["exam_attempts"]
+    J --> O["video_interactions"]
+    J --> P["navigation_events"]
+    J --> Q["content_access_events"]
+    J --> R["system_noise_events"]
+    I --> S["silver_unknown_events"]
+    H --> T["silver_invalid_events"]
 ```
 
 ### Ý nghĩa data flow

@@ -3,33 +3,19 @@ rules:
     type: required
     field: event_id
     status: invalid
-  - id: required_source_id
-    type: required
-    field: source_id
-    status: invalid
   - id: required_event_time
     type: required
-    field: event_time
+    field: event_time_utc
     status: invalid
-  - id: required_raw_event_type
+  - id: required_event_type
     type: required
-    field: raw_event_type
+    field: event_type
     status: invalid
-  - id: allowed_learning_relevance
-    type: allowed_values
-    field: learning_relevance
-    allowed:
-      - learning
-      - non_learning
-      - noise
-      - unknown
+  - id: required_event_group
+    type: required
+    field: event_group
     status: invalid
-  - id: allowed_quality_status
-    type: allowed_values
-    field: quality_status
-    allowed:
-      - valid
-      - warning
-      - invalid
-      - ignored
+  - id: required_parser_family
+    type: required
+    field: parser_family
     status: invalid

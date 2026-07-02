@@ -1,5 +1,5 @@
 metric_id: gold_course_activity_summary
-input: silver_event_index
+input: events_canonical
 output: gold_course_activity_summary
 window: 1 hour
 execution:

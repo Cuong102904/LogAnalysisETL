@@ -1,61 +1,44 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
-
-LearningRelevance = Literal["learning", "non_learning", "noise", "unknown"]
-QualityStatus = Literal["valid", "warning", "invalid", "ignored"]
+from pydantic import BaseModel, ConfigDict
 
 
-class EventIndex(BaseModel):
+class EventsCanonical(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     event_id: str
-    source_id: str
-    source_type: str
-    raw_event_ref: str
-    event_time: datetime
-    ingest_time: datetime | None = None
-    processing_time: datetime
-
-    actor_id: str | None = None
-    actor_external_id: str | None = None
+    event_time_utc: datetime
+    event_date: date
+    event_hour_utc: int
+    username: str | None = None
+    user_id: str | None = None
     session_id: str | None = None
-    course_id: str | None = None
-    org_id: str | None = None
-
-    raw_name: str | None = None
-    raw_event_type: str
-    event_source: str | None = None
-    event_group: str
-    normalized_type: str
-    action: str
-    object_type: str
-    object_id: str | None = None
-    learning_relevance: LearningRelevance
-
-    path: str | None = None
+    ip: str | None = None
+    agent: str | None = None
+    host: str | None = None
     page: str | None = None
     referer: str | None = None
-    host: str | None = None
-    ip: str | None = None
-    user_agent: str | None = None
-
-    is_authenticated: bool
-    is_bot: bool
+    event_source: str | None = None
+    event_type: str
+    event_name: str | None = None
+    course_id: str | None = None
+    org_id: str | None = None
+    context_path: str | None = None
+    module_usage_key: str | None = None
+    module_display_name: str | None = None
+    event_json: str | None = None
+    event_group: str
+    event_subgroup: str
+    parser_family: str
     is_noise: bool = False
-    quality_status: QualityStatus = "valid"
-    quality_errors: list[str] = Field(default_factory=list)
+    is_authenticated: bool = False
+    route_id: str | None = None
+    route_version: str | None = None
 
-    payload_kind: str
-    payload_json: dict[str, Any] | None = None
-    context: dict[str, Any] | None = None
-
-    event_date: date | None = None
-    event_hour: int | None = None
-
-    def as_record(self) -> dict[str, Any]:
+    def as_record(self) -> dict[str, object]:
         return self.model_dump(mode="python")
 
+
+EventIndex = EventsCanonical

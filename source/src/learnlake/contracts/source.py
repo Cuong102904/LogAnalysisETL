@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import Literal
-
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from typing import Literal
 
 
 class InputConfig(BaseModel):
@@ -35,70 +34,82 @@ class SilverTargetConfig(BaseModel):
     table: str
     path: str
     checkpoint: str | None = None
-    mapping: str | None = None
     schema_name: str | None = Field(default=None, alias="schema")
     partition_by: list[str] = Field(default_factory=list)
-    quality_rules: list[str] = Field(default_factory=list)
 
 
-class InvalidTargetConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+class SilverRuntimeConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
 
-    table: str
-    path: str
-    checkpoint: str | None = None
-    schema_name: str | None = Field(default=None, alias="schema")
+    checkpoint: str
+    trigger_processing_time: str = "10 seconds"
+    max_files_per_trigger: int = 100
+
+    @model_validator(mode="after")
+    def validate_runtime(self) -> "SilverRuntimeConfig":
+        if not self.checkpoint:
+            raise ValueError("silver.runtime.checkpoint is required")
+        if not self.trigger_processing_time:
+            raise ValueError("silver.runtime.trigger_processing_time is required")
+        if self.max_files_per_trigger <= 0:
+            raise ValueError("silver.runtime.max_files_per_trigger must be positive")
+        return self
 
 
 class SilverConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    event_index: SilverTargetConfig
+    runtime: SilverRuntimeConfig
+    canonical: SilverTargetConfig
+    unknown: SilverTargetConfig
+    invalid: SilverTargetConfig
     targets: dict[str, SilverTargetConfig] = Field(default_factory=dict)
-    invalid: InvalidTargetConfig | None = None
     routing: str
+    parsers: str
     quality_rules: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_targets(self) -> "SilverConfig":
-        if not self.event_index.table or not self.event_index.path:
-            raise ValueError("silver.event_index requires non-empty table and path")
-        if not self.event_index.mapping:
-            raise ValueError("silver.event_index requires a mapping reference")
+        if not self.canonical.table or not self.canonical.path:
+            raise ValueError("silver.canonical requires non-empty table and path")
+        if not self.unknown.table or not self.unknown.path:
+            raise ValueError("silver.unknown requires non-empty table and path")
+        if not self.invalid.table or not self.invalid.path:
+            raise ValueError("silver.invalid requires non-empty table and path")
         if not self.routing:
             raise ValueError("silver.routing is required")
+        if not self.parsers:
+            raise ValueError("silver.parsers is required")
         for target_name, target in self.targets.items():
             if not target.table or not target.path:
                 raise ValueError(
                     f"silver.targets.{target_name} requires non-empty table and path"
                 )
-        if self.invalid is not None and (not self.invalid.table or not self.invalid.path):
-            raise ValueError("silver.invalid requires non-empty table and path")
         return self
 
     @property
     def table(self) -> str:
-        return self.event_index.table
+        return self.canonical.table
 
     @property
     def path(self) -> str:
-        return self.event_index.path
+        return self.canonical.path
 
     @property
-    def checkpoint(self) -> str | None:
-        return self.event_index.checkpoint
+    def checkpoint(self) -> str:
+        return self.runtime.checkpoint
 
     @property
-    def mapping(self) -> str | None:
-        return self.event_index.mapping
-
-    @property
-    def invalid_path(self) -> str | None:
-        return None if self.invalid is None else self.invalid.path
+    def invalid_path(self) -> str:
+        return self.invalid.path
 
     def target_for_table(self, table_name: str) -> SilverTargetConfig | None:
-        if self.event_index.table == table_name:
-            return self.event_index
+        if self.canonical.table == table_name:
+            return self.canonical
+        if self.unknown.table == table_name:
+            return self.unknown
+        if self.invalid.table == table_name:
+            return self.invalid
         for target in self.targets.values():
             if target.table == table_name:
                 return target

@@ -33,7 +33,7 @@ tasks:
     priority: 500
     args:
       - --table-path
-      - s3a://lakehouse/learnlake/silver/silver_event_index
+      - s3a://lakehouse/learnlake/silver/events_canonical
       - --app-name
-      - silver_event_index_maintenance
+      - events_canonical_maintenance
       - --optimize

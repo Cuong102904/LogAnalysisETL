@@ -1,158 +1,181 @@
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Any
+from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class FactBase(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    event_id: str
-    event_time: datetime
-    actor_id: str | None = None
-    session_id: str | None = None
-    course_id: str | None = None
-    org_id: str | None = None
-
-    def as_record(self) -> dict[str, Any]:
+    def as_record(self) -> dict[str, object]:
         return self.model_dump(mode="python")
 
 
-class AssessmentEvent(FactBase):
+class ProblemSubmission(FactBase):
+    submission_event_id: str
+    event_time_utc: datetime
+    username: str | None = None
+    user_id: str | None = None
+    session_id: str | None = None
+    course_id: str | None = None
     problem_id: str | None = None
-    assessment_action: str
-    problem_display_name: str | None = None
-    response_type: str | None = None
-    input_type: str | None = None
-    attempts: int | None = None
+    module_usage_key: str | None = None
+    module_display_name: str | None = None
+    submission_source: str
+    answer_payload: str | None = None
+    attempt_no: int | None = None
     success: str | None = None
-    grade: float | None = None
-    max_grade: float | None = None
+    grade_raw: float | None = None
+    max_grade_raw: float | None = None
+    question_variant: str | None = None
+    in_exam_window: bool = False
+    exam_attempt_id: str | None = None
+
+
+class ProblemGrade(FactBase):
+    grade_event_id: str
+    event_time_utc: datetime
+    username: str | None = None
+    user_id: str | None = None
+    session_id: str | None = None
+    course_id: str | None = None
+    problem_id: str | None = None
+    module_usage_key: str | None = None
+    module_display_name: str | None = None
     weighted_earned: float | None = None
     weighted_possible: float | None = None
-    answers_json: dict[str, Any] | None = None
-    correct_map_json: dict[str, Any] | None = None
-    submission_json: dict[str, Any] | None = None
-    event_transaction_id: str | None = None
+    is_correct: bool | None = None
+    grade_ratio: float | None = None
+    exam_attempt_id: str | None = None
+    in_exam_window: bool = False
 
 
-class VideoEvent(FactBase):
-    video_id: str | None = None
-    video_action: str
+class ExamAttempt(FactBase):
+    exam_attempt_event_id: str
+    event_time_utc: datetime
+    attempt_event_type: str
+    exam_attempt_id: str
+    exam_id: str | None = None
+    exam_name: str | None = None
+    exam_content_id: str | None = None
+    course_id: str | None = None
+    username: str | None = None
+    user_id: str | None = None
+    attempt_user_id: str | None = None
+    session_id: str | None = None
+    attempt_code: str | None = None
+    created_time_utc: datetime | None = None
+    started_time_utc: datetime | None = None
+    submitted_time_utc: datetime | None = None
+    attempt_event_elapsed_time_secs: float | None = None
+    allowed_time_limit_mins: int | None = None
+    exam_default_time_limit_mins: int | None = None
+    attempt_status: str | None = None
+    exam_is_active: bool | None = None
+    is_proctored: bool | None = None
+    is_practice_exam: bool | None = None
+
+
+class VideoInteraction(FactBase):
+    video_event_id: str
+    event_time_utc: datetime
+    username: str | None = None
+    user_id: str | None = None
+    session_id: str | None = None
+    course_id: str | None = None
+    video_id: str
+    video_block_id: str | None = None
     video_code: str | None = None
-    duration_seconds: float | None = None
-    current_time_seconds: float | None = None
-    old_time_seconds: float | None = None
-    new_time_seconds: float | None = None
+    action_type: str
+    duration_s: float | None = None
+    current_time_s: float | None = None
+    old_time_s: float | None = None
+    new_time_s: float | None = None
     old_speed: float | None = None
     new_speed: float | None = None
-    saved_position: str | None = None
-    transcript_language: str | None = None
-    completion_status: str | None = None
-
-
-class DocumentEvent(FactBase):
-    document_action: str
-    document_type: str | None = None
-    document_id: str | None = None
-    asset_url: str | None = None
-    file_name: str | None = None
-    chapter: str | None = None
-    chapter_title: str | None = None
-    page_number: int | None = None
-    old_value: str | None = None
-    new_value: str | None = None
-    zoom_amount: float | None = None
-    scroll_direction: str | None = None
-    search_query: str | None = None
-    search_status: str | None = None
-    case_sensitive: bool | None = None
-    highlight_all: bool | None = None
+    speed: float | None = None
+    seek_type: str | None = None
+    watch_ratio: float | None = None
+    position_bucket_10s: int | None = None
+    position_bucket_30s: int | None = None
 
 
 class NavigationEvent(FactBase):
-    navigation_action: str
-    current_url: str | None = None
-    target_url: str | None = None
-    current_tab: int | None = None
+    navigation_event_id: str
+    event_time_utc: datetime
+    username: str | None = None
+    session_id: str | None = None
+    course_id: str | None = None
+    nav_type: str
+    nav_name: str | None = None
+    from_block: str | None = None
+    to_block: str | None = None
+    old_tab: int | None = None
+    new_tab: int | None = None
     target_tab: int | None = None
+    current_tab: int | None = None
     tab_count: int | None = None
     widget_placement: str | None = None
-    displayed_in: str | None = None
+    position: int | None = None
+    usage_key: str | None = None
+    page: str | None = None
+    referer: str | None = None
 
 
-class ExamEvent(FactBase):
-    exam_action: str
-    exam_id: int | None = None
-    exam_content_id: str | None = None
-    exam_name: str | None = None
-    exam_default_time_limit_mins: int | None = None
-    exam_is_proctored: bool | None = None
-    exam_is_practice_exam: bool | None = None
-    exam_is_active: bool | None = None
-    attempt_id: int | None = None
-    attempt_user_id: int | None = None
-    attempt_started_at: datetime | None = None
-    attempt_completed_at: datetime | None = None
-    attempt_status: str | None = None
-    attempt_elapsed_time_secs: float | None = None
-    quiz_nav_action: str | None = None
+class ContentAccessEvent(FactBase):
+    event_time_utc: datetime
+    username: str | None = None
+    session_id: str | None = None
+    course_id: str | None = None
+    content_type: str
+    chapter: str | None = None
+    page_no: int | None = None
+    direction: str | None = None
+    old_page: int | None = None
+    new_page: int | None = None
 
 
-class CourseContentEvent(FactBase):
-    content_action: str
-    content_type: str | None = None
-    block_type: str | None = None
-    block_id: str | None = None
-    content_url: str | None = None
-    target_block_id: str | None = None
-    completion_value: int | None = None
-
-
-class AuthoringEvent(FactBase):
-    authoring_action: str
-    library_key: str | None = None
-    xblock_usage_key: str | None = None
-    xblock_type: str | None = None
-    container_id: str | None = None
-    grading_policy_hash: str | None = None
-    request_get_json: dict[str, Any] | None = None
-    request_post_json: dict[str, Any] | None = None
-
-
-class AuthEvent(FactBase):
-    auth_action: str
-    provider: str | None = None
-    next_url: str | None = None
-    registration_status: str | None = None
-    has_oauth_code: bool | None = None
-
-
-class SystemEvent(FactBase):
-    system_action: str
-    noise_type: str | None = None
-    path: str | None = None
-    reason: str | None = None
+class SystemNoiseEvent(FactBase):
+    event_time_utc: datetime
+    host: str | None = None
+    ip: str | None = None
+    agent: str | None = None
+    event_type: str | None = None
+    context_path: str | None = None
+    noise_family: str
+    username_empty_flag: bool = False
 
 
 class UnknownEvent(FactBase):
-    unknown_action: str = "unknown"
-    raw_name: str | None = None
-    raw_event_type: str | None = None
+    event_id: str
+    event_time_utc: datetime | None = None
+    event_date: date | None = None
+    username: str | None = None
+    user_id: str | None = None
+    session_id: str | None = None
+    course_id: str | None = None
+    event_source: str | None = None
+    event_type: str | None = None
+    event_name: str | None = None
+    context_path: str | None = None
+    unknown_reason: str
+    route_version: str
+    replay_status: str
+    first_seen_at: datetime
+    last_replayed_at: datetime | None = None
+    resolved_at: datetime | None = None
+    resolved_route_id: str | None = None
+    raw_json: str
 
 
 FACT_MODEL_BY_TARGET: dict[str, type[FactBase]] = {
-    "silver_assessment_events": AssessmentEvent,
-    "silver_video_events": VideoEvent,
-    "silver_document_events": DocumentEvent,
-    "silver_navigation_events": NavigationEvent,
-    "silver_exam_events": ExamEvent,
-    "silver_course_content_events": CourseContentEvent,
-    "silver_authoring_events": AuthoringEvent,
-    "silver_auth_events": AuthEvent,
-    "silver_system_events": SystemEvent,
+    "problem_submissions": ProblemSubmission,
+    "problem_grades": ProblemGrade,
+    "exam_attempts": ExamAttempt,
+    "video_interactions": VideoInteraction,
+    "navigation_events": NavigationEvent,
+    "content_access_events": ContentAccessEvent,
+    "system_noise_events": SystemNoiseEvent,
     "silver_unknown_events": UnknownEvent,
 }
-

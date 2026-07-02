@@ -399,7 +399,7 @@ services:
     ports:
     - 4040:4040
     restart: unless-stopped
-    mem_limit: 1536m
+    mem_limit: 1024m
   silver-stream:
     build:
       context: .
@@ -444,7 +444,7 @@ services:
     ports:
     - 4041:4041
     restart: unless-stopped
-    mem_limit: 768m
+    mem_limit: 1536m
   gold-stream:
     build:
       context: .
@@ -623,7 +623,7 @@ services:
     - '100'
     - --skip-decode-errors
     volumes:
-    - /home/cuong/Desktop/DATN/BK_activity_logs_unzipped:/data/activity_logs:ro
+    - /home/cuong/Desktop/DATN/data_mock:/data/activity_logs:ro
     restart: 'no'
     mem_limit: 512m
     container_name: lsp-tracking-log-replayer

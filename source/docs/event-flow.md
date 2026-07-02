@@ -2,29 +2,33 @@
 
 ## End-to-End Flow
 
-1. `tracking_log_replayer` đọc JSON lines từ `BK_activity_logs_unzipped`.
-2. Producer publish raw lines vào Kafka `mooc.raw.events`.
-3. Bronze app đọc stream, enrich metadata, technical dedup, ghi `bronze.mooc_events_raw`.
-4. Silver app đọc bronze stream/table, parse `event`, route theo source-pack YAML, và tạo `silver_event_index`.
-5. Silver extractor fan-out ra các silver tables theo domain.
-6. Gold app tổng hợp feature tables như `gold.video_friction_signals` và `gold.exam_integrity_signals`.
-7. Event lỗi parse hoặc vi phạm required tối thiểu sẽ đi `mooc.dlq.events` hoặc `silver_invalid_events`.
-8. Event parse được nhưng chưa match source-pack route sẽ vẫn có `silver_event_index` row và `silver_unknown_events` row.
+1. `tracking_log_replayer` đọc JSON lines và publish raw events vào Kafka.
+2. Bronze app đọc Kafka, giữ `raw_payload` string, enrich metadata kỹ thuật, và ghi `bronze_events`.
+3. Silver app đọc `bronze_events` bằng đúng một Structured Streaming runtime:
+   - `trigger(processingTime='10 seconds')`
+   - `maxFilesPerTrigger=100`
+4. Driver chỉ load source profile, `routing.yaml`, `parsers.yaml`, quality rules, rồi compile Spark plan.
+5. Workers parse `raw_json`, `context_json`, `event_json`, attach route metadata, và build:
+   - `events_canonical`
+   - domain tables
+   - `silver_unknown_events`
+   - `silver_invalid_events`
+6. `run_silver_replay.py` là bounded manual replay path cho `silver_unknown_events`.
+7. Gold đọc từ `events_canonical` và các domain tables phù hợp.
 
-## Ingest Coverage Notes
+## Silver Outcomes
 
-- Producer allowlist tại `platform/local/kafka/config/producer_filter.yaml` đã mở rộng để thu thêm:
-  - `pdf/book` interactions
-  - navigation/page movement
-  - problem/quiz, grade/progress
-  - access/login/dashboard/session
-  - completion-related events
-- Mục tiêu là tăng độ phủ raw events cho phân tích hành vi, đồng thời vẫn giữ DLQ cho dữ liệu nhiễu/không khớp rule.
+- Match route + pass validation:
+  - ghi `events_canonical`
+  - ghi domain tables tương ứng
+- Không match route:
+  - chỉ ghi `silver_unknown_events`
+- Match route nhưng fail parse/schema/quality:
+  - chỉ ghi `silver_invalid_events`
 
-## Unknown/Dead-letter Strategy
+## Unknown Strategy
 
-- Invalid JSON tại ingress: gửi Kafka DLQ, payload giữ `raw` và `raw_value` để tra ngược nội dung gốc.
-- Parse được nhưng không match rule nghiệp vụ: ghi `silver_unknown_events` và giữ lineage trong `silver_event_index`.
-- Fail contract/required quality rule tại Silver: ghi `silver_invalid_events` và không emit domain facts.
-- DLQ Kafka giữ thêm `event_snapshot` để biết event nào bị loại, đồng thời giữ `raw`/`raw_value` để debug nhanh.
-- Hỗ trợ replay bằng cách đọc lại raw topic hoặc bronze table theo partition thời gian.
+- `silver_unknown_events` giữ `raw_json` và metadata đủ để replay.
+- Unknown event không còn emit canonical row.
+- Khi thêm route/parser mới, operator chạy replay bounded job trên unknown unresolved.
+- Unknown resolved vẫn được giữ lại ở trạng thái audit cho tới khi retention hoặc `VACUUM` dọn dữ liệu cũ.

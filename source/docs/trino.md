@@ -23,18 +23,16 @@ The bootstrap creates `delta.mooc` without forcing an external schema location, 
 
 It also registers the Silver Delta tables from `s3://lakehouse/learnlake/silver/...` so the canonical normalized layer is queryable through the metastore:
 
-- `silver_event_index`
-- `silver_assessment_events`
-- `silver_auth_events`
-- `silver_authoring_events`
-- `silver_course_content_events`
-- `silver_document_events`
-- `silver_exam_events`
-- `silver_invalid_events`
-- `silver_navigation_events`
-- `silver_system_events`
+- `events_canonical`
+- `problem_submissions`
+- `problem_grades`
+- `exam_attempts`
+- `video_interactions`
+- `navigation_events`
+- `content_access_events`
+- `system_noise_events`
 - `silver_unknown_events`
-- `silver_video_events`
+- `silver_invalid_events`
 
 ## Semantic views
 
@@ -52,7 +50,7 @@ It also registers the Silver Delta tables from `s3://lakehouse/learnlake/silver/
 ## Notes
 
 - Superset connects to Trino through `trino://superset@trino:8080/delta/mooc`.
-- Bronze and Silver are exposed as registered Delta tables, not views. In SQL Lab you can query them directly as `delta.mooc.bronze_events`, `delta.mooc.silver_event_index`, `delta.mooc.silver_video_events`, and so on.
+- Bronze and Silver are exposed as registered Delta tables, not views. In SQL Lab you can query them directly as `delta.mooc.bronze_events`, `delta.mooc.events_canonical`, `delta.mooc.video_interactions`, and so on.
 - The semantic layer is code-driven, so the bootstrap can rebuild it from the SQL files instead of manual UI configuration.
 - If the Superset API/bootstrap path does not create dashboards automatically, the dashboard layer has a Playwright fallback that logs in and creates the declared surfaces.
 - If the repo is bootstrapped locally outside the container, `TRINO_VIEWS_DIR` can point validation at the checked-in `serving/trino/views/` directory.
