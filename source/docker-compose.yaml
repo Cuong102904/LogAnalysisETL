@@ -184,6 +184,9 @@ services:
       SPARK_APP_PATH: /opt/project
       SPARK_CONF_DIR: /opt/bitnami/spark/conf
       PYTHONPATH: /opt/project/src:/opt/project
+      # OpenLineage disabled for local/dev. Enable in production by setting
+      # `OPENLINEAGE_ENABLED: 'true'` in the service environment.
+      OPENLINEAGE_ENABLED: 'false'
       OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
       OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
       OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
@@ -227,6 +230,9 @@ services:
       SPARK_APP_PATH: /opt/project
       SPARK_CONF_DIR: /opt/bitnami/spark/conf
       PYTHONPATH: /opt/project/src:/opt/project
+      # OpenLineage disabled for local/dev. Enable in production by setting
+      # `OPENLINEAGE_ENABLED: 'true'` in the service environment.
+      OPENLINEAGE_ENABLED: 'false'
       OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
       OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
       OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
@@ -265,6 +271,9 @@ services:
       SPARK_APP_PATH: /opt/project
       SPARK_CONF_DIR: /opt/bitnami/spark/conf
       PYTHONPATH: /opt/project/src:/opt/project
+      # OpenLineage disabled for local/dev. Enable in production by setting
+      # `OPENLINEAGE_ENABLED: 'true'` in the service environment.
+      OPENLINEAGE_ENABLED: 'false'
       OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
       OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
       OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
@@ -361,6 +370,9 @@ services:
       SPARK_APP_PATH: /opt/project
       SPARK_CONF_DIR: /opt/bitnami/spark/conf
       PYTHONPATH: /opt/project/src:/opt/project
+      # OpenLineage disabled for local/dev. Enable in production by setting
+      # `OPENLINEAGE_ENABLED: 'true'` in the service environment.
+      OPENLINEAGE_ENABLED: 'false'
       OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
       OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
       OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
@@ -407,6 +419,9 @@ services:
       SPARK_APP_PATH: /opt/project
       SPARK_CONF_DIR: /opt/bitnami/spark/conf
       PYTHONPATH: /opt/project/src:/opt/project
+      # OpenLineage disabled for local/dev. Enable in production by setting
+      # `OPENLINEAGE_ENABLED: 'true'` in the service environment.
+      OPENLINEAGE_ENABLED: 'false'
       OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
       OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
       OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
@@ -449,6 +464,9 @@ services:
       SPARK_APP_PATH: /opt/project
       SPARK_CONF_DIR: /opt/bitnami/spark/conf
       PYTHONPATH: /opt/project/src:/opt/project
+      # OpenLineage disabled for local/dev. Enable in production by setting
+      # `OPENLINEAGE_ENABLED: 'true'` in the service environment.
+      OPENLINEAGE_ENABLED: 'false'
       OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
       OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
       OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
