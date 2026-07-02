@@ -1,6 +1,0 @@
-{
-  "include": ["apps"],
-  "extraPaths": ["."],
-  "pythonVersion": "3.10"
-}
-

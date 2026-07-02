@@ -1,1 +1,0 @@
-"""Bronze app package."""

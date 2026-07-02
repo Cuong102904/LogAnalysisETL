@@ -1,2 +1,0 @@
-"""Raw event schema definitions."""
-

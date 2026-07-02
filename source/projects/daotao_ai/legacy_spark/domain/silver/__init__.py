@@ -1,1 +1,0 @@
-"""Silver domain logic."""

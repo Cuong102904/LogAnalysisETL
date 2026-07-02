@@ -1,1 +1,0 @@
-"""Bronze domain logic."""

@@ -1,1 +1,0 @@
-"""Spark ETL domain layer."""

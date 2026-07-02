@@ -1,2 +1,0 @@
-"""Bronze schema definitions."""
-

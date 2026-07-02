@@ -1,2 +1,0 @@
-"""Canonical Spark schema definitions."""
-

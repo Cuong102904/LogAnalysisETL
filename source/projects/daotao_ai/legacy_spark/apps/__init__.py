@@ -1,1 +1,0 @@
-"""Spark application entrypoints."""
