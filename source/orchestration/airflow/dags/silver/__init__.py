@@ -1,1 +1,0 @@
-# Silver DAG package placeholder.
