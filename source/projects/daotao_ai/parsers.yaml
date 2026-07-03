@@ -83,7 +83,7 @@ parsers:
     description: Parse book and PDF access events
     inputs:
       required: [event_time_utc, event_type, course_id]
-      optional: [username, session_id, event_json]
+      optional: [username, session_id, event_name, event_json]
     outputs:
       domain_tables: [content_access_events]
 

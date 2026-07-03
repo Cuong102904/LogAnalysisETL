@@ -163,7 +163,10 @@ routes:
       any:
         - field: event_type
           op: in
-          values: ["book", "textbook.pdf.page.scrolled"]
+          values: ["book", "textbook.pdf.page.scrolled", "textbook.pdf.display.scaled"]
+        - field: event_name
+          op: in
+          values: ["textbook.pdf.page.loaded", "textbook.pdf.page.scrolled", "textbook.pdf.display.scaled"]
     classify:
       event_group: learning
       event_subgroup: content_access

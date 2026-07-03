@@ -42,6 +42,36 @@ def _publish_dlq_record(
     _produce_with_backpressure(producer, topic, json.dumps(payload, ensure_ascii=False).encode("utf-8"))
 
 
+def _wait_for_kafka_bootstrap(
+    producer: Producer,
+    brokers: str,
+    *,
+    timeout_seconds: float,
+    poll_interval_seconds: float,
+) -> None:
+    deadline = time.monotonic() + timeout_seconds
+    last_error = "Kafka bootstrap is not ready yet"
+
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError(
+                f"Kafka bootstrap {brokers} did not become ready within {timeout_seconds:.1f}s: {last_error}"
+            )
+
+        probe_timeout = min(5.0, max(0.5, remaining))
+        try:
+            producer.list_topics(timeout=probe_timeout)
+            return
+        except Exception as exc:  # pragma: no cover - librdkafka error text varies by environment
+            last_error = str(exc)
+            print(
+                f"Waiting for Kafka bootstrap {brokers} to become ready: {last_error}",
+                flush=True,
+            )
+            time.sleep(poll_interval_seconds)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Replay static source events as raw JSON.")
     parser.add_argument("--source", required=True)
@@ -83,6 +113,18 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Skip malformed replay records instead of failing the replay.",
     )
+    parser.add_argument(
+        "--bootstrap-timeout",
+        type=float,
+        default=120.0,
+        help="Maximum number of seconds to wait for Kafka bootstrap to accept metadata requests.",
+    )
+    parser.add_argument(
+        "--bootstrap-poll-interval",
+        type=float,
+        default=2.0,
+        help="Seconds between Kafka readiness checks.",
+    )
     return parser.parse_args()
 
 
@@ -102,6 +144,12 @@ def main() -> int:
             "max.in.flight.requests.per.connection": 1,
         }
         producer = Producer(producer_config)
+        _wait_for_kafka_bootstrap(
+            producer,
+            args.brokers,
+            timeout_seconds=args.bootstrap_timeout,
+            poll_interval_seconds=args.bootstrap_poll_interval,
+        )
     previous_event_time = None
     if output_path and not args.dry_run:
         output_path.parent.mkdir(parents=True, exist_ok=True)

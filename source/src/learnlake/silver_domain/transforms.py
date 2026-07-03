@@ -180,7 +180,7 @@ def build_unknown_events(df: DataFrame) -> DataFrame:
 
 def build_invalid_events(df: DataFrame, invalid_reason_col: str = "invalid_reason") -> DataFrame:
     def _maybe_col(name: str, dtype: str = "string"):
-        return F.col(name) if name in df.columns else F.lit(None).cast(dtype)
+        return F.col(name) if name in df.columns else F.lit(None).cast(dtype).alias(name)
 
     event_id_col = None
     for candidate in ("event_id", "submission_event_id", "grade_event_id", "exam_attempt_event_id", "video_event_id"):
@@ -188,7 +188,7 @@ def build_invalid_events(df: DataFrame, invalid_reason_col: str = "invalid_reaso
             event_id_col = F.col(candidate)
             break
     if event_id_col is None:
-        event_id_col = F.lit(None).cast("string")
+        event_id_col = F.lit(None).cast("string").alias("event_id")
 
     raw_json_col = _maybe_col("raw_json")
     return df.select(
@@ -397,11 +397,13 @@ def parse_content_access_event(df: DataFrame) -> DataFrame:
         "session_id",
         "course_id",
         F.when(F.col("event_type") == "book", F.lit("book")).otherwise(F.lit("pdf")).alias("content_type"),
+        F.coalesce(_json("event_json", "$.name"), F.col("event_name")).alias("content_event_name"),
         _json("event_json", "$.chapter").alias("chapter"),
         _json_long("event_json", "$.page").cast("int").alias("page_no"),
         _json("event_json", "$.direction").alias("direction"),
-        _json_long("event_json", "$.old_page").cast("int").alias("old_page"),
-        _json_long("event_json", "$.new_page").cast("int").alias("new_page"),
+        _json_long("event_json", "$.old").cast("int").alias("old_page"),
+        _json_long("event_json", "$.new").cast("int").alias("new_page"),
+        _json_double("event_json", "$.amount").alias("zoom_amount"),
     )
 
 

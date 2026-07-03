@@ -129,11 +129,13 @@ class ContentAccessEvent(FactBase):
     session_id: str | None = None
     course_id: str | None = None
     content_type: str
+    content_event_name: str | None = None
     chapter: str | None = None
     page_no: int | None = None
     direction: str | None = None
     old_page: int | None = None
     new_page: int | None = None
+    zoom_amount: float | None = None
 
 
 class SystemNoiseEvent(FactBase):

@@ -188,6 +188,7 @@ def test_replay_to_kafka_dry_run_prints_preview_without_side_effects(
             output=str(tmp_path / "out.jsonl"),
             brokers="localhost:9092",
             topic="raw-topic",
+            dlq_topic="",
             dry_run=True,
             dry_run_limit=1,
             max_files=0,
@@ -216,3 +217,27 @@ def test_replay_to_kafka_dry_run_prints_preview_without_side_effects(
     assert "event_type" in captured.out
     assert "second" not in captured.out
     assert not (tmp_path / "out.jsonl").exists()
+
+
+def test_wait_for_kafka_bootstrap_retries_until_ready(monkeypatch) -> None:
+    attempts: list[float] = []
+    sleeps: list[float] = []
+
+    class FakeProducer:
+        def list_topics(self, timeout: float):
+            attempts.append(timeout)
+            if len(attempts) < 3:
+                raise RuntimeError("transport failure")
+            return SimpleNamespace(brokers={"broker1": object()})
+
+    monkeypatch.setattr(replay_to_kafka.time, "sleep", lambda seconds: sleeps.append(seconds))
+
+    replay_to_kafka._wait_for_kafka_bootstrap(
+        FakeProducer(),
+        "broker1:29092,broker2:29092,broker3:29092",
+        timeout_seconds=5.0,
+        poll_interval_seconds=0.25,
+    )
+
+    assert len(attempts) == 3
+    assert sleeps == [0.25, 0.25]
