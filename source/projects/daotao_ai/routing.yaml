@@ -59,7 +59,7 @@ routes:
       all:
         - field: event_type
           op: in
-          values: ["edx.grades.problem.submitted", "problem_graded"]
+          values: ["edx.grades.problem.submitted"]
     classify:
       event_group: assessment
       event_subgroup: problem_grade

@@ -55,20 +55,28 @@ class ExamAttempt(FactBase):
     exam_attempt_event_id: str
     event_time_utc: datetime
     attempt_event_type: str
-    exam_attempt_id: str
+    # Raw JSON field names (preserve original keys from event payload)
+    attempt_id: str | None = None
+    attempt_user_id: str | None = None
+    attempt_started_at: datetime | None = None
+    attempt_completed_at: datetime | None = None
+    attempt_allowed_time_limit_mins: int | None = None
+    attempt_event_elapsed_time_secs: float | None = None
+
+    # Normalized / legacy aliases (kept for compatibility)
+    exam_attempt_id: str | None = None
+    created_time_utc: datetime | None = None
+    started_time_utc: datetime | None = None
+    submitted_time_utc: datetime | None = None
+
     exam_id: str | None = None
     exam_name: str | None = None
     exam_content_id: str | None = None
     course_id: str | None = None
     username: str | None = None
     user_id: str | None = None
-    attempt_user_id: str | None = None
     session_id: str | None = None
     attempt_code: str | None = None
-    created_time_utc: datetime | None = None
-    started_time_utc: datetime | None = None
-    submitted_time_utc: datetime | None = None
-    attempt_event_elapsed_time_secs: float | None = None
     allowed_time_limit_mins: int | None = None
     exam_default_time_limit_mins: int | None = None
     attempt_status: str | None = None

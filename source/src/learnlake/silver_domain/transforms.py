@@ -283,6 +283,11 @@ def parse_special_exam_attempt(df: DataFrame) -> DataFrame:
     started_at = F.to_timestamp(_json("event_json", "$.attempt_started_at"))
     submitted_at = F.to_timestamp(_json("event_json", "$.attempt_completed_at"))
     elapsed_secs = _json_double("event_json", "$.attempt_event_elapsed_time_secs")
+    # Also expose raw JSON field names alongside normalized names so all four
+    # lifecycle events share a common, explicit schema matching the incoming
+    # event payload keys. Keep existing normalized aliases for backwards
+    # compatibility.
+    raw_attempt_id = F.coalesce(_json("event_json", "$.attempt_id"), _json("event_json", "$.exam_attempt_id")).cast("string")
     return df.select(
         F.col("event_id").alias("exam_attempt_event_id"),
         "event_time_utc",
@@ -292,7 +297,15 @@ def parse_special_exam_attempt(df: DataFrame) -> DataFrame:
         _json("event_json", "$.attempt_user_id").cast("string").alias("attempt_user_id"),
         "session_id",
         "course_id",
-        F.coalesce(_json("event_json", "$.attempt_id"), _json("event_json", "$.exam_attempt_id")).cast("string").alias("exam_attempt_id"),
+        # raw JSON names (exact)
+        raw_attempt_id.alias("attempt_id"),
+        _json("event_json", "$.attempt_started_at").alias("attempt_started_at"),
+        _json("event_json", "$.attempt_completed_at").alias("attempt_completed_at"),
+        _json_long("event_json", "$.attempt_allowed_time_limit_mins").cast("int").alias("attempt_allowed_time_limit_mins"),
+        _json_long("event_json", "$.attempt_allowed_time_limit_mins").cast("int").alias("allowed_time_limit_mins"),
+        _json_double("event_json", "$.attempt_event_elapsed_time_secs").alias("attempt_event_elapsed_time_secs"),
+        # normalized / legacy aliases kept for compatibility
+        raw_attempt_id.alias("exam_attempt_id"),
         _json("event_json", "$.exam_id").cast("string").alias("exam_id"),
         _json("event_json", "$.exam_name").alias("exam_name"),
         _json("event_json", "$.exam_content_id").alias("exam_content_id"),
@@ -301,7 +314,6 @@ def parse_special_exam_attempt(df: DataFrame) -> DataFrame:
         started_at.alias("started_time_utc"),
         submitted_at.alias("submitted_time_utc"),
         elapsed_secs.alias("attempt_event_elapsed_time_secs"),
-        _json_long("event_json", "$.attempt_allowed_time_limit_mins").cast("int").alias("allowed_time_limit_mins"),
         _json_long("event_json", "$.exam_default_time_limit_mins").cast("int").alias("exam_default_time_limit_mins"),
         _json("event_json", "$.attempt_status").alias("attempt_status"),
         _json_bool("event_json", "$.exam_is_active").alias("exam_is_active"),
