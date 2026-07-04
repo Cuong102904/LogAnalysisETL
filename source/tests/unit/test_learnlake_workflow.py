@@ -22,7 +22,7 @@ def test_workflow_definition_rejects_cycles() -> None:
     cycled = workflow.model_copy(
         update={
             "tasks": [
-                task.model_copy(update={"after": ["gold_course_activity_summary"]})
+                task.model_copy(update={"after": ["delta_maintenance"]})
                 if task.task_id == "bronze_ingest"
                 else task
                 for task in workflow.tasks

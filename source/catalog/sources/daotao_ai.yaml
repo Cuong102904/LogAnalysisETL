@@ -5,7 +5,7 @@ domain: mooc
 input:
   mode: kafka
   format: jsonl
-  path: /home/cuong/Desktop/DATN/data_mock
+  path: /home/cuong/Desktop/DATN/BK_activity_logs_unzipped
   topic: mooc.raw.events
   bootstrap_servers: broker1:29092,broker2:29092,broker3:29092
   starting_offsets: earliest
@@ -84,7 +84,5 @@ silver:
     - catalog/quality/common_learning_event_rules.yaml
     - catalog/quality/daotao_ai_rules.yaml
 
-metrics:
-  - catalog/metrics/gold_course_activity_summary.yaml
 workflows:
   - catalog/workflows/daotao_ai_pipeline.yaml

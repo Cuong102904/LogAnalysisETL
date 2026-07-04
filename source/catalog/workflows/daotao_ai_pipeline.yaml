@@ -15,16 +15,11 @@ tasks:
     args:
       - --source
       - daotao_ai
-  - task_id: gold_course_activity_summary
+  - task_id: gold_exam_ops_stream
     runner: spark
-    entrypoint: apps/spark/run_gold.py
+    entrypoint: apps/spark/run_gold_exam_ops_stream.py
     after:
       - silver_normalize
-    args:
-      - --source
-      - daotao_ai
-      - --metric
-      - gold_course_activity_summary
   - task_id: delta_maintenance
     runner: spark
     entrypoint: apps/maintenance/delta_maintenance.py

@@ -123,8 +123,8 @@ services:
     container_name: lsp-minio
     command: server --console-address ":9001" /data
     ports:
-    - 9000:9000
-    - 9001:9001
+    - ${MINIO_API_PORT:-9010}:9000
+    - ${MINIO_CONSOLE_PORT:-9011}:9001
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
@@ -139,6 +139,23 @@ services:
       interval: 10s
       timeout: 5s
       retries: 30
+  hive-metastore-db:
+    image: postgres:14
+    container_name: lsp-hive-metastore-db
+    environment:
+      POSTGRES_DB: ${HIVE_METASTORE_DB_NAME:-hive_metastore}
+      POSTGRES_USER: ${HIVE_METASTORE_DB_USER:-hive}
+      POSTGRES_PASSWORD: ${HIVE_METASTORE_DB_PASSWORD:-hivepassword}
+    volumes:
+    - hive-metastore-db-data:/var/lib/postgresql/data
+    mem_limit: 256m
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U ${HIVE_METASTORE_DB_USER:-hive} -d ${HIVE_METASTORE_DB_NAME:-hive_metastore}
+      interval: 10s
+      timeout: 5s
+      retries: 30
   hive-metastore:
     build:
       context: ./platform/local/hive-metastore
@@ -146,25 +163,33 @@ services:
     image: local/hive-metastore:dev
     container_name: lsp-hive-metastore
     user: root
+    depends_on:
+      hive-metastore-db:
+        condition: service_healthy
     environment:
       SERVICE_NAME: metastore
+      HIVE_METASTORE_PORT: ${HIVE_METASTORE_PORT:-9083}
+      HIVE_METASTORE_DB_HOST: ${HIVE_METASTORE_DB_HOST:-hive-metastore-db}
+      HIVE_METASTORE_DB_PORT: ${HIVE_METASTORE_DB_PORT:-5432}
+      HIVE_METASTORE_DB_NAME: ${HIVE_METASTORE_DB_NAME:-hive_metastore}
+      HIVE_METASTORE_DB_USER: ${HIVE_METASTORE_DB_USER:-hive}
+      HIVE_METASTORE_DB_PASSWORD: ${HIVE_METASTORE_DB_PASSWORD:-hivepassword}
+      HIVE_WAREHOUSE_DIR: ${HIVE_WAREHOUSE_DIR:-s3a://lakehouse/learnlake}
+      OBJECT_STORE_ENDPOINT: ${OBJECT_STORE_ENDPOINT:-http://minio:9000}
+      OBJECT_STORE_ACCESS_KEY: ${OBJECT_STORE_ACCESS_KEY:-minio}
+      OBJECT_STORE_SECRET_KEY: ${OBJECT_STORE_SECRET_KEY:-minio123456}
+      OBJECT_STORE_PATH_STYLE_ACCESS: ${OBJECT_STORE_PATH_STYLE_ACCESS:-true}
+      OBJECT_STORE_SSL_ENABLED: ${OBJECT_STORE_SSL_ENABLED:-false}
     ports:
-    - 9083:9083
+    - ${HIVE_METASTORE_PORT:-9083}:9083
     volumes:
     - hive-metastore-data:/opt/hive/data
     command:
     - bash
     - -lc
-    - |
-      set -e
-      cd /opt/hive/data
-      if ! /opt/hive/bin/schematool -dbType derby -info >/dev/null 2>&1; then
-        /opt/hive/bin/schematool -dbType derby -initSchema
-      fi
-      export METASTORE_PORT=9083
-      exec /opt/hive/bin/hive --skiphadoopversion --skiphbasecp --service metastore
+    - exec /opt/hive/bin/entrypoint-metastore.sh
     restart: 'no'
-    mem_limit: 512m
+    mem_limit: 384m
     healthcheck:
       test:
       - CMD-SHELL
@@ -409,10 +434,6 @@ services:
     depends_on:
       minio-init:
         condition: service_completed_successfully
-      spark-master:
-        condition: service_healthy
-      bronze-stream:
-        condition: service_started
     environment:
       SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
       SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
@@ -452,11 +473,11 @@ services:
     image: local/spark:dev
     container_name: lsp-gold-stream
     depends_on:
-      minio-init:
-        condition: service_completed_successfully
+      minio:
+        condition: service_healthy
       spark-master:
         condition: service_healthy
-      silver-stream:
+      spark-worker-1:
         condition: service_started
     environment:
       SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
@@ -482,98 +503,23 @@ services:
       SPARK_EXECUTOR_MEMORY: 1g
       PYSPARK_PYTHON: /opt/bitnami/python/bin/python
       PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
-      GOLD_APP_NAME: ${GOLD_APP_NAME:-gold_aggregator}
+      GOLD_EXAM_OPS_APP_NAME: ${GOLD_EXAM_OPS_APP_NAME:-gold_exam_ops_stream}
+      GOLD_EXAM_OPS_TRIGGER_INTERVAL_SECONDS: ${GOLD_EXAM_OPS_TRIGGER_INTERVAL_SECONDS:-10}
+      GOLD_EXAM_OPS_MAX_FILES_PER_TRIGGER: ${GOLD_EXAM_OPS_MAX_FILES_PER_TRIGGER:-2}
+      SPARK_CORES_MAX: ${SPARK_CORES_MAX:-2}
+      SPARK_EXECUTOR_INSTANCES: ${SPARK_EXECUTOR_INSTANCES:-1}
+      SPARK_EXECUTOR_CORES: ${SPARK_EXECUTOR_CORES:-1}
+      SPARK_SQL_SHUFFLE_PARTITIONS: ${SPARK_SQL_SHUFFLE_PARTITIONS:-4}
+      SPARK_DEFAULT_PARALLELISM: ${SPARK_DEFAULT_PARALLELISM:-2}
       SPARK_UI_PORT: 4042
     command:
-    - /opt/project/platform/local/spark/scripts/run_gold_stream.sh
+    - bash
+    - /opt/project/platform/local/spark/scripts/run_gold_exam_ops_stream.sh
     ports:
     - 4042:4042
+    volumes:
+    - ./:/opt/project
     restart: unless-stopped
-    mem_limit: 1536m
-  gold-alert-stream:
-    build:
-      context: .
-      dockerfile: platform/local/spark/Dockerfile
-    image: local/spark:dev
-    container_name: lsp-gold-alert-stream
-    depends_on:
-      minio-init:
-        condition: service_completed_successfully
-      spark-master:
-        condition: service_healthy
-      gold-stream:
-        condition: service_started
-    environment:
-      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
-      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
-      SPARK_APP_PATH: /opt/project
-      SPARK_CONF_DIR: /opt/bitnami/spark/conf
-      PYTHONPATH: /opt/project/src:/opt/project
-      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
-      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
-      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
-      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
-      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
-      MINIO_REGION: ${MINIO_REGION:-us-east-1}
-      S3A_PATH_STYLE_ACCESS: 'true'
-      S3A_SSL_ENABLED: 'false'
-      SPARK_DRIVER_MEMORY: 1024m
-      SPARK_EXECUTOR_MEMORY: 1g
-      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
-      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
-      GOLD_ALERTING_APP_NAME: ${GOLD_ALERTING_APP_NAME:-gold_alerting}
-      SPARK_UI_PORT: 4043
-    command:
-    - /opt/project/platform/local/spark/scripts/run_gold_alert_stream.sh
-    ports:
-    - 4043:4043
-    restart: unless-stopped
-    mem_limit: 1536m
-  # ── Batch / Replay Utilities (run-once) ────────────────────────────
-  gold-batch:
-    build:
-      context: .
-      dockerfile: platform/local/spark/Dockerfile
-    image: local/spark:dev
-    container_name: lsp-gold-batch
-    depends_on:
-      minio-init:
-        condition: service_completed_successfully
-      spark-master:
-        condition: service_healthy
-      silver-stream:
-        condition: service_started
-    environment:
-      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
-      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
-      SPARK_APP_PATH: /opt/project
-      SPARK_CONF_DIR: /opt/bitnami/spark/conf
-      PYTHONPATH: /opt/project/src:/opt/project
-      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
-      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
-      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
-      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
-      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
-      MINIO_REGION: ${MINIO_REGION:-us-east-1}
-      S3A_PATH_STYLE_ACCESS: 'true'
-      S3A_SSL_ENABLED: 'false'
-      SPARK_DRIVER_MEMORY: 1024m
-      SPARK_EXECUTOR_MEMORY: 1g
-      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
-      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
-      GOLD_BATCH_APP_NAME: ${GOLD_BATCH_APP_NAME:-gold_dashboard_serving_batch}
-      SPARK_UI_PORT: 4044
-    command:
-    - /opt/project/platform/local/spark/scripts/run_gold_batch.sh
-    ports:
-    - 4044:4044
-    restart: 'no'
     mem_limit: 1536m
   # ── Replay Smoke Test (run-once) ───────────────────────────────────
   tracking-log-replayer:
@@ -623,7 +569,7 @@ services:
     - '100'
     - --skip-decode-errors
     volumes:
-    - /home/cuong/Desktop/DATN/data_mock:/data/activity_logs:ro
+    - /home/cuong/Desktop/DATN/BK_activity_logs_unzipped:/data/activity_logs:ro
     restart: 'no'
     mem_limit: 512m
     container_name: lsp-tracking-log-replayer
@@ -639,12 +585,19 @@ services:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
+    environment:
+      TRINO_HIVE_METASTORE_URI: thrift://${DATA_PLATFORM_HOST:-100.120.19.23}:${HIVE_METASTORE_PORT:-9083}
+      TRINO_S3_ENDPOINT: http://${DATA_PLATFORM_HOST:-100.120.19.23}:${MINIO_API_PORT:-9010}
+      TRINO_S3_REGION: ${TRINO_S3_REGION:-us-east-1}
+      TRINO_S3_PATH_STYLE_ACCESS: ${TRINO_S3_PATH_STYLE_ACCESS:-true}
+      TRINO_S3_ACCESS_KEY: ${TRINO_S3_ACCESS_KEY:-minio}
+      TRINO_S3_SECRET_KEY: ${TRINO_S3_SECRET_KEY:-minio123456}
     ports:
-    - 8080:8080
+    - ${TRINO_PORT:-8080}:8080
     volumes:
     - trino-data:/data/trino
     restart: unless-stopped
-    mem_limit: 1536m
+    mem_limit: ${TRINO_MEM_LIMIT:-1536m}
     healthcheck:
       test:
       - CMD-SHELL
@@ -687,7 +640,7 @@ services:
       SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-superset_admin}
       SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
       SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
-      SUPERSET_TRINO_SQLALCHEMY_URI: ${SUPERSET_TRINO_SQLALCHEMY_URI:-trino://superset@trino:8080/delta/mooc}
+      SUPERSET_TRINO_SQLALCHEMY_URI: trino://superset@${BI_PLATFORM_HOST:-100.121.19.84}:${TRINO_PORT:-8080}/delta/mooc
     volumes:
     - superset-home:/app/superset_home
     entrypoint:
@@ -718,11 +671,11 @@ services:
       SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-superset_admin}
       SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
       SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
-      SUPERSET_TRINO_SQLALCHEMY_URI: ${SUPERSET_TRINO_SQLALCHEMY_URI:-trino://superset@trino:8080/delta/mooc}
+      SUPERSET_TRINO_SQLALCHEMY_URI: trino://superset@${BI_PLATFORM_HOST:-100.121.19.84}:${TRINO_PORT:-8080}/delta/mooc
     volumes:
     - superset-home:/app/superset_home
     ports:
-    - 8088:8088
+    - ${SUPERSET_PORT:-8088}:8088
     command:
     - sh
     - -c
@@ -744,7 +697,7 @@ services:
       SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-superset_admin}
       SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
       SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
-      SUPERSET_TRINO_SQLALCHEMY_URI: ${SUPERSET_TRINO_SQLALCHEMY_URI:-trino://superset@trino:8080/delta/mooc}
+      SUPERSET_TRINO_SQLALCHEMY_URI: trino://superset@${BI_PLATFORM_HOST:-100.121.19.84}:${TRINO_PORT:-8080}/delta/mooc
     volumes:
     - ./serving/superset/bootstrap:/bootstrap:ro
     command:
@@ -848,6 +801,7 @@ volumes:
   broker2-data: null
   broker3-data: null
   minio-data: null
+  hive-metastore-db-data: null
   hive-metastore-data: null
   trino-data: null
   superset-home: null
