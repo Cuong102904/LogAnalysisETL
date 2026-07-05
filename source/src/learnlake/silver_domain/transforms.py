@@ -21,10 +21,6 @@ def _json_bool(path_column: str, json_path: str):
     return _json(path_column, json_path).cast("boolean")
 
 
-def _first_csv_token(column_name: str):
-    return F.trim(F.element_at(F.split(F.col(column_name), ","), 1))
-
-
 def parse_base_fields(df: DataFrame) -> DataFrame:
     raw_json_col = F.col("raw_payload")
     return (
@@ -215,16 +211,16 @@ def parse_problem_check_browser(df: DataFrame) -> DataFrame:
         "user_id",
         "session_id",
         "course_id",
-        F.lit(None).cast("string").alias("problem_id"),
+        F.coalesce(module_usage_key, F.lit(None).cast("string")).alias("problem_id"),
         module_usage_key.alias("module_usage_key"),
         "module_display_name",
         F.lit("browser").alias("submission_source"),
-        _first_csv_token("event_json").alias("answer_payload"),
+        F.col("event_json").alias("answer_payload"),
         F.lit(None).cast("int").alias("attempt_no"),
-        _json("event_json", "$.success").alias("success"),
-        _json_double("event_json", "$.grade").alias("grade_raw"),
-        _json_double("event_json", "$.max_grade").alias("max_grade_raw"),
-        _json("event_json", "$.question_variant").alias("question_variant"),
+        F.lit(None).cast("string").alias("success"),
+        F.lit(None).cast("double").alias("grade_raw"),
+        F.lit(None).cast("double").alias("max_grade_raw"),
+        F.lit(None).cast("string").alias("question_variant"),
         F.lit(False).alias("in_exam_window"),
         F.lit(None).cast("string").alias("exam_attempt_id"),
     )
@@ -242,7 +238,7 @@ def parse_problem_check_server(df: DataFrame) -> DataFrame:
         "user_id",
         "session_id",
         "course_id",
-        _json("event_json", "$.problem_id").alias("problem_id"),
+        F.coalesce(_json("event_json", "$.problem_id"), F.col("module_usage_key")).alias("problem_id"),
         F.col("module_usage_key"),
         "module_display_name",
         F.lit("server").alias("submission_source"),
@@ -303,7 +299,7 @@ def parse_special_exam_attempt(df: DataFrame) -> DataFrame:
         _json("event_json", "$.attempt_completed_at").alias("attempt_completed_at"),
         _json_long("event_json", "$.attempt_allowed_time_limit_mins").cast("int").alias("attempt_allowed_time_limit_mins"),
         _json_long("event_json", "$.attempt_allowed_time_limit_mins").cast("int").alias("allowed_time_limit_mins"),
-        _json_double("event_json", "$.attempt_event_elapsed_time_secs").alias("attempt_event_elapsed_time_secs"),
+        elapsed_secs.alias("attempt_event_elapsed_time_secs"),
         # normalized / legacy aliases kept for compatibility
         raw_attempt_id.alias("exam_attempt_id"),
         _json("event_json", "$.exam_id").cast("string").alias("exam_id"),
@@ -313,7 +309,6 @@ def parse_special_exam_attempt(df: DataFrame) -> DataFrame:
         F.col("event_time_utc").alias("created_time_utc"),
         started_at.alias("started_time_utc"),
         submitted_at.alias("submitted_time_utc"),
-        elapsed_secs.alias("attempt_event_elapsed_time_secs"),
         _json_long("event_json", "$.exam_default_time_limit_mins").cast("int").alias("exam_default_time_limit_mins"),
         _json("event_json", "$.attempt_status").alias("attempt_status"),
         _json_bool("event_json", "$.exam_is_active").alias("exam_is_active"),

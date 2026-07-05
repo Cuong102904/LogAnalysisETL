@@ -1,0 +1,19 @@
+app_name: gold_assessment_stream
+
+input:
+  silver_exam_attempts_path: s3a://lakehouse/learnlake/silver/exam_attempts
+  silver_problem_submissions_path: s3a://lakehouse/learnlake/silver/problem_submissions
+
+storage:
+  assessment_exam_session_snapshot_path: s3a://lakehouse/learnlake/gold/assessment_exam_session_snapshot
+  assessment_exam_session_events_path: s3a://lakehouse/learnlake/gold/assessment_exam_session_events
+
+checkpoint:
+  path: s3a://platform/learnlake/checkpoints/gold/daotao_ai/assessment_stream
+
+streaming:
+  query_name: gold_assessment_stream
+  trigger_interval_seconds: 5
+
+options:
+  max_files_per_trigger: 2

@@ -8,6 +8,14 @@ set -euo pipefail
 : "${TRINO_S3_ACCESS_KEY:=minio}"
 : "${TRINO_S3_SECRET_KEY:=minio123456}"
 
+export AWS_ACCESS_KEY_ID="${TRINO_S3_ACCESS_KEY}"
+export AWS_SECRET_ACCESS_KEY="${TRINO_S3_SECRET_KEY}"
+export AWS_ACCESS_KEY="${TRINO_S3_ACCESS_KEY}"
+export AWS_SECRET_KEY="${TRINO_S3_SECRET_KEY}"
+export AWS_REGION="${TRINO_S3_REGION}"
+export AWS_DEFAULT_REGION="${TRINO_S3_REGION}"
+export HADOOP_CONF_DIR=/etc/trino
+
 cat > /etc/trino/catalog/hive.properties <<EOF
 connector.name=hive
 hive.non-managed-table-writes-enabled=true

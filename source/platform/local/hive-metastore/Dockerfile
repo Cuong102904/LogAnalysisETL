@@ -9,8 +9,8 @@ ADD https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.262/aw
 
 RUN apt-get update     && apt-get install -y --no-install-recommends gettext-base netcat-openbsd     && rm -rf /var/lib/apt/lists/*
 
-ENV HADOOP_HEAPSIZE=128
-ENV HADOOP_HEAPSIZE_MAX=128
+ENV HADOOP_HEAPSIZE=256
+ENV HADOOP_HEAPSIZE_MAX=256
 
 RUN set -eux;     install -D /tmp/hadoop-aws-3.3.6.jar /opt/hadoop/share/hadoop/common/lib/hadoop-aws-3.3.6.jar;     install -D /tmp/hadoop-aws-3.3.6.jar /opt/hive/lib/hadoop-aws-3.3.6.jar;     install -D /tmp/aws-java-sdk-bundle-1.12.262.jar /opt/hadoop/share/hadoop/common/lib/aws-java-sdk-bundle-1.12.262.jar;     install -D /tmp/aws-java-sdk-bundle-1.12.262.jar /opt/hive/lib/aws-java-sdk-bundle-1.12.262.jar;     rm -f /tmp/hadoop-aws-3.3.6.jar /tmp/aws-java-sdk-bundle-1.12.262.jar
 

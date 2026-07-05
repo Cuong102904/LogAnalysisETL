@@ -5,12 +5,7 @@ from pyspark.sql import functions as F
 from pyspark.sql import Window
 from pyspark.sql.column import Column
 
-ATTEMPT_EVENT_TYPES = {
-    "created": "edx.special_exam.timed.attempt.created",
-    "started": "edx.special_exam.timed.attempt.started",
-    "ready_to_submit": "edx.special_exam.timed.attempt.ready_to_submit",
-    "submitted": "edx.special_exam.timed.attempt.submitted",
-}
+from projects.daotao_ai.gold.domain.assessment import ATTEMPT_EVENT_TYPES, build_exam_windows
 
 LOAD_GROUP_KEYS = ["event_date", "bucket_10s", "course_id", "exam_id", "exam_name"]
 FLOW_GROUP_KEYS = [*LOAD_GROUP_KEYS, "flow_stage"]
@@ -109,59 +104,6 @@ def build_gold_exam_attempt_flow_10s(df: DataFrame) -> DataFrame:
     for stage_df in stage_frames[1:]:
         flow_df = flow_df.unionByName(stage_df)
     return flow_df
-
-
-def build_exam_windows(df: DataFrame) -> DataFrame:
-    attempt_id = _first_available(df, "attempt_id", "exam_attempt_id").cast("string")
-    user_id = _first_available(df, "attempt_user_id", "user_id").cast("string")
-    start_candidate = F.when(
-        F.col("attempt_event_type") == F.lit(ATTEMPT_EVENT_TYPES["started"]),
-        F.coalesce(F.col("started_time_utc"), F.col("event_time_utc")),
-    )
-    end_candidate = F.when(
-        F.col("attempt_event_type") == F.lit(ATTEMPT_EVENT_TYPES["submitted"]),
-        F.coalesce(F.col("submitted_time_utc"), F.col("event_time_utc")),
-    )
-
-    return (
-        df.select(
-            F.col("event_time_utc"),
-            F.col("course_id").alias("course_id"),
-            F.col("exam_id").cast("string").alias("exam_id"),
-            F.col("exam_name").alias("exam_name"),
-            attempt_id.alias("exam_attempt_id"),
-            user_id.alias("user_id"),
-            F.col("session_id").alias("session_id"),
-            F.col("attempt_event_type").alias("attempt_event_type"),
-            start_candidate.alias("window_start_candidate"),
-            end_candidate.alias("window_end_candidate"),
-        )
-        .filter(F.col("exam_attempt_id").isNotNull())
-        .filter(F.col("user_id").isNotNull())
-        .groupBy("course_id", "exam_id", "exam_name", "exam_attempt_id", "user_id")
-        .agg(
-            F.max(F.struct(F.col("event_time_utc"), F.col("session_id"))).getField("session_id").alias("session_id"),
-            F.min("window_start_candidate").alias("window_start_utc"),
-            F.max("window_end_candidate").alias("window_end_utc"),
-            F.min("event_time_utc").alias("first_attempt_event_time_utc"),
-            F.max("event_time_utc").alias("last_attempt_event_time_utc"),
-            F.max(
-                F.when(F.col("attempt_event_type") == F.lit(ATTEMPT_EVENT_TYPES["submitted"]), F.lit(True)).otherwise(
-                    F.lit(False)
-                )
-            ).alias("is_submitted"),
-        )
-        .withColumn(
-            "window_start_utc",
-            F.coalesce(F.col("window_start_utc"), F.col("first_attempt_event_time_utc")),
-        )
-        .withColumn(
-            "window_end_utc",
-            F.coalesce(F.col("window_end_utc"), F.col("last_attempt_event_time_utc")),
-        )
-        .filter(F.col("window_end_utc") >= F.col("window_start_utc"))
-        .withColumn("event_date", F.to_date("window_start_utc"))
-    )
 
 
 def build_gold_exam_attempt_timeline(

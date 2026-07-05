@@ -15,6 +15,16 @@ tasks:
     args:
       - --source
       - daotao_ai
+  - task_id: gold_assessment_stream
+    runner: spark
+    entrypoint: apps/spark/run_gold_assessment_stream.py
+    after:
+      - silver_normalize
+  - task_id: gold_assessment_batch
+    runner: spark
+    entrypoint: apps/spark/run_gold_assessment_batch.py
+    after:
+      - silver_normalize
   - task_id: gold_exam_ops_stream
     runner: spark
     entrypoint: apps/spark/run_gold_exam_ops_stream.py

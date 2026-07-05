@@ -1,0 +1,12 @@
+app_name: gold_assessment_batch
+
+input:
+  silver_exam_attempts_path: s3a://lakehouse/learnlake/silver/exam_attempts
+  silver_problem_submissions_path: s3a://lakehouse/learnlake/silver/problem_submissions
+  silver_problem_grades_path: s3a://lakehouse/learnlake/silver/problem_grades
+
+storage:
+  assessment_problem_daily_stats_path: s3a://lakehouse/learnlake/gold/assessment_problem_daily_stats
+
+streaming:
+  query_name: gold_assessment_batch

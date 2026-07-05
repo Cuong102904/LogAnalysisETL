@@ -117,9 +117,6 @@ routes:
         - field: context_path
           op: regex
           value: "/handler/transcript/"
-        - field: event_type
-          op: in
-          values: ["transcript_download", "transcript_request"]
     classify:
       event_group: video
       event_subgroup: transcript

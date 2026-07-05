@@ -5,6 +5,7 @@ import os
 import pytest
 
 from learnlake.ingestion import build_bronze_records
+from learnlake.ingestion.bronze_transform import build_bronze_schema
 from learnlake.runtime import build_spark, load_source_profile
 from learnlake.silver.runtime import load_silver_plan, transform_bronze_batch
 
@@ -118,7 +119,7 @@ def test_silver_runtime_static_batch_emits_canonical_domain_unknown_and_invalid(
         ],
         profile,
     )
-    bronze_df = spark.createDataFrame(bronze_records)
+    bronze_df = spark.createDataFrame(bronze_records, schema=build_bronze_schema())
     outputs = transform_bronze_batch(bronze_df, load_silver_plan("daotao_ai"))
 
     assert outputs["events_canonical"].count() == 3
@@ -135,6 +136,48 @@ def test_silver_runtime_static_batch_emits_canonical_domain_unknown_and_invalid(
     assert exam_row.exam_attempt_id == "5001"
     assert exam_row.attempt_status == "started"
     assert exam_row.attempt_event_type == "edx.special_exam.timed.attempt.started"
+
+
+def test_silver_runtime_parses_browser_problem_check_as_raw_answer_payload(spark) -> None:
+    profile = load_source_profile("daotao_ai")
+    bronze_records = build_bronze_records(
+        [
+            {
+                "time": "2026-01-18T01:51:54.625154+00:00",
+                "event_type": "problem_check",
+                "name": "problem_check",
+                "event_source": "browser",
+                "username": "20225420",
+                "session": "7f63d96fd1fb6725abaa282c2a2dc4f5",
+                "agent": "Mozilla/5.0",
+                "event": "input_29f161ce431536b1ef6b_2_1%5B%5D=choice_1",
+                "context": {
+                    "user_id": 25402,
+                    "course_id": "course-v1:SoICT+FinalExam-2025-1+IT4409",
+                    "org_id": "SoICT",
+                    "path": "/event",
+                    "module": {
+                        "usage_key": "block-v1:SoICT+FinalExam-2025-1+IT4409+type@problem+block@29f161ce431536b1ef6b",
+                        "display_name": "D2",
+                    },
+                },
+            }
+        ],
+        profile,
+    )
+    bronze_df = spark.createDataFrame(bronze_records, schema=build_bronze_schema())
+    outputs = transform_bronze_batch(bronze_df, load_silver_plan("daotao_ai"))
+
+    rows = outputs["problem_submissions"].collect()
+    assert len(rows) == 1
+    row = rows[0]
+    assert row.submission_source == "browser"
+    assert row.answer_payload == "input_29f161ce431536b1ef6b_2_1%5B%5D=choice_1"
+    assert row.problem_id == "block-v1:SoICT+FinalExam-2025-1+IT4409+type@problem+block@29f161ce431536b1ef6b"
+    assert row.success is None
+    assert row.grade_raw is None
+    assert row.max_grade_raw is None
+    assert row.question_variant is None
 
 
 def test_silver_runtime_extracts_pdf_book_content_fields_from_raw_json(spark) -> None:
@@ -205,7 +248,7 @@ def test_silver_runtime_extracts_pdf_book_content_fields_from_raw_json(spark) ->
         ],
         profile,
     )
-    bronze_df = spark.createDataFrame(bronze_records)
+    bronze_df = spark.createDataFrame(bronze_records, schema=build_bronze_schema())
     outputs = transform_bronze_batch(bronze_df, load_silver_plan("daotao_ai"))
 
     assert outputs["content_access_events"].count() == 3
