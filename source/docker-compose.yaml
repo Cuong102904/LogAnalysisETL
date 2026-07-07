@@ -180,14 +180,17 @@ services:
       OBJECT_STORE_SECRET_KEY: ${OBJECT_STORE_SECRET_KEY:-minio123456}
       OBJECT_STORE_PATH_STYLE_ACCESS: ${OBJECT_STORE_PATH_STYLE_ACCESS:-true}
       OBJECT_STORE_SSL_ENABLED: ${OBJECT_STORE_SSL_ENABLED:-false}
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      AWS_ACCESS_KEY: ${MINIO_ROOT_USER}
+      AWS_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      AWS_DEFAULT_REGION: ${MINIO_REGION:-us-east-1}
     ports:
     - ${HIVE_METASTORE_PORT:-9083}:9083
     volumes:
     - hive-metastore-data:/opt/hive/data
-    command:
-    - bash
-    - -lc
-    - exec /opt/hive/bin/entrypoint-metastore.sh
+    entrypoint:
+    - /opt/hive/bin/entrypoint-metastore.sh
     restart: 'no'
     mem_limit: 384m
     healthcheck:
@@ -228,7 +231,7 @@ services:
       PYSPARK_PYTHON: /opt/bitnami/python/bin/python
       PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
       SPARK_MODE: master
-      SPARK_PUBLIC_DNS: ${SPARK_MASTER_ADVERTISE_HOST:-100.120.19.23}
+      SPARK_PUBLIC_DNS: ${SPARK_MASTER_ADVERTISE_HOST:-100.86.60.85}
     ports:
     - 7077:7077
     - 8081:8080
@@ -409,22 +412,22 @@ services:
       MINIO_REGION: ${MINIO_REGION:-us-east-1}
       S3A_PATH_STYLE_ACCESS: 'true'
       S3A_SSL_ENABLED: 'false'
-      SPARK_DRIVER_MEMORY: 1024m
-      SPARK_EXECUTOR_MEMORY: 1g
+      SPARK_DRIVER_MEMORY: 1g
+      SPARK_EXECUTOR_MEMORY: 3g
       PYSPARK_PYTHON: /opt/bitnami/python/bin/python
       PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
       BRONZE_APP_NAME: ${BRONZE_APP_NAME:-learnlake_bronze_ingestion}
       SPARK_UI_PORT: 4040
       BRONZE_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS_DOCKER:-broker1:29092,broker2:29092,broker3:29092}
       BRONZE_STARTING_OFFSETS: ${BRONZE_STARTING_OFFSETS:-earliest}
-      BRONZE_MAX_OFFSETS_PER_TRIGGER: ${BRONZE_MAX_OFFSETS_PER_TRIGGER:-1000}
-      BRONZE_TRIGGER_PROCESSING_TIME: ${BRONZE_TRIGGER_PROCESSING_TIME:-5 seconds}
+      BRONZE_MAX_OFFSETS_PER_TRIGGER: ${BRONZE_MAX_OFFSETS_PER_TRIGGER:-100000}
+      BRONZE_TRIGGER_PROCESSING_TIME: ${BRONZE_TRIGGER_PROCESSING_TIME:-5 minutes}
     command:
     - /opt/project/platform/local/spark/scripts/run_bronze_stream.sh
     ports:
     - 4040:4040
-    restart: unless-stopped
-    mem_limit: 1024m
+    restart: 'no'
+    mem_limit: 2048m
   silver-stream:
     build:
       context: .
@@ -454,17 +457,19 @@ services:
       MINIO_REGION: ${MINIO_REGION:-us-east-1}
       S3A_PATH_STYLE_ACCESS: 'true'
       S3A_SSL_ENABLED: 'false'
-      SPARK_DRIVER_MEMORY: 768m
-      SPARK_EXECUTOR_MEMORY: 1g
+      SPARK_DRIVER_MEMORY: 1g
+      SPARK_EXECUTOR_MEMORY: 3g
       PYSPARK_PYTHON: /opt/bitnami/python/bin/python
       PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
       SILVER_APP_NAME: ${SILVER_APP_NAME:-learnlake_silver_normalization}
+      SILVER_MAX_FILES_PER_TRIGGER: ${SILVER_MAX_FILES_PER_TRIGGER:-100000}
+      SILVER_TRIGGER_PROCESSING_TIME: ${SILVER_TRIGGER_PROCESSING_TIME:-5 minutes}
       SPARK_UI_PORT: 4041
     command:
     - /opt/project/platform/local/spark/scripts/run_silver_stream.sh
     ports:
     - 4041:4041
-    restart: unless-stopped
+    restart: 'no'
     mem_limit: 1536m
   gold-stream:
     build:
@@ -499,18 +504,18 @@ services:
       MINIO_REGION: ${MINIO_REGION:-us-east-1}
       S3A_PATH_STYLE_ACCESS: 'true'
       S3A_SSL_ENABLED: 'false'
-      SPARK_DRIVER_MEMORY: 1024m
-      SPARK_EXECUTOR_MEMORY: 1g
+      SPARK_DRIVER_MEMORY: 1g
+      SPARK_EXECUTOR_MEMORY: 3g
       PYSPARK_PYTHON: /opt/bitnami/python/bin/python
       PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
       GOLD_EXAM_OPS_APP_NAME: ${GOLD_EXAM_OPS_APP_NAME:-gold_exam_ops_stream}
-      GOLD_EXAM_OPS_TRIGGER_INTERVAL_SECONDS: ${GOLD_EXAM_OPS_TRIGGER_INTERVAL_SECONDS:-10}
-      GOLD_EXAM_OPS_MAX_FILES_PER_TRIGGER: ${GOLD_EXAM_OPS_MAX_FILES_PER_TRIGGER:-2}
-      SPARK_CORES_MAX: ${SPARK_CORES_MAX:-2}
+      GOLD_EXAM_OPS_TRIGGER_INTERVAL_SECONDS: ${GOLD_EXAM_OPS_TRIGGER_INTERVAL_SECONDS:-300}
+      GOLD_EXAM_OPS_MAX_FILES_PER_TRIGGER: ${GOLD_EXAM_OPS_MAX_FILES_PER_TRIGGER:-100000}
+      SPARK_CORES_MAX: ${SPARK_CORES_MAX:-4}
       SPARK_EXECUTOR_INSTANCES: ${SPARK_EXECUTOR_INSTANCES:-1}
-      SPARK_EXECUTOR_CORES: ${SPARK_EXECUTOR_CORES:-1}
+      SPARK_EXECUTOR_CORES: ${SPARK_EXECUTOR_CORES:-4}
       SPARK_SQL_SHUFFLE_PARTITIONS: ${SPARK_SQL_SHUFFLE_PARTITIONS:-4}
-      SPARK_DEFAULT_PARALLELISM: ${SPARK_DEFAULT_PARALLELISM:-2}
+      SPARK_DEFAULT_PARALLELISM: ${SPARK_DEFAULT_PARALLELISM:-4}
       SPARK_UI_PORT: 4042
     command:
     - bash
@@ -519,7 +524,62 @@ services:
     - 4042:4042
     volumes:
     - ./:/opt/project
-    restart: unless-stopped
+    restart: 'no'
+    mem_limit: 1536m
+  gold-video-batch:
+    build:
+      context: .
+      dockerfile: platform/local/spark/Dockerfile
+    image: local/spark:dev
+    container_name: lsp-gold-video-batch
+    profiles:
+    - video-gold
+    depends_on:
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_healthy
+      spark-worker-1:
+        condition: service_started
+    environment:
+      SPARK_MASTER_HOST: ${SPARK_MASTER_ADVERTISE_HOST:-spark-master}
+      SPARK_MASTER_URL: ${SPARK_MASTER_URL:-spark://spark-master:7077}
+      SPARK_APP_PATH: /opt/project
+      SPARK_CONF_DIR: /opt/bitnami/spark/conf
+      PYTHONPATH: /opt/project/src:/opt/project
+      OPENLINEAGE_ENABLED: 'false'
+      OPENLINEAGE_NAMESPACE: ${OPENLINEAGE_NAMESPACE:-learnlake-local}
+      OPENLINEAGE_TRANSPORT_TYPE: ${OPENLINEAGE_TRANSPORT_TYPE:-http}
+      OPENLINEAGE_TRANSPORT_URL: ${OPENLINEAGE_TRANSPORT_URL:-http://marquez-api:5000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      S3A_PATH_STYLE_ACCESS: 'true'
+      S3A_SSL_ENABLED: 'false'
+      SPARK_DRIVER_MEMORY: ${GOLD_VIDEO_SPARK_DRIVER_MEMORY:-1g}
+      SPARK_EXECUTOR_MEMORY: ${GOLD_VIDEO_SPARK_EXECUTOR_MEMORY:-2g}
+      PYSPARK_PYTHON: /opt/bitnami/python/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/bitnami/python/bin/python
+      GOLD_VIDEO_APP_NAME: ${GOLD_VIDEO_APP_NAME:-gold_video_batch}
+      GOLD_VIDEO_QUERY_NAME: ${GOLD_VIDEO_QUERY_NAME:-gold_video_batch}
+      SPARK_UI_PORT: ${GOLD_VIDEO_SPARK_UI_PORT:-4045}
+      SPARK_CORES_MAX: ${SPARK_CORES_MAX:-4}
+      SPARK_EXECUTOR_INSTANCES: ${SPARK_EXECUTOR_INSTANCES:-1}
+      SPARK_EXECUTOR_CORES: ${SPARK_EXECUTOR_CORES:-4}
+      SPARK_SQL_SHUFFLE_PARTITIONS: ${SPARK_SQL_SHUFFLE_PARTITIONS:-4}
+      SPARK_DEFAULT_PARALLELISM: ${SPARK_DEFAULT_PARALLELISM:-4}
+    command:
+    - /opt/project/platform/local/spark/scripts/run_gold_video_batch.sh
+    ports:
+    - 4045:4045
+    volumes:
+    - ./:/opt/project
+    restart: 'no'
     mem_limit: 1536m
   # ── Replay Smoke Test (run-once) ───────────────────────────────────
   tracking-log-replayer:
@@ -532,6 +592,12 @@ services:
     depends_on:
       kafka-init:
         condition: service_completed_successfully
+      broker1:
+        condition: service_healthy
+      broker2:
+        condition: service_healthy
+      broker3:
+        condition: service_healthy
       bronze-stream:
         condition: service_started
     environment:
@@ -566,10 +632,10 @@ services:
     - --brokers
     - broker1:29092,broker2:29092,broker3:29092
     - --speed
-    - '100'
+    - '0'
     - --skip-decode-errors
     volumes:
-    - /home/cuong/Desktop/DATN/BK_activity_logs_unzipped:/data/activity_logs:ro
+    - /home/amira/Desktop/DEV/theinfitech/LogAnalysisETL/data_filter/BK_activity_logs/normal_days:/data/activity_logs:ro
     restart: 'no'
     mem_limit: 512m
     container_name: lsp-tracking-log-replayer
@@ -586,12 +652,17 @@ services:
       minio-init:
         condition: service_completed_successfully
     environment:
-      TRINO_HIVE_METASTORE_URI: thrift://${DATA_PLATFORM_HOST:-100.120.19.23}:${HIVE_METASTORE_PORT:-9083}
-      TRINO_S3_ENDPOINT: http://${DATA_PLATFORM_HOST:-100.120.19.23}:${MINIO_API_PORT:-9010}
+      TRINO_HIVE_METASTORE_URI: thrift://hive-metastore:9083
+      TRINO_S3_ENDPOINT: http://minio:9000
       TRINO_S3_REGION: ${TRINO_S3_REGION:-us-east-1}
       TRINO_S3_PATH_STYLE_ACCESS: ${TRINO_S3_PATH_STYLE_ACCESS:-true}
       TRINO_S3_ACCESS_KEY: ${TRINO_S3_ACCESS_KEY:-minio}
       TRINO_S3_SECRET_KEY: ${TRINO_S3_SECRET_KEY:-minio123456}
+      AWS_ACCESS_KEY_ID: ${TRINO_S3_ACCESS_KEY:-minio}
+      AWS_SECRET_ACCESS_KEY: ${TRINO_S3_SECRET_KEY:-minio123456}
+      AWS_ACCESS_KEY: ${TRINO_S3_ACCESS_KEY:-minio}
+      AWS_SECRET_KEY: ${TRINO_S3_SECRET_KEY:-minio123456}
+      AWS_DEFAULT_REGION: ${TRINO_S3_REGION:-us-east-1}
     ports:
     - ${TRINO_PORT:-8080}:8080
     volumes:
@@ -640,7 +711,7 @@ services:
       SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-superset_admin}
       SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
       SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
-      SUPERSET_TRINO_SQLALCHEMY_URI: trino://superset@${BI_PLATFORM_HOST:-100.121.19.84}:${TRINO_PORT:-8080}/delta/mooc
+      SUPERSET_TRINO_SQLALCHEMY_URI: trino://superset@trino:${TRINO_PORT:-8080}/delta/mooc
     volumes:
     - superset-home:/app/superset_home
     entrypoint:
@@ -671,7 +742,7 @@ services:
       SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-superset_admin}
       SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
       SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
-      SUPERSET_TRINO_SQLALCHEMY_URI: trino://superset@${BI_PLATFORM_HOST:-100.121.19.84}:${TRINO_PORT:-8080}/delta/mooc
+      SUPERSET_TRINO_SQLALCHEMY_URI: trino://superset@trino:${TRINO_PORT:-8080}/delta/mooc
     volumes:
     - superset-home:/app/superset_home
     ports:
@@ -684,7 +755,7 @@ services:
     mem_limit: 768m
   # ── Superset Bootstrap (run-once) ──────────────────────────────────
   superset-bootstrap:
-    image: python:3.11-slim
+    image: local/superset:dev
     container_name: lsp-superset-bootstrap
     depends_on:
       superset:
@@ -693,13 +764,15 @@ services:
         condition: service_healthy
     environment:
       PYTHONPATH: /app/pythonpath
+      SQLALCHEMY_DATABASE_URI: sqlite:////app/superset_home/superset.db
       SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
       SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-superset_admin}
       SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
       SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
-      SUPERSET_TRINO_SQLALCHEMY_URI: trino://superset@${BI_PLATFORM_HOST:-100.121.19.84}:${TRINO_PORT:-8080}/delta/mooc
+      SUPERSET_TRINO_SQLALCHEMY_URI: trino://superset@trino:${TRINO_PORT:-8080}/delta/mooc
     volumes:
     - ./serving/superset/bootstrap:/bootstrap:ro
+    - superset-home:/app/superset_home
     command:
     - python
     - /bootstrap/bootstrap_superset.py

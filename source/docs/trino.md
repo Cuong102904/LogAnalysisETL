@@ -20,6 +20,11 @@ The bootstrap creates `delta.mooc` without forcing an external schema location, 
 - `exam_integrity_signals`
 - `behavior_anomaly_signals`
 - `anomaly_alerts`
+- `gold_user_video_engagement`
+- `gold_user_video_engagement_daily`
+- `gold_course_video_summary_daily`
+- `gold_course_video_seek_hotspots_daily`
+- `gold_video_retention_by_bucket_daily`
 
 It also registers the Silver Delta tables from `s3://lakehouse/learnlake/silver/...` so the canonical normalized layer is queryable through the metastore:
 
@@ -51,6 +56,7 @@ It also registers the Silver Delta tables from `s3://lakehouse/learnlake/silver/
 
 - Superset connects to Trino through `trino://superset@trino:8080/delta/mooc`.
 - Bronze and Silver are exposed as registered Delta tables, not views. In SQL Lab you can query them directly as `delta.mooc.bronze_events`, `delta.mooc.events_canonical`, `delta.mooc.video_interactions`, and so on.
+- The video insight batch reads from `s3a://lakehouse/learnlake/silver/video_interactions` and writes five Gold Delta tables for user engagement, summary, hotspots, and retention analysis.
 - The semantic layer is code-driven, so the bootstrap can rebuild it from the SQL files instead of manual UI configuration.
 - If the Superset API/bootstrap path does not create dashboards automatically, the dashboard layer has a Playwright fallback that logs in and creates the declared surfaces.
 - If the repo is bootstrapped locally outside the container, `TRINO_VIEWS_DIR` can point validation at the checked-in `serving/trino/views/` directory.

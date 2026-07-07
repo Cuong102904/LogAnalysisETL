@@ -1,0 +1,14 @@
+app_name: gold_video_batch
+
+input:
+  silver_video_events_path: s3a://lakehouse/learnlake/silver/video_interactions
+
+storage:
+  gold_user_video_engagement_path: s3a://lakehouse/learnlake/gold/gold_user_video_engagement
+  gold_user_video_engagement_daily_path: s3a://lakehouse/learnlake/gold/gold_user_video_engagement_daily
+  gold_course_video_summary_daily_path: s3a://lakehouse/learnlake/gold/gold_course_video_summary_daily
+  gold_course_video_seek_hotspots_daily_path: s3a://lakehouse/learnlake/gold/gold_course_video_seek_hotspots_daily
+  gold_video_retention_by_bucket_daily_path: s3a://lakehouse/learnlake/gold/gold_video_retention_by_bucket_daily
+
+streaming:
+  query_name: gold_video_batch

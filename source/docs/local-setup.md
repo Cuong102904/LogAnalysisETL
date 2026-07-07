@@ -18,7 +18,7 @@ ls source/.env
 Sửa các giá trị `change-me` trong `.env` trước khi chạy (đặc biệt `MINIO_ROOT_PASSWORD`).
 
 Với mô hình 2 máy hiện tại:
-- Máy Linux `100.120.19.23` chạy Docker Compose stack.
+- Máy Linux `100.86.60.85` chạy Docker Compose stack.
 - Máy Windows `100.121.19.84` chỉ nên chạy Spark worker ngoài Docker nếu cần.
 - Các biến `KAFKA_EXTERNAL_HOST`, `KAFKA_BOOTSTRAP_SERVERS_HOST`, `SPARK_MASTER_HOST`, `SPARK_MASTER_URL`, và `AIRFLOW_CONN_SPARK_DEFAULT` nên trỏ về máy Linux, không phải `localhost`.
 
@@ -30,6 +30,23 @@ docker compose up -d --build
 ```
 
 Lệnh này bật: Kafka (3 broker), Kafka UI, MinIO, Hive Metastore, Trino, Superset, Spark Master + 3 Workers, History Server, Airflow, Bronze stream, Silver stream, Gold stream, Gold alert stream, và tracking-log-replayer.
+
+Nếu chỉ muốn chạy riêng bộ insight video Gold mới, dùng service run-once:
+
+```bash
+cd source
+docker compose --profile video-gold up --build gold-video-batch
+```
+
+Service này đọc `silver.video_events` và ghi ra các bảng Gold sau:
+
+- `gold_user_video_engagement`
+- `gold_user_video_engagement_daily`
+- `gold_course_video_summary_daily`
+- `gold_course_video_seek_hotspots_daily`
+- `gold_video_retention_by_bucket_daily`
+
+Job này là batch, mục đích là build mart/insight trước để Trino hoặc BI tool đọc lại sau. Không query Silver trực tiếp để vẽ chart.
 
 Nếu muốn xem OpenLineage graph, bật thêm profile `lineage`:
 

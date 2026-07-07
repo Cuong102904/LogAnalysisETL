@@ -18,6 +18,7 @@ def _first_env(*names: str) -> str | None:
 
 def build_spark(app_name: str) -> SparkSession:
     builder = SparkSession.builder.appName(app_name)
+    spark_user = _first_env("SPARK_USER", "USER", "LOGNAME", "USERNAME") or "spark"
 
     master_url = os.getenv("SPARK_MASTER_URL")
     if master_url:
@@ -25,6 +26,8 @@ def build_spark(app_name: str) -> SparkSession:
 
     builder = configure_openlineage(builder)
     builder = builder.config("spark.pyspark.driver.python", sys.executable)
+    builder = builder.config("spark.driver.extraJavaOptions", f"-Duser.name={spark_user}")
+    builder = builder.config("spark.executor.extraJavaOptions", f"-Duser.name={spark_user}")
     builder = builder.config(
         "spark.sql.extensions",
         "io.delta.sql.DeltaSparkSessionExtension",

@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import argparse
 
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import SparkSession
 
 from apps.spark.common import load_profile
 from learnlake.ingestion.bronze_transform import (
     transform_bronze_dataframe,
-    write_bronze_dataframe,
 )
 from learnlake.connectors import read_kafka_stream
 from learnlake.runtime import build_spark
@@ -65,18 +64,17 @@ def _run_stream(args: argparse.Namespace) -> int:
 
     output_path = args.output or profile.bronze.path
 
-    def process_batch(batch_df: DataFrame, batch_id: int) -> None:
-        write_bronze_dataframe(batch_df, output_path, profile.bronze.partition_by)
-        print(f"learnlake bronze batch_id={batch_id} wrote batch", flush=True)
-
-    (
-        bronze_df.writeStream.option("checkpointLocation", profile.bronze.checkpoint)
-        .trigger(processingTime=profile.input.trigger_processing_time or "5 seconds")
-        .foreachBatch(process_batch)
+    writer = (
+        bronze_df.writeStream.format("delta")
+        .outputMode("append")
+        .option("checkpointLocation", profile.bronze.checkpoint)
+        .option("path", output_path)
         .queryName("learnlake_bronze_ingestion")
-        .start()
-        .awaitTermination()
+        .trigger(availableNow=True)
     )
+    if profile.bronze.partition_by:
+        writer = writer.partitionBy(*profile.bronze.partition_by)
+    writer.start().awaitTermination()
     return 0
 
 

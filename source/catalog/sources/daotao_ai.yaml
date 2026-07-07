@@ -5,10 +5,11 @@ domain: mooc
 input:
   mode: kafka
   format: jsonl
-  path: /home/cuong/Desktop/DATN/data_filter
+  path: /home/amira/Desktop/DEV/theinfitech/LogAnalysisETL/data_filter/BK_activity_logs/normal_days
   topic: mooc.raw.events
   bootstrap_servers: broker1:29092,broker2:29092,broker3:29092
   starting_offsets: earliest
+  max_offsets_per_trigger: 100000
   event_time_field: time
   event_type_field: event_type
 
@@ -23,8 +24,8 @@ bronze:
 silver:
   runtime:
     checkpoint: s3a://platform/learnlake/checkpoints/silver/daotao_ai/runtime
-    trigger_processing_time: 10 seconds
-    max_files_per_trigger: 10
+    trigger_processing_time: 5 minutes
+    max_files_per_trigger: 100000
   canonical:
     table: events_canonical
     path: s3a://lakehouse/learnlake/silver/events_canonical

@@ -16,6 +16,30 @@ export AWS_REGION="${TRINO_S3_REGION}"
 export AWS_DEFAULT_REGION="${TRINO_S3_REGION}"
 export HADOOP_CONF_DIR=/etc/trino
 
+cat > /etc/trino/s3-security-mapping.json <<EOF
+{
+  "mappings": [
+    {
+      "prefix": "s3://lakehouse/learnlake/",
+      "accessKey": "${TRINO_S3_ACCESS_KEY}",
+      "secretKey": "${TRINO_S3_SECRET_KEY}",
+      "endpoint": "${TRINO_S3_ENDPOINT}",
+      "region": "${TRINO_S3_REGION}"
+    },
+    {
+      "prefix": "s3://platform/learnlake/",
+      "accessKey": "${TRINO_S3_ACCESS_KEY}",
+      "secretKey": "${TRINO_S3_SECRET_KEY}",
+      "endpoint": "${TRINO_S3_ENDPOINT}",
+      "region": "${TRINO_S3_REGION}"
+    },
+    {
+      "useClusterDefault": true
+    }
+  ]
+}
+EOF
+
 cat > /etc/trino/catalog/hive.properties <<EOF
 connector.name=hive
 hive.non-managed-table-writes-enabled=true
@@ -27,6 +51,8 @@ s3.region=${TRINO_S3_REGION}
 s3.path-style-access=${TRINO_S3_PATH_STYLE_ACCESS}
 s3.aws-access-key=${TRINO_S3_ACCESS_KEY}
 s3.aws-secret-key=${TRINO_S3_SECRET_KEY}
+s3.security-mapping.enabled=true
+s3.security-mapping.config-file=/etc/trino/s3-security-mapping.json
 s3.max-connections=500
 EOF
 
@@ -40,6 +66,8 @@ s3.region=${TRINO_S3_REGION}
 s3.path-style-access=${TRINO_S3_PATH_STYLE_ACCESS}
 s3.aws-access-key=${TRINO_S3_ACCESS_KEY}
 s3.aws-secret-key=${TRINO_S3_SECRET_KEY}
+s3.security-mapping.enabled=true
+s3.security-mapping.config-file=/etc/trino/s3-security-mapping.json
 s3.max-connections=500
 delta.register-table-procedure.enabled=true
 EOF

@@ -354,10 +354,19 @@ def build_assessment_problem_daily_stats(
     *,
     course_mode_submissions_df: DataFrame | None = None,
 ) -> DataFrame:
-    classified_submissions = classify_problem_submissions(submissions_df, exam_windows_df)
-    classified_grades = classify_problem_grades(grades_df, exam_windows_df)
+    classified_submissions = classify_problem_submissions(submissions_df, exam_windows_df).withColumn(
+        "event_date",
+        F.to_date("event_time_utc"),
+    )
+    classified_grades = classify_problem_grades(grades_df, exam_windows_df).withColumn(
+        "event_date",
+        F.to_date("event_time_utc"),
+    )
     course_mode_source = course_mode_submissions_df if course_mode_submissions_df is not None else submissions_df
-    course_mode_classified = classify_problem_submissions(course_mode_source, exam_windows_df)
+    course_mode_classified = classify_problem_submissions(course_mode_source, exam_windows_df).withColumn(
+        "event_date",
+        F.to_date("event_time_utc"),
+    )
 
     group_keys = ["event_date", "course_id", "problem_id", "context"]
     submission_stats = (

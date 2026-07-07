@@ -6,13 +6,13 @@ set -euo pipefail
   --deploy-mode client \
   --driver-memory "${SPARK_DRIVER_MEMORY:-1g}" \
   --executor-memory "${SPARK_EXECUTOR_MEMORY:-2g}" \
-  --name "${GOLD_ASSESSMENT_BATCH_APP_NAME:-gold_assessment_batch}" \
+  --name "${GOLD_VIDEO_APP_NAME:-gold_video_batch}" \
   --conf spark.executorEnv.PYTHONPATH=/opt/project/src:/opt/project \
-  --conf "spark.ui.port=${SPARK_UI_PORT:-4044}" \
+  --conf "spark.ui.port=${SPARK_UI_PORT:-4045}" \
   --conf "spark.eventLog.enabled=false" \
   --conf "spark.cores.max=${SPARK_CORES_MAX:-4}" \
   --conf "spark.executor.instances=${SPARK_EXECUTOR_INSTANCES:-1}" \
   --conf "spark.executor.cores=${SPARK_EXECUTOR_CORES:-4}" \
   --conf "spark.sql.shuffle.partitions=${SPARK_SQL_SHUFFLE_PARTITIONS:-4}" \
   --conf "spark.default.parallelism=${SPARK_DEFAULT_PARALLELISM:-4}" \
-  /opt/project/apps/spark/run_gold_assessment_batch.py "$@"
+  /opt/project/apps/spark/run_gold_video_batch.py "$@"

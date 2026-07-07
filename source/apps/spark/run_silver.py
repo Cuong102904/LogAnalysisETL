@@ -51,9 +51,11 @@ def main() -> int:
             flush=True,
         )
 
+    # Run Silver as a bounded backlog reader, same pattern as Bronze.
+    # Spark will drain the available Delta input, write outputs, then exit.
     (
         bronze_stream.writeStream.option("checkpointLocation", plan.profile.silver.checkpoint)
-        .trigger(processingTime=plan.profile.silver.runtime.trigger_processing_time)
+        .trigger(availableNow=True)
         .foreachBatch(process_batch)
         .queryName("learnlake_silver_normalization")
         .start()

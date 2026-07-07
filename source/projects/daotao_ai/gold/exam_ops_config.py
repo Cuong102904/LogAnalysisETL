@@ -106,13 +106,13 @@ class GoldExamOpsConfig:
                 config,
                 "streaming",
                 "trigger_interval_seconds",
-                default=5,
+                default=300,
             ),
             max_files_per_trigger=env_int(
                 "GOLD_EXAM_OPS_MAX_FILES_PER_TRIGGER",
                 config,
                 "options",
                 "max_files_per_trigger",
-                default=2,
+                default=100000,
             ),
         )

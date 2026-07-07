@@ -15,7 +15,7 @@ TRINO_SOURCE = os.environ.get("TRINO_BOOTSTRAP_SOURCE", "trino-bootstrap")
 TRINO_CATALOG = os.environ.get("TRINO_BOOTSTRAP_CATALOG", "delta")
 TRINO_SCHEMA = os.environ.get("TRINO_BOOTSTRAP_SCHEMA", "mooc")
 TRINO_VIEWS_DIR = Path(os.environ.get("TRINO_VIEWS_DIR", "/views"))
-TRINO_BOOTSTRAP_TABLE_LOCATION_SCHEME = os.environ.get("TRINO_BOOTSTRAP_TABLE_LOCATION_SCHEME", "s3a")
+TRINO_BOOTSTRAP_TABLE_LOCATION_SCHEME = os.environ.get("TRINO_BOOTSTRAP_TABLE_LOCATION_SCHEME", "s3")
 TRINO_BOOTSTRAP_TABLE_LOCATION_ROOT = os.environ.get(
     "TRINO_BOOTSTRAP_TABLE_LOCATION_ROOT",
     f"{TRINO_BOOTSTRAP_TABLE_LOCATION_SCHEME}://lakehouse/learnlake",
@@ -107,6 +107,36 @@ REGISTERED_TABLES: tuple[TableRegistration, ...] = (
     TableRegistration(
         "gold_exam_question_metrics",
         f"{TRINO_BOOTSTRAP_TABLE_LOCATION_ROOT}/gold/gold_exam_question_metrics/",
+        "gold",
+    ),
+    TableRegistration(
+        "assessment_problem_daily_stats",
+        f"{TRINO_BOOTSTRAP_TABLE_LOCATION_ROOT}/gold/assessment_problem_daily_stats/",
+        "gold",
+    ),
+    TableRegistration(
+        "gold_user_video_engagement",
+        f"{TRINO_BOOTSTRAP_TABLE_LOCATION_ROOT}/gold/gold_user_video_engagement/",
+        "gold",
+    ),
+    TableRegistration(
+        "gold_user_video_engagement_daily",
+        f"{TRINO_BOOTSTRAP_TABLE_LOCATION_ROOT}/gold/gold_user_video_engagement_daily/",
+        "gold",
+    ),
+    TableRegistration(
+        "gold_course_video_summary_daily",
+        f"{TRINO_BOOTSTRAP_TABLE_LOCATION_ROOT}/gold/gold_course_video_summary_daily/",
+        "gold",
+    ),
+    TableRegistration(
+        "gold_course_video_seek_hotspots_daily",
+        f"{TRINO_BOOTSTRAP_TABLE_LOCATION_ROOT}/gold/gold_course_video_seek_hotspots_daily/",
+        "gold",
+    ),
+    TableRegistration(
+        "gold_video_retention_by_bucket_daily",
+        f"{TRINO_BOOTSTRAP_TABLE_LOCATION_ROOT}/gold/gold_video_retention_by_bucket_daily/",
         "gold",
     ),
 )

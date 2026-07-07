@@ -145,7 +145,7 @@ def run(config: AssessmentStreamConfig) -> None:
     )
     (
         exam_attempts_stream.writeStream.option("checkpointLocation", config.checkpoint_path)
-        .trigger(processingTime=f"{config.trigger_interval_seconds} seconds")
+        .trigger(availableNow=True)
         .foreachBatch(lambda batch_df, batch_id: _process_batch(batch_df, batch_id, config))
         .queryName(config.query_name)
         .start()

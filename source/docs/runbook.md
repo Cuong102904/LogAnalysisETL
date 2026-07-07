@@ -50,6 +50,24 @@ docker compose exec -T spark-master \
 5. Event fail parse/schema/quality chỉ xuất hiện ở `silver_invalid_events`.
 6. Replay chuyển unknown resolved sang canonical/domain mà không tạo duplicate `event_id`.
 
+## Video Gold Insight
+
+- Chạy batch tạo mart video insight:
+
+```bash
+cd source
+docker compose --profile video-gold up --build gold-video-batch
+```
+
+- Job này đọc `silver.video_events` và tạo:
+  - `gold_user_video_engagement`
+  - `gold_user_video_engagement_daily`
+  - `gold_course_video_summary_daily`
+  - `gold_course_video_seek_hotspots_daily`
+  - `gold_video_retention_by_bucket_daily`
+
+- Dùng khi cần refresh insight/dashboard video theo ngày hoặc theo một range batch.
+
 ## Cleanup
 
 - Unknown resolved records vẫn được giữ để audit.
