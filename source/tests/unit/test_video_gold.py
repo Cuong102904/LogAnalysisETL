@@ -36,7 +36,7 @@ def test_video_config_loads_defaults() -> None:
     config = VideoGoldConfig.from_env()
 
     assert config.app_name == "gold_video_batch"
-    assert config.input_video_events_path.endswith("/silver/video_events")
+    assert config.input_video_events_path.endswith("/silver/video_interactions")
     assert config.output_user_video_engagement_path.endswith("/gold/gold_user_video_engagement")
     assert config.output_course_video_summary_daily_path.endswith("/gold/gold_course_video_summary_daily")
 
@@ -149,6 +149,7 @@ def test_video_gold_tables_aggregate_video_events(spark) -> None:
     assert user_video_rows[("1", "course-a", "video-1")].event_count == 4
     assert user_video_rows[("1", "course-a", "video-1")].seek_count == 1
     assert user_video_rows[("1", "course-a", "video-1")].completed_flag == 1
+    assert user_video_rows[("1", "course-a", "video-1")].video_length_s == 120.0
 
     daily_user_video_rows = {
         (row.event_date.isoformat(), row.user_id, row.course_id, row.video_id): row
@@ -165,6 +166,7 @@ def test_video_gold_tables_aggregate_video_events(spark) -> None:
     assert summary.seek_count == 2
     assert summary.completed_users == 1
     assert summary.completion_rate == 0.5
+    assert summary.video_length_s == 120.0
 
     hotspot_rows = {
         (row.event_date.isoformat(), row.course_id, row.video_id, row.position_bucket_30s): row

@@ -68,6 +68,9 @@ docker compose --profile video-gold up --build gold-video-batch
 
 - Dùng khi cần refresh insight/dashboard video theo ngày hoặc theo một range batch.
 
+- Guide để viết caption và bố cục slide cho dashboard này:
+  - `docs/video_seek_dashboard_storytelling.md`
+
 ## Cleanup
 
 - Unknown resolved records vẫn được giữ để audit.
